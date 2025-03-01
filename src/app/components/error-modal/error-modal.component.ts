@@ -27,6 +27,7 @@ export class ErrorModalComponent implements OnChanges {
     }
   }
 
+  
   closeModal() {
     const modal = document.getElementById('login-form__errorModal') as HTMLDialogElement;
     if (modal) {
