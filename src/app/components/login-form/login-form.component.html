@@ -24,6 +24,7 @@
   >
       <button
         class="btn max-w-32"
+        [disabled]="!loginForm.valid"
         [ngClass]="{
           'btn-disabled':
             !loginForm.get('login')?.value ||
