@@ -8,7 +8,7 @@ import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLogin
 import { Router } from '@angular/router';
 import { LoginAsAdminBtnComponent } from "../components/login-as-admin-btn/login-as-admin-btn.component";
 import { ErrorModalComponent } from "../components/error-modal/error-modal.component";
-import { throttleTime } from 'rxjs/operators';
+
 @Component({
   selector: 'app-login',
   imports: [
@@ -54,7 +54,6 @@ export class LoginComponent {
     if (this.isLoading) return;
     this.isLoading = true;
     const result = this.authService.logIn($event);
-    //disable button
     result.subscribe({
       next: (response) => {
         this.isLoading = false;
@@ -71,11 +70,7 @@ export class LoginComponent {
         this.isLoading = false;
         this.error = err;
         console.log(err);
-      },
-      complete: () => {
-        //enable button
       }
-      
     });
   }
 }
