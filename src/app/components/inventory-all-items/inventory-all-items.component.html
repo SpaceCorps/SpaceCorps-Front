@@ -6,6 +6,9 @@
         @for (item of categorizedItems.get(category); track item.id) {
           <div class="card bg-base-100 hover:cursor-grab hover:bg-base-300 dragstart:cursor-grabbing"
                (click)="itemSelected.emit(item)"
+               (dragstart)="onDragStart($event, item)"
+               (dragover)="onDragOver($event)"
+               (drop)="onDrop($event)"
                draggable="true">
             <div class="card-body">
               <div class="card-title">

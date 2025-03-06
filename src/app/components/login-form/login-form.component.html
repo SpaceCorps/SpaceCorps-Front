@@ -24,6 +24,7 @@
   >
       <button
         class="btn max-w-32"
+        [disabled]="!loginForm.pending"
         [ngClass]="{
           'btn-disabled':
             !loginForm.get('email')?.value ||
