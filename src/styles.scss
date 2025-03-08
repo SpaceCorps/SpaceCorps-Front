@@ -1,5 +1,40 @@
 @use "tailwindcss";
 
 @plugin "daisyui" {
-  themes: dark --default, light, black, dracula, night, sunset, business, abyss, winter, acid
-};
+  themes: dark, light, black, dracula, night, sunset, business, abyss, winter, acid
+} ;
+
+@plugin "daisyui/theme" {
+  name: sc_main;
+  default: true;
+  prefersdark: false;
+  color-scheme: dark;
+  --color-base-100: oklch(19.38% 0.0303 44.27);
+  --color-base-200: oklch(19.69% 0.0133 18.34);
+  --color-base-300: oklch(13.18% 0.0173 53.31);
+  --color-base-content: oklch(96% 0.059 95.617);
+  --color-primary: rgba(178, 84, 18, 1);
+  --color-primary-content: oklch(96% 0.059 95.617);
+  --color-secondary: oklch(55% 0.163 48.998);
+  --color-secondary-content: oklch(25% 0.092 26.042);
+  --color-accent: oklch(83% 0.128 66.29);
+  --color-accent-content: oklch(26% 0.079 36.259);
+  --color-neutral: oklch(44% 0.11 240.79);
+  --color-neutral-content: oklch(98% 0.003 247.858);
+  --color-info: oklch(58% 0.158 241.966);
+  --color-info-content: oklch(30% 0.056 229.695);
+  --color-success: oklch(68% 0.169 237.323);
+  --color-success-content: oklch(27% 0.046 192.524);
+  --color-warning: oklch(66% 0.179 58.318);
+  --color-warning-content: oklch(26% 0.079 36.259);
+  --color-error: oklch(47% 0.157 37.304);
+  --color-error-content: oklch(28% 0.109 3.907);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
