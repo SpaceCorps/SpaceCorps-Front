@@ -1,17 +1,18 @@
-import { Injectable, isDevMode } from '@angular/core';
-import { UserCredentialsCreateRequest } from '../models/auth/UserCredentialsCreateRequest';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLoginRequest';
-import { GetPlayerInfoRequest } from '../models/player/GetPlayerInfoRequest';
-import { PlayerData } from '../models/player/PlayerData';
-import { SpaceMapDataEntry } from '../models/dataEntries/SpaceMapDataEntry';
-import { UpdateSpaceMapDataEntryRequest } from '../models/dataEntries/UpdateSpaceMapDataEntryRequest';
-import { CreateStaticEntityRequest } from '../models/entity/CreateStaticEntityRequest';
-import { DeleteStaticEntityRequest } from '../models/entity/DeleteStaticEntityRequest';
-import { ServerInfo } from '../models/servers/ServerInfo';
-import { BuyItemRequest } from '../models/player/BuyItemRequest';
-import { Inventory } from '../models/player/Inventory';
-import { SellableItems } from '../models/player/Items';
+import {Injectable, isDevMode} from '@angular/core';
+import {UserCredentialsCreateRequest} from '../models/auth/UserCredentialsCreateRequest';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {UserCredentialsLoginRequest} from '../models/auth/UserCredentialsLoginRequest';
+import {GetPlayerInfoRequest} from '../models/player/GetPlayerInfoRequest';
+import {PlayerData} from '../models/player/PlayerData';
+import {SpaceMapDataEntry} from '../models/dataEntries/SpaceMapDataEntry';
+import {UpdateSpaceMapDataEntryRequest} from '../models/dataEntries/UpdateSpaceMapDataEntryRequest';
+import {CreateStaticEntityRequest} from '../models/entity/CreateStaticEntityRequest';
+import {DeleteStaticEntityRequest} from '../models/entity/DeleteStaticEntityRequest';
+import {ServerInfo} from '../models/servers/ServerInfo';
+import {BuyItemRequest} from '../models/player/BuyItemRequest';
+import {Inventory} from '../models/player/Inventory';
+import {SellableItems} from '../models/player/Items';
+import {EquipLaserAmpRequest} from '../models/player/EquipLaserAmpRequest';
 
 @Injectable({
   providedIn: 'root',
@@ -54,7 +55,7 @@ export class ApiService {
   postSpaceMapDataEntry(mapName: string) {
     return this.http.post<SpaceMapDataEntry>(
       `${this.url}/SpaceMapDataEntries/Add`,
-      { name: mapName }
+      {name: mapName}
     );
   }
 
@@ -90,7 +91,7 @@ export class ApiService {
   ) {
     return this.http.delete(
       `${this.url}/SpaceMapDataEntries/deleteStaticEntityFromSpaceMap/${mapName}`,
-      { body: staticEntity }
+      {body: staticEntity}
     );
   }
 
@@ -108,7 +109,7 @@ export class ApiService {
   deleteItemEntry<T extends SellableItems>(item: T) {
     return this.http.delete(
       `${this.url}/ItemEntries/${item.itemType.replace('Entrie', '')}s/Delete`,
-      { body: { id: item.id } }
+      {body: {id: item.id}}
     );
   }
 
@@ -123,15 +124,19 @@ export class ApiService {
   }
 
   handleUserEditorCommand(command: string) {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http.post<void>(
       `${this.url}/Players/UserEditorCommand`,
       JSON.stringify(command),
-      { headers, responseType: "text" as "json" }
+      {headers, responseType: "text" as "json"}
     );
   }
 
   getUserInventory(username: string) {
     return this.http.get<Inventory>(`${this.url}/Players/Inventory/${username}`);
+  }
+
+  equipLaserAmp(equipLaserAmpRequest: EquipLaserAmpRequest) {
+    return this.http.post(`${this.url}/Players/EquipLaserAmp`, equipLaserAmpRequest, {});
   }
 }

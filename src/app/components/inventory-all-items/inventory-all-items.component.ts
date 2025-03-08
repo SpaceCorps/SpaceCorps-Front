@@ -17,7 +17,7 @@ export class InventoryAllItemsComponent implements OnInit {
   }) items?: SellableItems[] = [];
 
   @Output() itemSelected: EventEmitter<SellableItems> = new EventEmitter<SellableItems>();
-
+  @Output() itemDragged: EventEmitter<SellableItems> = new EventEmitter<SellableItems>();
 
   constructor(private apiService: ApiService, private authService: AuthService) {
 
@@ -62,5 +62,18 @@ export class InventoryAllItemsComponent implements OnInit {
     this.categorizedItems.forEach((items) => {
       items.sort((a, b) => a.name.localeCompare(b.name));
     });
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent) {
+
+  }
+
+  onDragStart(event: DragEvent, item: SellableItems) {
+    event.dataTransfer?.setData('text/plain', JSON.stringify(item));
+    this.itemDragged.emit(item);
   }
 }

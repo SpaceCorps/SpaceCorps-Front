@@ -3,15 +3,23 @@
     <div class="card-body">
       <h2 class="card-title">Your Inventory</h2>
       <div class="flex flex-col gap-4">
-        <app-inventory-active-ship [activeShipItemName]="inventory?.activeShipName"></app-inventory-active-ship>
-        <app-inventory-selected-item [selectedItem]="selectedItem"></app-inventory-selected-item>
+        <app-inventory-active-ship
+          [activeShipItemName]="inventory?.activeShipName">
+        </app-inventory-active-ship>
+        <app-inventory-selected-item
+          [selectedItem]="selectedItem">
+        </app-inventory-selected-item>
       </div>
     </div>
   </section>
   <section class="card bg-base-100 shadow-xl w-full h-full flex-1 overflow-y-auto overflow-x-auto">
     <div class="card-body">
       <h2 class="card-title">All Items</h2>
-      <app-inventory-all-items [items]="inventory?.items" (itemSelected)="handleItemSelection($event)">
+      <app-inventory-all-items
+        [items]="inventory?.items"
+        (itemSelected)="handleItemSelection($event)"
+        (itemDragged)="handleItemDragged($event)"
+      >
       </app-inventory-all-items>
     </div>
   </section>
