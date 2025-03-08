@@ -1,14 +1,10 @@
-import { Component } from '@angular/core';
-import { NavbarComponent } from '../components/navbar/navbar.component';
-import { GithubTimelineComponent } from '../components/github-timeline/github-timeline.component';
+import {Component} from '@angular/core';
 
 @Component({
-    selector: 'app-home',
-    imports: [
-        GithubTimelineComponent
-    ],
-    templateUrl: './home.component.html',
-    styleUrl: './home.component.scss'
+  selector: 'app-home',
+  imports: [],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss'
 })
 export class HomeComponent {
 
