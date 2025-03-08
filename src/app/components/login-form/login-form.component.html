@@ -9,8 +9,8 @@
 >
   <input
     type="text"
-    placeholder="Enter your email..."
-    formControlName="email"
+    placeholder="Enter your email or username..."
+    formControlName="login"
     class="input input-bordered"
   >
   <input
@@ -24,15 +24,14 @@
   >
       <button
         class="btn max-w-32"
-        [disabled]="!loginForm.pending"
+        [disabled]="!loginForm.valid"
         [ngClass]="{
           'btn-disabled':
-            !loginForm.get('email')?.value ||
-            !loginForm.get('password')?.value,
+            !loginForm.get('login')?.value ||
+            !loginForm.get('password')?.value
         }">
         Login
       </button>
-
       <a
         class="btn max-w-32"
         (click)="toggleView()"
