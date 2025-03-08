@@ -52,4 +52,12 @@
       </ul>
     </details>
   </li>
+  <li>
+    <details [open]="openItem === 'Patch info'" (click)="toggleItem('Patch info')" (mouseenter)="openItemOnHover('Patch info')">
+      <summary>Patch info</summary>
+      <ul class="bg-base-200">
+        <li><a routerLink="/">Patch info</a></li>
+      </ul>
+    </details>
+  </li>
 </ul>

@@ -4,8 +4,8 @@ export const routes: Routes = [{
   path: '',
   pathMatch: 'full',
   loadComponent: async () => {
-    const module = await import('./home/home.component');
-    return module.HomeComponent;
+    const module = await import('./login/login.component');
+    return module.LoginComponent;
   },
 },
   {

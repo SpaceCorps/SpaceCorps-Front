@@ -1,0 +1,7 @@
+$bg-image: url('/public/images/backGround.png');
+head {
+    background-image: $bg-image;
+    background-size: cover; /* Розтягне зображення на весь екран */
+    background-position: center; /* Центрує зображення */
+    background-repeat: no-repeat; /* Забороняє повторення */
+}
