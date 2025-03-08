@@ -2,18 +2,18 @@
 
 @plugin "daisyui" {
   themes: dark, light, black, dracula, night, sunset, business, abyss, winter, acid
-};
+} ;
 
 @plugin "daisyui/theme" {
-  name: "sc_main";
+  name: sc_main;
   default: true;
   prefersdark: false;
-  color-scheme: "dark";
-  --color-base-100: oklch(21% 0.006 56.043);
-  --color-base-200: oklch(26% 0 0);
-  --color-base-300: oklch(27% 0.006 286.033);
+  color-scheme: dark;
+  --color-base-100: oklch(19.38% 0.0303 44.27);
+  --color-base-200: oklch(19.69% 0.0133 18.34);
+  --color-base-300: oklch(13.18% 0.0173 53.31);
   --color-base-content: oklch(96% 0.059 95.617);
-  --color-primary: oklch(75% 0.183 55.934);
+  --color-primary: rgba(178, 84, 18, 1);
   --color-primary-content: oklch(96% 0.059 95.617);
   --color-secondary: oklch(55% 0.163 48.998);
   --color-secondary-content: oklch(25% 0.092 26.042);
