@@ -8,6 +8,7 @@ import {Component, OnInit} from '@angular/core';
 })
 export class ThemePickerComponent implements OnInit {
   themes = [
+    "sc-default",
     "dark",
     "light",
     "abyss",
