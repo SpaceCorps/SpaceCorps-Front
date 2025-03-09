@@ -6,7 +6,7 @@
   <nav class="mb-6">
     <!-- Dropdown for selecting chapter -->
     <label for="chapter-select" class="block mb-2 text-lg font-medium"
-      >Choose a Chapter:</label
+    >Choose a Chapter:</label
     >
     <select
       id="chapter-select"
@@ -14,21 +14,15 @@
       [(ngModel)]="selectedChapterIndex"
       (change)="selectChapter(selectedChapterIndex)"
     >
-      <option *ngFor="let chapter of chapters; let i = index" [value]="i">
-        {{ chapter.title }}
-      </option>
+      @for (chapter of chapters; track $index) {
+        <option [value]="$index">{{ chapter.title }}</option>
+      }
     </select>
   </nav>
 
   <!-- Chapter content -->
   <article class="chapter-content prose bg-base-200 p-6 rounded-lg shadow">
-    <h2 class="text-2xl font-semibold mb-4">
-      {{ chapters[selectedChapterIndex].title }}
-    </h2>
-    @for (paragraph of chapters[selectedChapterIndex].content; track $index) {}
-    <p class="mb-6">
-      {{ chapters[selectedChapterIndex].content }}
-    </p>
+    <markdown [src]="getChapterLink(selectedChapterIndex)"></markdown>
   </article>
 
   <!-- Navigation buttons -->
