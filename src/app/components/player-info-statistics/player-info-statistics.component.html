@@ -1,10 +1,12 @@
 <div class="card card-side bg-base-100 shadow-xl">
   <div class="card-body">
-    <ul class="stats stats-vertical shadow">
-      <li *ngFor="let category of categories" class="stat">
-        <div class="stat-title">{{ category }}</div>
-        <div class="stat-value">{{ getCategoryValue(category) }}</div>
-      </li>
+    <ul class="shadow flex flex-col">
+      @for (category of categories; track category) {
+        <li class="flex flex-row gap-4 items-center">
+          <div class="stat-title">{{ category }}</div>
+          <div class="stat-value">{{ getCategoryValue(category) }}</div>
+        </li>
+      }
     </ul>
   </div>
 </div>
