@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { NgForOf } from '@angular/common';
 import { PlayerStatistics } from '../../models/player/PlayerStatistics';
 
 @Component({
-    selector: 'app-player-info-statistics',
-    imports: [NgForOf],
-    templateUrl: './player-info-statistics.component.html',
-    styleUrl: './player-info-statistics.component.scss'
+  selector: 'app-player-info-statistics',
+  templateUrl: './player-info-statistics.component.html',
+  styleUrl: './player-info-statistics.component.scss',
 })
 export class PlayerInfoStatisticsComponent {
   categories = [
@@ -57,7 +55,7 @@ export class PlayerInfoStatisticsComponent {
     currentTitle: {
       title: 'Rookie',
     },
-  }
+  };
 
   getCategoryValue(category: string): any {
     if (!this.statistics) return null;

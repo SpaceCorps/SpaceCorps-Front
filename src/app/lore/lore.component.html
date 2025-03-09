@@ -5,7 +5,9 @@
 
   <nav class="mb-6">
     <!-- Dropdown for selecting chapter -->
-    <label for="chapter-select" class="block mb-2 text-lg font-medium">Choose a Chapter:</label>
+    <label for="chapter-select" class="block mb-2 text-lg font-medium"
+      >Choose a Chapter:</label
+    >
     <select
       id="chapter-select"
       class="select select-bordered w-full max-w-xs"
@@ -23,15 +25,16 @@
     <h2 class="text-2xl font-semibold mb-4">
       {{ chapters[selectedChapterIndex].title }}
     </h2>
-    <p *ngFor="let paragraph of chapters[selectedChapterIndex].content" class="mb-6">
-      {{ paragraph }}
+    @for (paragraph of chapters[selectedChapterIndex].content; track $index) {}
+    <p class="mb-6">
+      {{ chapters[selectedChapterIndex].content }}
     </p>
   </article>
 
   <!-- Navigation buttons -->
   <div class="flex justify-between mt-6">
     <button
-      class="btn "
+      class="btn"
       [disabled]="selectedChapterIndex === 0"
       (click)="navigateToPrevious()"
     >
