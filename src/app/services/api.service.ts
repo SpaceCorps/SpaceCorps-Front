@@ -1,28 +1,40 @@
-import {Injectable, isDevMode} from '@angular/core';
-import {UserCredentialsCreateRequest} from '../models/auth/UserCredentialsCreateRequest';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {UserCredentialsLoginRequest} from '../models/auth/UserCredentialsLoginRequest';
-import {GetPlayerInfoRequest} from '../models/player/GetPlayerInfoRequest';
-import {PlayerData} from '../models/player/PlayerData';
-import {SpaceMapDataEntry} from '../models/dataEntries/SpaceMapDataEntry';
-import {UpdateSpaceMapDataEntryRequest} from '../models/dataEntries/UpdateSpaceMapDataEntryRequest';
-import {CreateStaticEntityRequest} from '../models/entity/CreateStaticEntityRequest';
-import {DeleteStaticEntityRequest} from '../models/entity/DeleteStaticEntityRequest';
-import {ServerInfo} from '../models/servers/ServerInfo';
-import {BuyItemRequest} from '../models/player/BuyItemRequest';
-import {Inventory} from '../models/player/Inventory';
-import {SellableItems} from '../models/player/Items';
-import {EquipLaserAmpRequest} from '../models/player/EquipLaserAmpRequest';
+import { Injectable, isDevMode } from '@angular/core';
+import { UserCredentialsCreateRequest } from '../models/auth/UserCredentialsCreateRequest';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLoginRequest';
+import { GetPlayerInfoRequest } from '../models/player/GetPlayerInfoRequest';
+import { PlayerData } from '../models/player/PlayerData';
+import { SpaceMapDataEntry } from '../models/dataEntries/SpaceMapDataEntry';
+import { UpdateSpaceMapDataEntryRequest } from '../models/dataEntries/UpdateSpaceMapDataEntryRequest';
+import { CreateStaticEntityRequest } from '../models/entity/CreateStaticEntityRequest';
+import { DeleteStaticEntityRequest } from '../models/entity/DeleteStaticEntityRequest';
+import { ServerInfo } from '../models/servers/ServerInfo';
+import { BuyItemRequest } from '../models/player/BuyItemRequest';
+import { Inventory } from '../models/player/Inventory';
+import { SellableItems } from '../models/player/Items';
+import {
+  EquipEngineRequest,
+  EquipLaserAmpRequest,
+  EquipLaserRequest,
+  EquipShieldCellRequest,
+  EquipShieldRequest,
+  EquipThrusterRequest,
+  UnequipEngineRequest,
+  UnequipLaserAmpRequest,
+  UnequipLaserRequest,
+  UnequipShieldCellRequest,
+  UnequipShieldRequest, UnequipThrusterRequest,
+} from '../models/player/EquipUnequipDtos';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
+  private url = isDevMode()
+    ? 'http://localhost:5274/api'
+    : 'http://179.61.190.125:5274/api';
 
-  private url = isDevMode() ? 'http://localhost:5274/api' : 'http://179.61.190.125:5274/api';
-
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
   createNewUser(request: UserCredentialsCreateRequest) {
     return this.http.post(`${this.url}/UserCredentials/Create`, request);
@@ -42,56 +54,56 @@ export class ApiService {
 
   getSpaceMapDataEntryNames() {
     return this.http.get<string[]>(
-      `${this.url}/SpaceMapDataEntries/GetAllNames`
+      `${this.url}/SpaceMapDataEntries/GetAllNames`,
     );
   }
 
   getSpaceMapDataEntry(name: string) {
     return this.http.get<SpaceMapDataEntry>(
-      `${this.url}/SpaceMapDataEntries/Get/${name}`
+      `${this.url}/SpaceMapDataEntries/Get/${name}`,
     );
   }
 
   postSpaceMapDataEntry(mapName: string) {
     return this.http.post<SpaceMapDataEntry>(
       `${this.url}/SpaceMapDataEntries/Add`,
-      {name: mapName}
+      { name: mapName },
     );
   }
 
   updateSpaceMapDataEntry(
     mapName: string,
-    request: UpdateSpaceMapDataEntryRequest
+    request: UpdateSpaceMapDataEntryRequest,
   ) {
     return this.http.patch<SpaceMapDataEntry>(
       `${this.url}/SpaceMapDataEntries/Update/${mapName}`,
-      request
+      request,
     );
   }
 
   deleteSpaceMapDataEntry(mapName: string) {
     return this.http.delete(
-      `${this.url}/SpaceMapDataEntries/Delete/${mapName}`
+      `${this.url}/SpaceMapDataEntries/Delete/${mapName}`,
     );
   }
 
   addStaticEntityToMap(
     selectedSpaceMapDataEntryName: string,
-    newStaticEntity: CreateStaticEntityRequest
+    newStaticEntity: CreateStaticEntityRequest,
   ) {
     return this.http.post(
       `${this.url}/SpaceMapDataEntries/addStaticEntityToSpaceMap/${selectedSpaceMapDataEntryName}`,
-      newStaticEntity
+      newStaticEntity,
     );
   }
 
   deleteStaticEntityFromMap(
     mapName: string,
-    staticEntity: DeleteStaticEntityRequest
+    staticEntity: DeleteStaticEntityRequest,
   ) {
     return this.http.delete(
       `${this.url}/SpaceMapDataEntries/deleteStaticEntityFromSpaceMap/${mapName}`,
-      {body: staticEntity}
+      { body: staticEntity },
     );
   }
 
@@ -102,14 +114,14 @@ export class ApiService {
   createNewItemEntry<T extends SellableItems>(newItem: T) {
     return this.http.post<T>(
       `${this.url}/ItemEntries/${newItem.itemType.replace('Entrie', '')}s/Add`,
-      newItem
+      newItem,
     );
   }
 
   deleteItemEntry<T extends SellableItems>(item: T) {
     return this.http.delete(
       `${this.url}/ItemEntries/${item.itemType.replace('Entrie', '')}s/Delete`,
-      {body: {id: item.id}}
+      { body: { id: item.id } },
     );
   }
 
@@ -119,24 +131,118 @@ export class ApiService {
 
   buyItem(buyItemRequest: BuyItemRequest) {
     return this.http.post(`${this.url}/Shops/ShipYard/Buy`, buyItemRequest, {
-      responseType: "text" as "json"
+      responseType: 'text' as 'json',
     });
   }
 
   handleUserEditorCommand(command: string) {
-    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<void>(
       `${this.url}/Players/UserEditorCommand`,
       JSON.stringify(command),
-      {headers, responseType: "text" as "json"}
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   getUserInventory(username: string) {
-    return this.http.get<Inventory>(`${this.url}/Players/Inventory/${username}`);
+    return this.http.get<Inventory>(
+      `${this.url}/Players/Inventory/${username}`,
+    );
   }
 
   equipLaserAmp(equipLaserAmpRequest: EquipLaserAmpRequest) {
-    return this.http.post(`${this.url}/Players/EquipLaserAmp`, equipLaserAmpRequest, {});
+    return this.http.post(
+      `${this.url}/Players/EquipLaserAmp`,
+      equipLaserAmpRequest,
+      {},
+    );
+  }
+
+  unequipLaserAmp(unequipLaserAmpRequest: UnequipLaserAmpRequest) {
+    return this.http.post(
+      `${this.url}/Players/UnequipLaserAmp`,
+      unequipLaserAmpRequest,
+      {},
+    );
+  }
+
+  equipShieldCell(equipShieldCellRequest: EquipShieldCellRequest) {
+    return this.http.post(
+      `${this.url}/Players/EquipShieldCell`,
+      equipShieldCellRequest,
+      {},
+    );
+  }
+
+  unequipShieldCell(unequipShieldCellRequest: UnequipShieldCellRequest) {
+    return this.http.post(
+      `${this.url}/Players/UnequipShieldCell`,
+      unequipShieldCellRequest,
+      {},
+    );
+  }
+
+  equipLaser(equipLaserRequest: EquipLaserRequest) {
+    return this.http.post(
+      `${this.url}/Players/EquipLaser`,
+      equipLaserRequest,
+      {},
+    );
+  }
+
+  unequipLaser(unequipLaserRequest: UnequipLaserRequest) {
+    return this.http.post(
+      `${this.url}/Players/UnequipLaser`,
+      unequipLaserRequest,
+      {},
+    );
+  }
+
+  equipShield(equipShieldRequest: EquipShieldRequest) {
+    return this.http.post(
+      `${this.url}/Players/EquipShield`,
+      equipShieldRequest,
+      {},
+    );
+  }
+
+  unequipShield(unequipShieldRequest: UnequipShieldRequest) {
+    return this.http.post(
+      `${this.url}/Players/UnequipShield`,
+      unequipShieldRequest,
+      {},
+    );
+  }
+
+  equipEngine(equipEngineRequest: EquipEngineRequest) {
+    return this.http.post(
+      `${this.url}/Players/EquipEngine`,
+      equipEngineRequest,
+      {},
+    );
+  }
+
+  unequipEngine(unequipEngineRequest: UnequipEngineRequest) {
+    return this.http.post(
+      `${this.url}/Players/UnequipEngine`,
+      unequipEngineRequest,
+      {},
+    );
+  }
+
+  equipThruster(equipThrusterRequest: EquipThrusterRequest) {
+    return this.http.post(
+      `${this.url}/Players/EquipThruster`,
+      equipThrusterRequest,
+      {},
+    );
+  }
+
+  unequipThruster(unequipThrusterRequest: UnequipThrusterRequest) {
+    return this.http.post(
+      `${this.url}/Players/UnequipThruster`,
+      unequipThrusterRequest,
+      {},
+    );
   }
 }
