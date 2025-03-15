@@ -30,8 +30,8 @@ export class ShipModelComponent implements OnInit {
     }
 
     if(!this.shipModelName) {
-      console.error('Ship model name not found', this.shipModelName);
-      return;
+      console.warn('Ship model name not found, loading default one!', this.shipModelName);
+      this.shipModelName = 'Protos';
     }
 
     this.scene = new THREE.Scene();

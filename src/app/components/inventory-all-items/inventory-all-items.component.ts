@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -10,8 +9,17 @@ import {
 } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-import { firstValueFrom } from 'rxjs';
 import { SellableItems } from '../../models/player/Items';
+import {
+  animate,
+  animateChild,
+  query,
+  stagger,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const ORDERED_CATEGORIES = [
   'Ship',
@@ -26,6 +34,55 @@ const ORDERED_CATEGORIES = [
 
 @Component({
   selector: 'app-inventory-all-items',
+  animations: [
+    trigger('slideInFromLeft', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-100%)' }),
+        animate(
+          '300ms ease-out',
+          style({ opacity: 1, transform: 'translateX(0%)' }),
+        ),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateX(0)' }),
+        animate(
+          '300ms ease-in',
+          style({ opacity: 0, transform: 'translateX(-100%)' }),
+        ),
+      ]),
+    ]),
+    trigger('listAnimation', [
+      transition('* => *', [
+        query(
+          ':enter',
+          [
+            style({ opacity: 0, transform: 'translateY(-20px)' }),
+            stagger(50, [
+              animate(
+                '300ms ease-out',
+                style({ opacity: 1, transform: 'translateY(0)' }),
+              ),
+            ]),
+          ],
+          { optional: true },
+        ),
+        query(
+          ':leave',
+          [
+            stagger(50, [
+              animate(
+                '300ms ease-in',
+                style({ opacity: 0, transform: 'translateY(20px)' }),
+              ),
+            ]),
+          ],
+          { optional: true },
+        ),
+        query('@*', animateChild(), { optional: true }),
+      ]),
+    ]),
+  ],
+
   imports: [],
   templateUrl: './inventory-all-items.component.html',
   styleUrl: './inventory-all-items.component.scss',
