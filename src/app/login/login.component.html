@@ -3,7 +3,7 @@
 }
 @if (!(authState$ | async)!.isLoggedIn) {
   <main class="flex items-center justify-center">
-    <section class="card bg-base-300/75 w-96 shadow-xl">
+    <section class="card bg-base-300/75 w-96 shadow-xl my-70">
       <article class="card-body flex flex-col items-center">
         @if (isLoginView) {
           <app-login-form
