@@ -8,6 +8,7 @@ import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLogin
 import { Router } from '@angular/router';
 import { LoginAsAdminBtnComponent } from "../components/login-as-admin-btn/login-as-admin-btn.component";
 import { ErrorModalComponent } from "../components/error-modal/error-modal.component";
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,8 @@ import { ErrorModalComponent } from "../components/error-modal/error-modal.compo
     LoginFormComponent,
     RegisterFormComponent,
     LoginAsAdminBtnComponent,
-    ErrorModalComponent
+    ErrorModalComponent,
+    AsyncPipe
 ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
@@ -27,6 +29,7 @@ export class LoginComponent {
   error: HttpErrorResponse | null = null;
   isLoading = false;
   router = inject(Router);
+  authState$ = this.authService.authState$;
 
   clearLoginError() {
     this.error = null;

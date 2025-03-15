@@ -1,5 +1,9 @@
 .background-image-container {
+  position: relative;
+  width: 100%;
   background-image: url('../assets/images/main_background.png');
   background-size: cover;
-  width: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+
 }
