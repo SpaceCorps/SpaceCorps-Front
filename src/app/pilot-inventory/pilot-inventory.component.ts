@@ -4,8 +4,19 @@ import { ApiService } from '../services/api.service';
 import { AuthService } from '../services/auth.service';
 import { Inventory } from '../models/player/Inventory';
 import { InventoryAllItemsComponent } from '../components/inventory-all-items/inventory-all-items.component';
-import { Laser, SellableItems } from '../models/player/Items';
+import { Laser, LaserAmp, SellableItems } from '../models/player/Items';
 import { InventorySelectedItemComponent } from '../components/inventory-selected-item/inventory-selected-item.component';
+
+const ItemTypes = {
+  Laser: 'Laser',
+  LaserAmp: 'LaserAmp',
+  Shield: 'Shield',
+  ShieldCell: 'ShieldCell',
+  Engine: 'Engine',
+  Thruster: 'Thruster',
+  LaserAmmo: 'LaserAmmo',
+  Ship: 'Ship',
+};
 
 @Component({
   selector: 'app-pilot-inventory',
@@ -101,7 +112,17 @@ export class PilotInventoryComponent implements OnInit {
       })
       .subscribe({
         next: (response) => {
-          console.log(response);
+          const laser = this.inventory!.items.find(
+            (i) => i.id === event.laserId,
+          ) as Laser;
+          const laserAmp = laser.laserAmps!.find(
+            (i) => i.id === event.laserAmpId,
+          ) as LaserAmp;
+          this.inventory!.items = [...this.inventory!.items, laserAmp];
+          laser.laserAmps = laser.laserAmps!.filter(
+            (i) => i.id !== event.laserAmpId,
+          );
+          this.selectedItem = laser;
         },
         error: (err) => {
           console.error(err);

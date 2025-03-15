@@ -19,7 +19,7 @@
     <div class="card-body">
       <h2 class="card-title">All Items</h2>
       <app-inventory-all-items
-        [items]="inventory?.items"
+        [items]="inventory?.items!"
         (itemSelected)="handleItemSelection($event)"
         (itemDragged)="handleItemDragged($event)"
       >
