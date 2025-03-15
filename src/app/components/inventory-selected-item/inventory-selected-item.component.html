@@ -15,6 +15,7 @@
                    draggable="true"
                    (dragstart)="onDragStart($event, selectedItem[mapping.childrenKey][$index])">
                 <p class="text-xs text-center">{{ selectedItem[mapping.childrenKey][$index].name }}</p>
+                <button class="btn btn-xs" (click)="onUnequipItem(selectedItem[mapping.childrenKey][$index].id, selectedItem.id)">Unequip</button>
               </div>
             } @else {
               <div class="w-16 h-16 aspect-square empty-slot cursor-pointer bg-base-300"

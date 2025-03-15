@@ -23,7 +23,8 @@ import {
   UnequipLaserAmpRequest,
   UnequipLaserRequest,
   UnequipShieldCellRequest,
-  UnequipShieldRequest, UnequipThrusterRequest,
+  UnequipShieldRequest,
+  UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
 
 @Injectable({
@@ -151,98 +152,109 @@ export class ApiService {
   }
 
   equipLaserAmp(equipLaserAmpRequest: EquipLaserAmpRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/EquipLaserAmp`,
       equipLaserAmpRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   unequipLaserAmp(unequipLaserAmpRequest: UnequipLaserAmpRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/UnequipLaserAmp`,
       unequipLaserAmpRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   equipShieldCell(equipShieldCellRequest: EquipShieldCellRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/EquipShieldCell`,
       equipShieldCellRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   unequipShieldCell(unequipShieldCellRequest: UnequipShieldCellRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/UnequipShieldCell`,
       unequipShieldCellRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   equipLaser(equipLaserRequest: EquipLaserRequest) {
-    return this.http.post(
-      `${this.url}/Players/EquipLaser`,
-      equipLaserRequest,
-      {},
-    );
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${this.url}/Players/EquipLaser`, equipLaserRequest, {
+      headers,
+      responseType: 'text' as 'json',
+    });
   }
 
   unequipLaser(unequipLaserRequest: UnequipLaserRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/UnequipLaser`,
       unequipLaserRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   equipShield(equipShieldRequest: EquipShieldRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/EquipShield`,
       equipShieldRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   unequipShield(unequipShieldRequest: UnequipShieldRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/UnequipShield`,
       unequipShieldRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   equipEngine(equipEngineRequest: EquipEngineRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/EquipEngine`,
       equipEngineRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   unequipEngine(unequipEngineRequest: UnequipEngineRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/UnequipEngine`,
       unequipEngineRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   equipThruster(equipThrusterRequest: EquipThrusterRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/EquipThruster`,
       equipThrusterRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 
   unequipThruster(unequipThrusterRequest: UnequipThrusterRequest) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${this.url}/Players/UnequipThruster`,
       unequipThrusterRequest,
-      {},
+      { headers, responseType: 'text' as 'json' },
     );
   }
 }
