@@ -196,4 +196,44 @@ export const chapters = [
     title: 'Глава 50: Последствия соглашения',
     file: 'chapter50.md',
   },
+  {
+    title: 'Глава 51: Уход GVG с Земли',
+    file: 'chapter51.md',
+  },
+  {
+    title: 'Глава 52: Основание "Новой Гавани"',
+    file: 'chapter52.md',
+  },
+  {
+    title: 'Глава 53: Первые контакты GVG и MCC',
+    file: 'chapter53.md',
+  },
+  {
+    title: 'Глава 54: Угроза для TSG',
+    file: 'chapter54.md',
+  },
+  {
+    title: 'Глава 55: Последний мирный год',
+    file: 'chapter55.md',
+  },
+  {
+    title: 'Глава 56: Искра войны',
+    file: 'chapter56.md',
+  },
+  {
+    title: 'Глава 57: Битва за пояс астероидов',
+    file: 'chapter57.md',
+  },
+  {
+    title: 'Глава 58: Вторжение на Марс',
+    file: 'chapter58.md',
+  },
+  {
+    title: 'Глава 59: Разрушение Земли',
+    file: 'chapter59.md',
+  },
+  {
+    title: 'Глава 60: Конец старого мира, начало нового',
+    file: 'chapter60.md',
+  },
 ];
