@@ -7,7 +7,10 @@
           [activeShipItemName]="inventory?.activeShipName">
         </app-inventory-active-ship>
         <app-inventory-selected-item
-          [selectedItem]="selectedItem">
+          [selectedItem]="selectedItem"
+          (itemDroppedEquipCase)="handleItemDroppedEquipCase($event)"
+          (itemUnequipEvent)="handleItemUnequipEvent($event)"
+        >
         </app-inventory-selected-item>
       </div>
     </div>
@@ -16,7 +19,7 @@
     <div class="card-body">
       <h2 class="card-title">All Items</h2>
       <app-inventory-all-items
-        [items]="inventory?.items"
+        [items]="inventory?.items!"
         (itemSelected)="handleItemSelection($event)"
         (itemDragged)="handleItemDragged($event)"
       >

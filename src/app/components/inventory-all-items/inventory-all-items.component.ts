@@ -1,76 +1,153 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-import { firstValueFrom } from 'rxjs';
 import { SellableItems } from '../../models/player/Items';
+import {
+  animate,
+  animateChild,
+  query,
+  stagger,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+const ORDERED_CATEGORIES = [
+  'Ship',
+  'Laser',
+  'LaserAmp',
+  'Shield',
+  'ShieldCell',
+  'Engine',
+  'Thruster',
+  'LaserAmmo',
+];
 
 @Component({
   selector: 'app-inventory-all-items',
+  animations: [
+    trigger('slideInFromLeft', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-100%)' }),
+        animate(
+          '300ms ease-out',
+          style({ opacity: 1, transform: 'translateX(0%)' }),
+        ),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateX(0)' }),
+        animate(
+          '300ms ease-in',
+          style({ opacity: 0, transform: 'translateX(-100%)' }),
+        ),
+      ]),
+    ]),
+    trigger('listAnimation', [
+      transition('* => *', [
+        query(
+          ':enter',
+          [
+            style({ opacity: 0, transform: 'translateY(-20px)' }),
+            stagger(50, [
+              animate(
+                '300ms ease-out',
+                style({ opacity: 1, transform: 'translateY(0)' }),
+              ),
+            ]),
+          ],
+          { optional: true },
+        ),
+        query(
+          ':leave',
+          [
+            stagger(50, [
+              animate(
+                '300ms ease-in',
+                style({ opacity: 0, transform: 'translateY(20px)' }),
+              ),
+            ]),
+          ],
+          { optional: true },
+        ),
+        query('@*', animateChild(), { optional: true }),
+      ]),
+    ]),
+  ],
+
   imports: [],
   templateUrl: './inventory-all-items.component.html',
-  styleUrl: './inventory-all-items.component.scss'
+  styleUrl: './inventory-all-items.component.scss',
 })
-export class InventoryAllItemsComponent implements OnInit {
-
+export class InventoryAllItemsComponent implements OnInit, OnChanges {
   @Input({
-    required: true
-  }) items?: SellableItems[] = [];
+    required: true,
+  })
+  items: SellableItems[] = [];
 
-  @Output() itemSelected: EventEmitter<SellableItems> = new EventEmitter<SellableItems>();
-  @Output() itemDragged: EventEmitter<SellableItems> = new EventEmitter<SellableItems>();
+  @Output() itemSelected: EventEmitter<SellableItems> =
+    new EventEmitter<SellableItems>();
+  @Output() itemDragged: EventEmitter<SellableItems> =
+    new EventEmitter<SellableItems>();
 
-  constructor(private apiService: ApiService, private authService: AuthService) {
+  categorizedItems = new Map<string, SellableItems[]>();
 
-  }
-
-  categorizedItems: Map<string, SellableItems[]> =
-    new Map<string, SellableItems[]>();
-
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService,
+  ) {}
 
   async ngOnInit() {
-
     const username = this.authService.state().username;
 
     if (!username) {
-      console.error("Username was not provided, can not load component.");
+      console.error('Username was not provided, can not load component.');
       return;
     }
 
-    if (this.items === null || this.items === undefined) {
-      console.warn("Inventory items were not provided, loading them from the server...");
-
-      const inventory = await firstValueFrom(this.apiService.getUserInventory(username));
-      this.items = inventory.items;
+    if (this.items) {
+      this.categorizeItems();
     }
+  }
 
-    this.categorizeItems();
-
-    console.log("Items loaded and sorted in inventory: ", this.items);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['items'] && !changes['items'].firstChange) {
+      this.categorizeItems();
+    }
   }
 
   categorizeItems() {
-    // Categorize items
-    this.items?.forEach(item => {
-      if (!this.categorizedItems.has(item.itemType)) {
-        this.categorizedItems.set(item.itemType, [item]);
-      } else {
+    // Start each category as an empty array, preserving order
+    this.categorizedItems = new Map<string, SellableItems[]>(
+      ORDERED_CATEGORIES.map((category) => [category, []]),
+    );
+
+    // Place incoming items into their respective category arrays
+    for (const item of this.items) {
+      if (this.categorizedItems.has(item.itemType)) {
         this.categorizedItems.get(item.itemType)!.push(item);
       }
-    });
+    }
 
-    // Sort items per category
-    this.categorizedItems.forEach((items) => {
+    // Sort items within each category by name
+    for (const [category, items] of this.categorizedItems.entries()) {
       items.sort((a, b) => a.name.localeCompare(b.name));
-    });
+    }
   }
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
   }
 
-  onDrop(event: DragEvent) {
-
-  }
+  onDrop(event: DragEvent) {}
 
   onDragStart(event: DragEvent, item: SellableItems) {
     event.dataTransfer?.setData('text/plain', JSON.stringify(item));

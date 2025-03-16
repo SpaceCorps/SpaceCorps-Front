@@ -11,10 +11,14 @@
         <div class="grid grid-cols-4 gap-2">
           @for (slot of getSlots(mapping.maxSlots); track $index) {
             @if (selectedItem[mapping.childrenKey] && selectedItem[mapping.childrenKey][$index]) {
-              <div class="w-16 h-16 aspect-square child-item draggable"
+              <div class="w-16 h-16 aspect-square child-item draggable bg-base-300"
                    draggable="true"
                    (dragstart)="onDragStart($event, selectedItem[mapping.childrenKey][$index])">
                 <p class="text-xs text-center">{{ selectedItem[mapping.childrenKey][$index].name }}</p>
+                <button class="btn btn-xs"
+                        (click)="onUnequipItem(selectedItem[mapping.childrenKey][$index].id, selectedItem.id, selectedItem[mapping.childrenKey][$index].itemType)">
+                  Unequip
+                </button>
               </div>
             } @else {
               <div class="w-16 h-16 aspect-square empty-slot cursor-pointer bg-base-300"
