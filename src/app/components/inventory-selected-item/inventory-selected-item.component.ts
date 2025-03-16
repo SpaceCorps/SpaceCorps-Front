@@ -36,8 +36,9 @@ export class InventorySelectedItemComponent implements OnInit {
   }>();
 
   @Output() itemUnequipEvent = new EventEmitter<{
-    laserAmpId: number;
-    laserId: number;
+    childId: number;
+    parentId: number;
+    itemType: string;
   }>();
 
   draggedItem: SellableItems | null = null;
@@ -132,10 +133,11 @@ export class InventorySelectedItemComponent implements OnInit {
     }
   }
 
-  onUnequipItem(laserAmpId: number, laserId: number) {
+  onUnequipItem(childId: number, parentId: number, itemType: string) {
     this.itemUnequipEvent.emit({
-      laserAmpId: laserAmpId,
-      laserId: laserId,
+      childId: childId,
+      parentId: parentId,
+      itemType: itemType,
     });
   }
 }

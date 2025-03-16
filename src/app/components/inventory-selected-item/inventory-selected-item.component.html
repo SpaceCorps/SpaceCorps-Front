@@ -16,7 +16,8 @@
                    (dragstart)="onDragStart($event, selectedItem[mapping.childrenKey][$index])">
                 <p class="text-xs text-center">{{ selectedItem[mapping.childrenKey][$index].name }}</p>
                 <button class="btn btn-xs"
-                        (click)="onUnequipItem(selectedItem[mapping.childrenKey][$index].id, selectedItem.id)">Unequip
+                        (click)="onUnequipItem(selectedItem[mapping.childrenKey][$index].id, selectedItem.id, selectedItem[mapping.childrenKey][$index].itemType)">
+                  Unequip
                 </button>
               </div>
             } @else {
