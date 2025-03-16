@@ -1,11 +1,11 @@
 <html data-theme="forest">
-  <div class="flex flex-col min-h-screen">
-    @if(showNavbar){
+<div class="flex flex-col min-h-screen">
+  @if (showNavbar) {
     <app-navbar></app-navbar>
-    }
-    <main class="flex-grow">
-      <router-outlet></router-outlet>
-    </main>
-    <app-footer></app-footer>
-  </div>
+  }
+  <main class="flex-grow">
+    <router-outlet></router-outlet>
+  </main>
+  <app-footer></app-footer>
+</div>
 </html>
