@@ -1,11 +1,16 @@
 {
   "name": "space-corps-front",
   "version": "0.3.1",
+  "main": "dist/electron/main.js",
   "reqBackendVersion": "0.2.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build-electron": "tsc -p tsconfig.electron.json",
+    "start-electron": "npm run build && npm run build-electron && electron .",
+    "pack-electron": "npm run build && npm run build-electron && electron-builder --dir",
+    "dist-electron": "npm run build && npm run build-electron && electron-builder",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -40,6 +45,8 @@
     "@types/three": "^0.173.0",
     "autoprefixer": "^10.4.20",
     "daisyui": "^5.0.0",
+    "electron": "^35.0.2",
+    "electron-builder": "^25.1.8",
     "jasmine-core": "~5.5.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
@@ -49,5 +56,33 @@
     "postcss": "^8.5.1",
     "prettier": "3.5.3",
     "typescript": "~5.7.3"
+  },
+  "build": {
+    "appId": "com.example.spacecorps",
+    "productName": "SpaceCorps 2025",
+    "directories": {
+      "output": "dist/electron"
+    },
+    "files": [
+      "dist/electron/**/*",
+      "dist/space-corps-front/browser/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }
