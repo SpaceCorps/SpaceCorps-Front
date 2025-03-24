@@ -10,10 +10,9 @@
         <tr>
           <th></th>
           <th></th>
-          <th>Exp:</th>
-          <th>RP:</th>
-          <th>ALD:</th>
-          <th>SLD:</th>
+          @for (field of playerRankFields; track field) {
+            <th>{{ field }}</th>
+          }
         </tr>
         </thead>
         <tbody>
