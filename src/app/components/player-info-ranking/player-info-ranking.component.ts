@@ -11,11 +11,103 @@ export class PlayerInfoRankingComponent {
 
   playerRanks: PlayerRankDto[] = [];
   playerRankFields: PlayerRankField[] = ['EXP', 'RP', 'ALD', 'SLD'];
+
+  getPlayerRanks(): PlayerRankDto[] {
+    return [
+      {
+        topPosition: 1,
+        playerName: 'Player 1',
+        experience: {
+          shortName: 'EXP',
+          value: 1000,
+        },
+        rankingPoints: {
+          shortName: 'RP',
+          value: 2000,
+        },
+        aliensDestroyed: {
+          shortName: 'ALD',
+          value: 3000,
+        },
+        shipsDestroyed: {
+          shortName: 'SLD',
+          value: 4000,
+        },
+      },
+      {
+        topPosition: 2,
+        playerName: 'Player 2',
+        experience: {
+          shortName: 'EXP',
+          value: 1000,
+        },
+        rankingPoints: {
+          shortName: 'RP',
+          value: 2000,
+        },
+        aliensDestroyed: {
+          shortName: 'ALD',
+          value: 3000,
+        },
+        shipsDestroyed: {
+          shortName: 'SLD',
+          value: 4000,
+        },
+      },
+      {
+        topPosition: 3,
+        playerName: 'Player 3',
+        experience: {
+          shortName: 'EXP',
+          value: 1000,
+        },
+        rankingPoints: {
+          shortName: 'RP',
+          value: 2000,
+        },
+        aliensDestroyed: {
+          shortName: 'ALD',
+          value: 3000,
+        },
+        shipsDestroyed: {
+          shortName: 'SLD',
+          value: 4000,
+        },
+      },
+      {
+        topPosition: 4,
+        playerName: 'Player 4',
+        experience: {
+          shortName: 'EXP',
+          value: 1000,
+        },
+        rankingPoints: {
+          shortName: 'RP',
+          value: 2000,
+        },
+        aliensDestroyed: {
+          shortName: 'ALD',
+          value: 3000,
+        },
+        shipsDestroyed: {
+          shortName: 'SLD',
+          value: 4000,
+        },
+      },
+    ];
+  }
 }
 
-type PlayerRankField = PlayerRankDto[keyof PlayerRankDto]['shortName'];
+type PlayerRankField = FieldsWithShortName;
+type FieldsWithShortName = {
+  [K in keyof PlayerRankDto]: PlayerRankDto[K] extends { shortName: infer S }
+    ? S
+    : never;
+}[keyof PlayerRankDto];
 
 export type PlayerRankDto = {
+  topPosition: number;
+  playerName: string;
   experience: {
     shortName: 'EXP';
     value: number;

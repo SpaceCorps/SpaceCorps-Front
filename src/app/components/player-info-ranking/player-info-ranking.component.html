@@ -16,14 +16,16 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <th>1</th>
-          <td>Vasiliy Pupkin</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
+          @for (playerRank of getPlayerRanks(); track playerRank.topPosition) {
+            <tr>
+              <th>{{ playerRank.topPosition }}</th>
+              <td>{{ playerRank.playerName }}</td>
+              <td>{{ playerRank.experience.value }}</td>
+              <td>{{ playerRank.rankingPoints.value }}</td>
+              <td>{{ playerRank.aliensDestroyed.value }}</td>
+              <td>{{ playerRank.shipsDestroyed.value }}</td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
