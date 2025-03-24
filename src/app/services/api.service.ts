@@ -26,6 +26,8 @@ import {
   UnequipShieldRequest,
   UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
+import {PlayerRankDto} from '../components/player-info-ranking/player-info-ranking.component';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',

@@ -16,7 +16,7 @@
         </tr>
         </thead>
         <tbody>
-          @for (playerRank of getPlayerRanks(); track playerRank.topPosition) {
+          @for (playerRank of playerRanks; track playerRank.topPosition) {
             <tr>
               <th>{{ playerRank.topPosition }}</th>
               <td>{{ playerRank.playerName }}</td>

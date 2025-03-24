@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-player-info-ranking',
@@ -7,12 +8,15 @@ import { Component } from '@angular/core';
   styleUrl: './player-info-ranking.component.scss',
 })
 export class PlayerInfoRankingComponent {
-  constructor() {}
+  constructor(private apiService: ApiService) {}
 
   playerRanks: PlayerRankDto[] = [];
   playerRankFields: PlayerRankField[] = ['EXP', 'RP', 'ALD', 'SLD'];
 
   getPlayerRanks(): PlayerRankDto[] {
+
+    // this.apiService.getPlayerRanks().subscribe((playerRanks) => {response => this.playerRanks = response;});
+    // this.playerRanks = ...;
     return [
       {
         topPosition: 1,
