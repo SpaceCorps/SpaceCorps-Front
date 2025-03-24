@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -7,16 +7,17 @@ import { ApiService } from '../../services/api.service';
   templateUrl: './player-info-ranking.component.html',
   styleUrl: './player-info-ranking.component.scss',
 })
-export class PlayerInfoRankingComponent {
+export class PlayerInfoRankingComponent implements OnInit {
   constructor(private apiService: ApiService) {}
 
   playerRanks: PlayerRankDto[] = [];
   playerRankFields: PlayerRankField[] = ['EXP', 'RP', 'ALD', 'SLD'];
 
-  getPlayerRanks(): PlayerRankDto[] {
+  ngOnInit(): void {
+    this.playerRanks = this.getPlayerRanks();
+  }
 
-    // this.apiService.getPlayerRanks().subscribe((playerRanks) => {response => this.playerRanks = response;});
-    // this.playerRanks = ...;
+  getPlayerRanks(): PlayerRankDto[] {
     return [
       {
         topPosition: 1,
