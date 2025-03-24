@@ -4,8 +4,10 @@ import { Component } from '@angular/core';
   selector: 'app-player-info-clan-info',
   imports: [],
   templateUrl: './player-info-clan-info.component.html',
-  styleUrl: './player-info-clan-info.component.scss'
+  styleUrl: './player-info-clan-info.component.scss',
 })
 export class PlayerInfoClanInfoComponent {
+  constructor() {}
 
 }
+
