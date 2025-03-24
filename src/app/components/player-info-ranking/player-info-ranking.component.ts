@@ -18,6 +18,8 @@ export class PlayerInfoRankingComponent implements OnInit {
   }
 
   getPlayerRanks(): PlayerRankDto[] {
+
+    //TODO: actual api call here
     return [
       {
         topPosition: 1,
