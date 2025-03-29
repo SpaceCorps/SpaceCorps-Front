@@ -8,9 +8,9 @@
     "start": "ng serve",
     "build": "ng build",
     "build-electron": "tsc -p tsconfig.electron.json",
-    "start-electron": "npm run build && npm run build-electron && electron .",
-    "pack-electron": "npm run build && npm run build-electron && electron-builder --dir",
-    "dist-electron": "npm run build && npm run build-electron && electron-builder",
+    "start-electron": "ng build --configuration electron && npm run build-electron && electron .",
+    "pack-electron": "ng build --configuration electron && npm run build-electron && electron-builder --dir",
+    "dist-electron": "ng build --configuration electron && npm run build-electron && electron-builder",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
