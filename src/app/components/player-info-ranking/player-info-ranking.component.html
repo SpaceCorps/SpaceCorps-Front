@@ -1,0 +1,33 @@
+<div class="card bg-base-100/50 shadow-xl flex flex-col items-center container min-w-xs">
+  <ul class="flex flex-row bg-base-200 justify-around p-4 w-full">
+    <li>Worldwide Top</li>
+    <li>Clan Top</li>
+  </ul>
+  <div class="card-body">
+    <div class="overflow-x-auto">
+      <table class="table table-xs">
+        <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          @for (field of playerRankFields; track field) {
+            <th>{{ field }}</th>
+          }
+        </tr>
+        </thead>
+        <tbody>
+          @for (playerRank of playerRanks; track playerRank.topPosition) {
+            <tr>
+              <th>{{ playerRank.topPosition }}</th>
+              <td>{{ playerRank.playerName }}</td>
+              <td>{{ playerRank.experience.value }}</td>
+              <td>{{ playerRank.rankingPoints.value }}</td>
+              <td>{{ playerRank.aliensDestroyed.value }}</td>
+              <td>{{ playerRank.shipsDestroyed.value }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
