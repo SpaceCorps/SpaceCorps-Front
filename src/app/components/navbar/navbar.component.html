@@ -18,10 +18,13 @@
 </header>
 
 @if (showPatchInfo) {
-  <div
-    class="rounded-lg"
-    (click)="togglePatchInfo()"
-  >
-    <app-github-timeline />
+  <div class="inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="togglePatchInfo()">
+    <div class="card w-96 bg-base-100 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="card-body p-0">
+        <div class="h-[600px] overflow-y-auto">
+          <app-github-timeline />
+        </div>
+      </div>
+    </div>
   </div>
 }

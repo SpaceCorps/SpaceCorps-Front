@@ -36,4 +36,10 @@ export class NavbarComponent {
   togglePatchInfo() {
     this.showPatchInfo = !this.showPatchInfo;
   }
+
+
+  // TODO: remove too many divs (move css classes around)
+  // TODO: position absolute for timeline component
+  // TODO: edit colors in github-timeline component to use theme colors
+  // TODO: rework github-timeline component to use native daisyui components and update tsc code
 }
