@@ -4,6 +4,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { filter } from 'rxjs';
 import { FooterComponent } from './components/footer/footer.component';
 
+declare const window: any;
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, NavbarComponent, FooterComponent],
@@ -13,7 +15,16 @@ import { FooterComponent } from './components/footer/footer.component';
 export class AppComponent implements OnInit {
   showNavbar = true;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    // Check if we're running in Electron
+    if (window.electron) {
+      // Listen for new tab requests from Electron
+      window.electron.on('open-new-tab', (url: string) => {
+        // Navigate to the URL in the current window
+        this.router.navigateByUrl(url);
+      });
+    }
+  }
 
   ngOnInit(): void {
     this.router.events
