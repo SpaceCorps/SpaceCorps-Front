@@ -1,30 +1,26 @@
 <header class="navbar bg-base-300 h-16">
   <nav class="flex justify-between gap-4 container mx-auto max-sm:gap-2">
     <a class="text-center self-center" routerLink="/">SpaceCorps 2025</a>
-    @if ((authState$ | async)?.isLoggedIn) {
-      <app-main-menu></app-main-menu>
-    }
+    <app-main-menu *ngIf="(authState$ | async)?.isLoggedIn"></app-main-menu>
     <ul class="flex gap-2 items-center">
-      @if ((authState$ | async)?.isLoggedIn) {
-        <a class="btn bg-base-200" routerLink="/" (click)="logOut()">
-          Log Out
-        </a>
-      }
-      <button class="btn bg-base-200" (click)="togglePatchInfo()">
-        Patch Info
-      </button>
+      <a *ngIf="(authState$ | async)?.isLoggedIn" class="btn bg-base-200" routerLink="/" (click)="logOut()">
+        Log Out
+      </a>
+      <div class="relative">
+        <button class="btn bg-base-200" (click)="togglePatchInfo()">
+          Patch Info
+        </button>
+
+        <div *ngIf="showPatchInfo" class="patch-info-container absolute top-full mt-2 right-0">
+          <div class="card w-94 bg-base-100 shadow-xl">
+            <div class="card-body p-0">
+              <div class="h-[300px] overflow-y-auto">
+                <app-github-timeline></app-github-timeline>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </ul>
   </nav>
 </header>
-
-@if (showPatchInfo) {
-  <div class="inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="togglePatchInfo()">
-    <div class="card w-96 bg-base-100 shadow-xl" (click)="$event.stopPropagation()">
-      <div class="card-body p-0">
-        <div class="h-[600px] overflow-y-auto">
-          <app-github-timeline />
-        </div>
-      </div>
-    </div>
-  </div>
-}
