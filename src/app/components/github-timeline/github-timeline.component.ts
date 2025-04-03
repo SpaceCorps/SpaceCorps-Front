@@ -5,9 +5,7 @@ import { DatePipe, NgForOf, NgIf } from '@angular/common';
 @Component({
     selector: 'app-github-timeline',
     imports: [
-        NgForOf,
         DatePipe,
-        NgIf
     ],
     templateUrl: './github-timeline.component.html',
     styleUrl: './github-timeline.component.scss'
