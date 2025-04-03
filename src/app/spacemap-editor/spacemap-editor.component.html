@@ -1,5 +1,5 @@
 @if (error) {
-<app-error-modal [error]="error"></app-error-modal>
+  <app-error-modal [error]="error"></app-error-modal>
 }
 <main class="drawer lg:drawer-open">
   <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
@@ -7,137 +7,263 @@
     Open All SpaceMaps
   </label>
   <section class="drawer-content flex flex-col gap-4">
-
     <!-- Map General Info -->
-    @if(selectedSpaceMapDataEntry) {
-    <article class="card bg-base-100 p-4">
-      <h2>Map General Info</h2>
-      <div class="flex flex-wrap gap-4">
-        <article class="card bg-base-200 max-w-96">
-          <div class="card-body flex flex-col gap-2 justify-center">
-            <h2>You selected: {{ selectedSpaceMapDataEntry.name }}</h2>
-            <label for="map-name">Name:</label>
-            <input id="map-name" [(ngModel)]="selectedSpaceMapDataEntry.name"
-              class="input input-bordered read-only:cursor-not-allowed" readonly />
-            <label for="preferred-color">Preferred Color:</label>
-            <input id="preferred-color" [(ngModel)]="selectedSpaceMapDataEntry.preferredColor"
-              class="input input-bordered" />
-            <fieldset>
-              <legend>Size:</legend>
-              <label for="width">Width:</label>
-              <input id="width" [(ngModel)]="selectedSpaceMapDataEntry.size.width" type="number"
-                class="input input-bordered" />
-              <label for="height">Height:</label>
-              <input id="height" [(ngModel)]="selectedSpaceMapDataEntry.size.height" type="number"
-                class="input input-bordered" />
-            </fieldset>
-            <button (click)="updateSpaceMapDataEntry()" class="btn bg-base-300 max-w-32 mx-auto mt-4">Save</button>
-          </div>
-        </article>
+    @if (selectedSpaceMapDataEntry) {
+      <article class="card bg-base-100 p-4">
+        <h2>Map General Info</h2>
+        <div class="flex flex-wrap gap-4">
+          <article class="card bg-base-200 max-w-96">
+            <div class="card-body flex flex-col gap-2 justify-center">
+              <h2>You selected: {{ selectedSpaceMapDataEntry.name }}</h2>
+              <label for="map-name">Name:</label>
+              <input
+                id="map-name"
+                [(ngModel)]="selectedSpaceMapDataEntry.name"
+                class="input input-bordered read-only:cursor-not-allowed"
+                readonly
+              />
+              <label for="preferred-color">Preferred Color:</label>
+              <input
+                id="preferred-color"
+                [(ngModel)]="selectedSpaceMapDataEntry.preferredColor"
+                class="input input-bordered"
+              />
+              <fieldset>
+                <legend>Size:</legend>
+                <label for="width">Width:</label>
+                <input
+                  id="width"
+                  [(ngModel)]="selectedSpaceMapDataEntry.size.width"
+                  type="number"
+                  class="input input-bordered"
+                />
+                <label for="height">Height:</label>
+                <input
+                  id="height"
+                  [(ngModel)]="selectedSpaceMapDataEntry.size.height"
+                  type="number"
+                  class="input input-bordered"
+                />
+              </fieldset>
+              <button
+                (click)="updateSpaceMapDataEntry()"
+                class="btn bg-base-300 max-w-32 mx-auto mt-4"
+              >
+                Save
+              </button>
+            </div>
+          </article>
 
-        <!-- Element to create a new static entity -->
-        <article class="card bg-base-200 p-4 max-w-96">
-          <h3>Create New Static Entity</h3>
-          <div class="flex flex-col gap-2">
-            <label for="new-static-name">Name:</label>
-            <input id="new-static-name" [(ngModel)]="newStaticEntity.name" class="input input-bordered" />
-            <fieldset>
-              <legend>Position:</legend>
-              <label for="position-x">X:</label>
-              <input id="position-x" [(ngModel)]="newStaticEntity.position.x" type="number"
-                class="input input-bordered w-20" />
-              <label for="position-y">Y:</label>
-              <input id="position-y" [(ngModel)]="newStaticEntity.position.y" type="number"
-                class="input input-bordered w-20" />
-              <label for="position-z">Z:</label>
-              <input id="position-z" [(ngModel)]="newStaticEntity.position.z" type="number"
-                class="input input-bordered w-20" />
-            </fieldset>
-            <label for="location-name">Location Name:</label>
-            <input id="location-name" [(ngModel)]="newStaticEntity.locationName" class="input input-bordered" />
-            <label for="safe-zone">Safe Zone Radii:</label>
-            <input id="safe-zone" [(ngModel)]="newStaticEntity.safeZoneRadii" type="number"
-              class="input input-bordered" />
-            <label for="destination">Destination:</label>
-            <input id="destination" [(ngModel)]="newStaticEntity.destination" class="input input-bordered" />
-            <button (click)="addStaticEntityToMap()" class="btn bg-base-300 mt-4 max-w-32 mx-auto">Add</button>
-          </div>
-        </article>
-      </div>
-    </article>
+          <!-- Element to create a new static entity -->
+          <article class="card bg-base-200 p-4 max-w-96">
+            <h3>Create New Static Entity</h3>
+            <div class="flex flex-col gap-2">
+              <label for="new-static-name">Name:</label>
+              <input
+                id="new-static-name"
+                [(ngModel)]="newStaticEntity.name"
+                class="input input-bordered"
+              />
+              <fieldset>
+                <legend>Position:</legend>
+                <label for="position-x">X:</label>
+                <input
+                  id="position-x"
+                  [(ngModel)]="newStaticEntity.position.x"
+                  type="number"
+                  class="input input-bordered w-20"
+                />
+                <label for="position-y">Y:</label>
+                <input
+                  id="position-y"
+                  [(ngModel)]="newStaticEntity.position.y"
+                  type="number"
+                  class="input input-bordered w-20"
+                />
+                <label for="position-z">Z:</label>
+                <input
+                  id="position-z"
+                  [(ngModel)]="newStaticEntity.position.z"
+                  type="number"
+                  class="input input-bordered w-20"
+                />
+              </fieldset>
+              <label for="location-name">Location Name:</label>
+              <input
+                id="location-name"
+                [(ngModel)]="newStaticEntity.locationName"
+                class="input input-bordered"
+              />
+              <label for="safe-zone">Safe Zone Radii:</label>
+              <input
+                id="safe-zone"
+                [(ngModel)]="newStaticEntity.safeZoneRadii"
+                type="number"
+                class="input input-bordered"
+              />
+              <label for="destination">Destination:</label>
+              <input
+                id="destination"
+                [(ngModel)]="newStaticEntity.destination"
+                class="input input-bordered"
+              />
+              <button
+                (click)="addStaticEntityToMap()"
+                class="btn bg-base-300 mt-4 max-w-32 mx-auto"
+              >
+                Add
+              </button>
+            </div>
+          </article>
+        </div>
+      </article>
     }
 
     <!-- Static Entities View -->
-    @if(selectedSpaceMapDataEntry) {
-    <article class="card bg-neutral">
-      <div class="card-body bg-base-200">
-        <h2>Static Entities on Map</h2>
-        <div class="flex flex-wrap gap-4">
-          @for(staticEntity of selectedSpaceMapDataEntry!.staticEntities; track staticEntity.id) {
-          <article class="card bg-base-200 p-4 max-w-96">
-            <div class="flex flex-col gap-2">
-              <label for="entity-name-{{staticEntity.id}}">Name:</label>
-              <div class="flex flex-row justify-between items-center">
-                <input id="entity-name-{{staticEntity.id}}" [(ngModel)]="staticEntity.name"
-                  class="input input-bordered" />
-                <button class="btn btn-error btn-xs btn-square" (click)="deleteStaticEntity(staticEntity)">X</button>
-              </div>
-              <fieldset>
-                <legend>Position:</legend>
-                <label for="entity-x-{{staticEntity.id}}">X:</label>
-                <input id="entity-x-{{staticEntity.id}}" [(ngModel)]="staticEntity.position.x" type="number"
-                  class="input input-bordered w-20" />
-                <label for="entity-y-{{staticEntity.id}}">Y:</label>
-                <input id="entity-y-{{staticEntity.id}}" [(ngModel)]="staticEntity.position.y" type="number"
-                  class="input input-bordered w-20" />
-                <label for="entity-z-{{staticEntity.id}}">Z:</label>
-                <input id="entity-z-{{staticEntity.id}}" [(ngModel)]="staticEntity.position.z" type="number"
-                  class="input input-bordered w-20" />
-              </fieldset>
-              <label for="entity-id-{{staticEntity.id}}">ID:</label>
-              <input id="entity-id-{{staticEntity.id}}" [(ngModel)]="staticEntity.id" type="number"
-                class="input input-bordered read-only:cursor-not-allowed" readonly />
-              <label for="entity-location-{{staticEntity.id}}">Location Name:</label>
-              <input id="entity-location-{{staticEntity.id}}" [(ngModel)]="staticEntity.locationName"
-                class="input input-bordered" />
-              <label for="entity-safeZone-{{staticEntity.id}}">Safe Zone Radii:</label>
-              <input id="entity-safeZone-{{staticEntity.id}}" [(ngModel)]="staticEntity.safeZoneRadii" type="number"
-                class="input input-bordered" />
-              <label for="entity-destination-{{staticEntity.id}}">Destination:</label>
-              <input id="entity-destination-{{staticEntity.id}}" [(ngModel)]="staticEntity.destination"
-                class="input input-bordered" />
-            </div>
-          </article>
-          }
+    @if (selectedSpaceMapDataEntry) {
+      <article class="card bg-neutral">
+        <div class="card-body bg-base-200">
+          <h2>Static Entities on Map</h2>
+          <div class="flex flex-wrap gap-4">
+            @for (
+              staticEntity of selectedSpaceMapDataEntry!.staticEntities;
+              track staticEntity.id
+            ) {
+              <article class="card bg-base-200 p-4 max-w-96">
+                <div class="flex flex-col gap-2">
+                  <label for="entity-name-{{ staticEntity.id }}">Name:</label>
+                  <div class="flex flex-row justify-between items-center">
+                    <input
+                      id="entity-name-{{ staticEntity.id }}"
+                      [(ngModel)]="staticEntity.name"
+                      class="input input-bordered"
+                    />
+                    <button
+                      class="btn btn-error btn-xs btn-square"
+                      (click)="deleteStaticEntity(staticEntity)"
+                    >
+                      X
+                    </button>
+                  </div>
+                  <fieldset>
+                    <legend>Position:</legend>
+                    <label for="entity-x-{{ staticEntity.id }}">X:</label>
+                    <input
+                      id="entity-x-{{ staticEntity.id }}"
+                      [(ngModel)]="staticEntity.position.x"
+                      type="number"
+                      class="input input-bordered w-20"
+                    />
+                    <label for="entity-y-{{ staticEntity.id }}">Y:</label>
+                    <input
+                      id="entity-y-{{ staticEntity.id }}"
+                      [(ngModel)]="staticEntity.position.y"
+                      type="number"
+                      class="input input-bordered w-20"
+                    />
+                    <label for="entity-z-{{ staticEntity.id }}">Z:</label>
+                    <input
+                      id="entity-z-{{ staticEntity.id }}"
+                      [(ngModel)]="staticEntity.position.z"
+                      type="number"
+                      class="input input-bordered w-20"
+                    />
+                  </fieldset>
+                  <label for="entity-id-{{ staticEntity.id }}">ID:</label>
+                  <input
+                    id="entity-id-{{ staticEntity.id }}"
+                    [(ngModel)]="staticEntity.id"
+                    type="number"
+                    class="input input-bordered read-only:cursor-not-allowed"
+                    readonly
+                  />
+                  <label for="entity-location-{{ staticEntity.id }}"
+                    >Location Name:</label
+                  >
+                  <input
+                    id="entity-location-{{ staticEntity.id }}"
+                    [(ngModel)]="staticEntity.locationName"
+                    class="input input-bordered"
+                  />
+                  <label for="entity-safeZone-{{ staticEntity.id }}"
+                    >Safe Zone Radii:</label
+                  >
+                  <input
+                    id="entity-safeZone-{{ staticEntity.id }}"
+                    [(ngModel)]="staticEntity.safeZoneRadii"
+                    type="number"
+                    class="input input-bordered"
+                  />
+                  <label for="entity-destination-{{ staticEntity.id }}"
+                    >Destination:</label
+                  >
+                  <input
+                    id="entity-destination-{{ staticEntity.id }}"
+                    [(ngModel)]="staticEntity.destination"
+                    class="input input-bordered"
+                  />
+                </div>
+              </article>
+            }
+          </div>
+          <button
+            (click)="saveStaticEntities()"
+            class="btn bg-base-300 max-w-32 mx-auto mt-4"
+          >
+            Save
+          </button>
         </div>
-        <button (click)="saveStaticEntities()" class="btn bg-base-300 max-w-32 mx-auto mt-4">Save</button>
-      </div>
-    </article>
+      </article>
     }
   </section>
 
   <!-- Sidebar -->
   <aside class="drawer-side">
-    <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
+    <label
+      for="my-drawer-2"
+      aria-label="close sidebar"
+      class="drawer-overlay"
+    ></label>
     <nav>
-      <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4 gap-4 overflow-y-auto">
+      <ul
+        class="menu bg-base-200 text-base-content min-h-full w-80 p-4 gap-4 overflow-y-auto"
+      >
         <li class="flex flex-row justify-between items-center">
           <span>Existing SpaceMaps</span>
-          <button class="btn bg-base-300 btn-xs btn-square" (click)="fetchSpaceMapDataEntryNames()" title="Refresh">
+          <button
+            class="btn bg-base-300 btn-xs btn-square"
+            (click)="fetchSpaceMapDataEntryNames()"
+            title="Refresh"
+          >
             <fa-icon [icon]="faArrowsRotate"></fa-icon>
           </button>
         </li>
-        @for(map of spaceMapDataEntryNames; track map) {
-        <li class="flex flex-row justify-between items-center">
-          <a (click)="selectSpaceMapDataEntry(map)">{{ map }}</a>
-          <button class="btn btn-error btn-xs max-w-4 btn-square" (dblclick)="deleteSpaceMap(map)"
-            title="Double-click to delete">X</button>
-        </li>
+        @for (map of spaceMapDataEntryNames; track map) {
+          <li class="flex flex-row justify-between items-center">
+            <a (click)="selectSpaceMapDataEntry(map)">{{ map }}</a>
+            <button
+              class="btn btn-error btn-xs max-w-4 btn-square"
+              (dblclick)="deleteSpaceMap(map)"
+              title="Double-click to delete"
+            >
+              X
+            </button>
+          </li>
         }
         <li class="flex flex-row justify-between">
-          <input class="input input-bordered" [(ngModel)]="newSpaceMapName" placeholder="Enter new" />
-          <button class="btn" (click)="postSpaceMapDataEntryByName(newSpaceMapName!)"
-            [ngClass]="{'btn-disabled': !newSpaceMapName}" [disabled]="!newSpaceMapName">Add</button>
+          <input
+            class="input input-bordered"
+            [(ngModel)]="newSpaceMapName"
+            placeholder="Enter new"
+          />
+          <button
+            class="btn"
+            (click)="postSpaceMapDataEntryByName(newSpaceMapName!)"
+            [ngClass]="{ 'btn-disabled': !newSpaceMapName }"
+            [disabled]="!newSpaceMapName"
+          >
+            Add
+          </button>
         </li>
       </ul>
     </nav>
