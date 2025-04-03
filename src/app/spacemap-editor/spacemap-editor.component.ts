@@ -11,6 +11,7 @@ import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons/faArrowsRotate
 import { StaticEntity } from '../models/entity/StaticEntity';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreateStaticEntityRequest } from '../models/entity/CreateStaticEntityRequest';
+import { SpawnableAlien } from '../models/entity/SpawnableAlien';
 
 @Component({
   selector: 'app-spacemap-editor',
@@ -220,6 +221,45 @@ export class SpacemapEditorComponent {
     locationName: '',
     safeZoneRadii: 0,
     destination: ''
+  }
+
+  newSpawnableAlien: SpawnableAlien = {
+    id: 0,
+    name: '',
+    spawnLimit: 0
+  };
+
+  addSpawnableAlien() {
+    if (!this.selectedSpaceMapDataEntry) return;
+
+    const newAlien: SpawnableAlien = {
+      id: this.selectedSpaceMapDataEntry.spawnableAliens.length + 1,
+      name: this.newSpawnableAlien.name,
+      spawnLimit: this.newSpawnableAlien.spawnLimit
+    };
+
+    this.selectedSpaceMapDataEntry.spawnableAliens.push(newAlien);
+    this.saveSpawnableAliens();
+
+    // Reset the form
+    this.newSpawnableAlien = {
+      id: 0,
+      name: '',
+      spawnLimit: 0
+    };
+  }
+
+  deleteSpawnableAlien(alien: SpawnableAlien) {
+    if (!this.selectedSpaceMapDataEntry) return;
+    this.selectedSpaceMapDataEntry.spawnableAliens = this.selectedSpaceMapDataEntry.spawnableAliens.filter(
+      a => a.id !== alien.id
+    );
+    this.saveSpawnableAliens();
+  }
+
+  saveSpawnableAliens() {
+    if (!this.selectedSpaceMapDataEntry) return;
+    this.updateSpaceMapDataEntry();
   }
 
 }

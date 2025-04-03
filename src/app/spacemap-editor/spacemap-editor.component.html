@@ -214,6 +214,91 @@
           </button>
         </div>
       </article>
+
+      <!-- Create New Spawnable Alien -->
+      <article class="card bg-neutral">
+        <div class="card-body bg-base-200">
+          <h2>Create New Spawnable Alien</h2>
+          <div class="flex flex-wrap gap-4">
+            <article class="card bg-base-200 p-4 max-w-96">
+              <div class="flex flex-col gap-2">
+                <label for="new-alien-name">Name:</label>
+                <input
+                  id="new-alien-name"
+                  [(ngModel)]="newSpawnableAlien.name"
+                  class="input input-bordered"
+                />
+                <label for="new-alien-spawn-limit">Spawn Limit:</label>
+                <input
+                  id="new-alien-spawn-limit"
+                  [(ngModel)]="newSpawnableAlien.spawnLimit"
+                  type="number"
+                  class="input input-bordered"
+                />
+                <button
+                  (click)="addSpawnableAlien()"
+                  class="btn bg-base-300 mt-4 max-w-32 mx-auto"
+                >
+                  Add
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </article>
+
+      <!-- Spawnable Aliens View -->
+      <article class="card bg-neutral">
+        <div class="card-body bg-base-200">
+          <h2>Spawnable Aliens on Map</h2>
+          <div class="flex flex-wrap gap-4">
+            @for (
+              alien of selectedSpaceMapDataEntry!.spawnableAliens;
+              track alien.id
+            ) {
+              <article class="card bg-base-200 p-4 max-w-96">
+                <div class="flex flex-col gap-2">
+                  <label for="alien-name-{{ alien.id }}">Name:</label>
+                  <div class="flex flex-row justify-between items-center">
+                    <input
+                      id="alien-name-{{ alien.id }}"
+                      [(ngModel)]="alien.name"
+                      class="input input-bordered"
+                    />
+                    <button
+                      class="btn btn-error btn-xs btn-square"
+                      (click)="deleteSpawnableAlien(alien)"
+                    >
+                      X
+                    </button>
+                  </div>
+                  <label for="alien-id-{{ alien.id }}">ID:</label>
+                  <input
+                    id="alien-id-{{ alien.id }}"
+                    [(ngModel)]="alien.id"
+                    type="number"
+                    class="input input-bordered read-only:cursor-not-allowed"
+                    readonly
+                  />
+                  <label for="alien-spawn-limit-{{ alien.id }}">Spawn Limit:</label>
+                  <input
+                    id="alien-spawn-limit-{{ alien.id }}"
+                    [(ngModel)]="alien.spawnLimit"
+                    type="number"
+                    class="input input-bordered"
+                  />
+                </div>
+              </article>
+            }
+          </div>
+          <button
+            (click)="saveSpawnableAliens()"
+            class="btn bg-base-300 max-w-32 mx-auto mt-4"
+          >
+            Save
+          </button>
+        </div>
+      </article>
     }
   </section>
 
