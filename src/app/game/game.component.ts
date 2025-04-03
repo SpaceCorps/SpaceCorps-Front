@@ -1,30 +1,34 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import * as THREE from 'three';
-import {HubService} from './services/hub.service';
-import {ActivatedRoute} from '@angular/router';
-import {PlayerDto, SpaceMapData} from './types/SpaceMapData';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import { HubService } from './services/hub.service';
+import { ActivatedRoute } from '@angular/router';
+import { PlayerDto, SpaceMapData } from './types/SpaceMapData';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
   initializeThreeJs,
-  loadNewSpacemap, loadPlayers,
-  updateSpacemap
+  loadNewSpacemap,
+  loadPlayers,
+  updateSpacemap,
 } from './game.utils';
-import {EntityDTO} from './types/Entity';
-import {KeyboardService} from './services/keyboard.service';
-import {PlayerData} from '../models/player/PlayerData';
+import { EntityDTO } from './types/Entity';
+import { KeyboardService } from './services/keyboard.service';
+import { PlayerData } from '../models/player/PlayerData';
+import { AlienManager } from './AlienManager';
+import { PlayerManager } from './PlayerManager';
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.scss']
+  styleUrls: ['./game.component.scss'],
 })
 export class GameComponent implements OnInit {
-
   public camera?: THREE.PerspectiveCamera;
   public renderer?: THREE.WebGLRenderer;
   public scene?: THREE.Scene;
-  public controls?: OrbitControls
+  public controls?: OrbitControls;
   public entities: Map<string, PlayerDto> = new Map();
+  public alienManager?: AlienManager;
+  public playerManager?: PlayerManager;
 
   public currentMapName?: string;
   public playerData: PlayerData | undefined;
@@ -32,16 +36,15 @@ export class GameComponent implements OnInit {
   constructor(
     private hubService: HubService,
     private route: ActivatedRoute,
-    private keyboardService: KeyboardService
-  ) {
-  }
+    private keyboardService: KeyboardService,
+  ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(async params => {
+    this.route.queryParams.subscribe(async (params) => {
       const username = params['username'];
       await this.hubService.initializeSignalR(username);
       this.setupSignalREvents(this.hubService);
-      await initializeThreeJs(this);
+      await this.initializeGame();
       await this.keyboardService.setScene(this.scene);
     });
 
@@ -67,7 +70,7 @@ export class GameComponent implements OnInit {
     hubService.on('loginSuccessful', (response: PlayerData) => {
       console.log('HubMessage: Login successful:', response);
       this.playerData = response;
-    })
+    });
 
     hubService.on('loginFailed', (response: string) => {
       console.error('HubMessage: Login failed:', response);
@@ -80,10 +83,31 @@ export class GameComponent implements OnInit {
     hubService.on('spacemapUpdate', async (spaceMapData: SpaceMapData) => {
       if (this.currentMapName != spaceMapData.mapName) {
         await loadNewSpacemap(this, spaceMapData);
-        await loadPlayers(spaceMapData.mapObject.players);
       } else {
         await updateSpacemap(this, spaceMapData);
       }
     });
+  }
+
+  private async initializeGame() {
+    await initializeThreeJs(this);
+    if (this.scene) {
+      this.alienManager = new AlienManager(this.scene);
+      this.playerManager = new PlayerManager(this.scene, 100);
+    }
+    this.setupGameLoop();
+  }
+
+  private setupGameLoop() {
+    const animate = () => {
+      requestAnimationFrame(animate);
+      if (this.alienManager) {
+        this.alienManager.animate();
+      }
+      if (this.renderer && this.scene && this.camera) {
+        this.renderer.render(this.scene, this.camera);
+      }
+    };
+    animate();
   }
 }

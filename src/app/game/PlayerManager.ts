@@ -1,11 +1,13 @@
 import * as THREE from 'three';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-export class SpaceshipManager {
-
+export class PlayerManager {
   private maxInstances: number;
   private scene: THREE.Scene;
-  private playerDictionary: Map<string, { shipName: string; instanceIndex: number }>;
+  private playerDictionary: Map<
+    string,
+    { shipName: string; instanceIndex: number }
+  >;
   private shipMeshes: Map<
     string,
     {
@@ -17,7 +19,10 @@ export class SpaceshipManager {
   constructor(scene: THREE.Scene, maxInstances: number = 1000) {
     this.maxInstances = maxInstances;
     this.scene = scene;
-    this.playerDictionary = new Map<string, { shipName: string; instanceIndex: number }>();
+    this.playerDictionary = new Map<
+      string,
+      { shipName: string; instanceIndex: number }
+    >();
     this.shipMeshes = new Map<
       string,
       {
@@ -44,7 +49,11 @@ export class SpaceshipManager {
             }
             const geometry = child.geometry as THREE.BufferGeometry;
             const material = child.material as THREE.Material;
-            const instancedMesh = new THREE.InstancedMesh(geometry, material, this.maxInstances);
+            const instancedMesh = new THREE.InstancedMesh(
+              geometry,
+              material,
+              this.maxInstances,
+            );
             instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
             this.scene.add(instancedMesh);
             instancedMeshes.push(instancedMesh);
@@ -62,22 +71,27 @@ export class SpaceshipManager {
             matrixArrays,
           });
 
-          console.log(`Ship model "${shipName}" loaded with ${instancedMeshes.length} meshes.`);
+          console.log(
+            `Ship model "${shipName}" loaded with ${instancedMeshes.length} meshes.`,
+          );
           resolve();
         },
         undefined,
         (error) => {
           console.error(`Failed to load ship model "${shipName}":`, error);
           reject(error);
-        }
+        },
       );
     });
   }
 
-
-
   /** Add a player with a specific ship */
-  public async addPlayer(playerId: string, shipName: string, position: THREE.Vector3, rotation: THREE.Euler): Promise<void> {
+  public async addPlayer(
+    playerId: string,
+    shipName: string,
+    position: THREE.Vector3,
+    rotation: THREE.Euler,
+  ): Promise<void> {
     if (this.playerDictionary.has(playerId)) return; // Player already exists
 
     if (shipName === '') {
@@ -97,8 +111,9 @@ export class SpaceshipManager {
     const { instancedMeshes, matrixArrays } = shipData;
 
     // Calculate the instance index for this ship
-    const instanceIndex = Array.from(this.playerDictionary.values())
-      .filter((entry) => entry.shipName === shipName).length;
+    const instanceIndex = Array.from(this.playerDictionary.values()).filter(
+      (entry) => entry.shipName === shipName,
+    ).length;
 
     if (instanceIndex >= this.maxInstances) {
       console.warn(`Max instances reached for ship "${shipName}".`);
@@ -112,7 +127,11 @@ export class SpaceshipManager {
     instancedMeshes.forEach((instancedMesh, meshIndex) => {
       // Create a transformation matrix
       const transformMatrix = new THREE.Matrix4();
-      transformMatrix.compose(position, new THREE.Quaternion().setFromEuler(rotation), new THREE.Vector3(1, 1, 1));
+      transformMatrix.compose(
+        position,
+        new THREE.Quaternion().setFromEuler(rotation),
+        new THREE.Vector3(1, 1, 1),
+      );
 
       // Update the instanced mesh and matrix array
       instancedMesh.setMatrixAt(instanceIndex, transformMatrix);
@@ -125,10 +144,12 @@ export class SpaceshipManager {
     });
   }
 
-
-
   /** Update the position and rotation of a player's ship */
-  public async updatePlayerPosition(playerId: string, position: THREE.Vector3, rotation: THREE.Euler): Promise<void> {
+  public async updatePlayerPosition(
+    playerId: string,
+    position: THREE.Vector3,
+    rotation: THREE.Euler,
+  ): Promise<void> {
     const playerData = this.playerDictionary.get(playerId);
     if (!playerData) return;
 
@@ -141,7 +162,11 @@ export class SpaceshipManager {
 
     // Create a transformation matrix
     const transformMatrix = new THREE.Matrix4();
-    transformMatrix.compose(position, new THREE.Quaternion().setFromEuler(rotation), new THREE.Vector3(1, 1, 1));
+    transformMatrix.compose(
+      position,
+      new THREE.Quaternion().setFromEuler(rotation),
+      new THREE.Vector3(1, 1, 1),
+    );
 
     // Update each mesh for this ship
     instancedMeshes.forEach((instancedMesh, meshIndex) => {
@@ -151,9 +176,7 @@ export class SpaceshipManager {
     });
   }
 
-
-
-  /** Remove a player and free up the instance slot */
+  /** Remove a player from the scene */
   public async removePlayer(playerId: string): Promise<void> {
     const playerData = this.playerDictionary.get(playerId);
     if (!playerData) return;
@@ -165,35 +188,22 @@ export class SpaceshipManager {
 
     const { instancedMeshes, matrixArrays } = shipData;
 
-    // Get the last instance index for this ship
-    const lastInstanceIndex = Array.from(this.playerDictionary.values())
-      .filter((entry) => entry.shipName === shipName).length - 1;
+    // Create an identity matrix (no transformation)
+    const identityMatrix = new THREE.Matrix4();
+
+    // Update each mesh for this ship
+    instancedMeshes.forEach((instancedMesh, meshIndex) => {
+      matrixArrays[meshIndex][instanceIndex] = identityMatrix;
+      instancedMesh.setMatrixAt(instanceIndex, identityMatrix);
+      instancedMesh.instanceMatrix.needsUpdate = true;
+    });
 
     // Remove player from the dictionary
     this.playerDictionary.delete(playerId);
-
-    // Iterate through all meshes for the ship
-    instancedMeshes.forEach((instancedMesh, meshIndex) => {
-      const matrixArray = matrixArrays[meshIndex];
-
-      if (instanceIndex !== lastInstanceIndex) {
-        // If the removed player's matrix is NOT the last, we swap it with the last matrix
-        const lastMatrix = matrixArray[lastInstanceIndex];
-
-        // Update the instanced mesh to reflect the swap
-        instancedMesh.setMatrixAt(instanceIndex, lastMatrix);
-        matrixArray[instanceIndex] = lastMatrix;
-      }
-
-      // Remove the last matrix (pop the array)
-      matrixArray.pop();
-      instancedMesh.count -= 1; // Adjust the instance count if necessary
-      instancedMesh.instanceMatrix.needsUpdate = true;
-    });
   }
 
-
-  async removeAllPlayers() {
+  /** Remove all players from the scene */
+  public async removeAllPlayers(): Promise<void> {
     for (const playerId of this.playerDictionary.keys()) {
       await this.removePlayer(playerId);
     }
