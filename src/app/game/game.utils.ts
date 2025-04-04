@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { PlayerDto, SpaceMapData, AlienDto } from './types/SpaceMapData';
 import { GameComponent } from './game.component';
 import { EntityDTO } from './types/Entity';
@@ -10,6 +11,65 @@ const LAYERS = {
   DEFAULT: 0,
   RAYCAST: 1
 };
+
+// Helper function to create entity labels (health bar, shields, nickname)
+export function createEntityLabel(name: string, health: number = 100, shields: number = 100): THREE.Group {
+  const group = new THREE.Group();
+
+  // Create container div for all labels
+  const container = document.createElement('div');
+  container.style.pointerEvents = 'none';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center';
+  container.style.width = '100px';
+
+  // Create nickname label
+  const nameDiv = document.createElement('div');
+  nameDiv.textContent = name;
+  nameDiv.style.color = 'white';
+  nameDiv.style.fontSize = '12px';
+  nameDiv.style.fontWeight = 'bold';
+  nameDiv.style.textShadow = '2px 2px 2px black';
+  container.appendChild(nameDiv);
+
+  // Create health bar container
+  const healthBarContainer = document.createElement('div');
+  healthBarContainer.style.width = '50px';
+  healthBarContainer.style.height = '4px';
+  healthBarContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  healthBarContainer.style.margin = '2px';
+
+  // Create health bar
+  const healthBar = document.createElement('div');
+  healthBar.style.width = `${health}%`;
+  healthBar.style.height = '100%';
+  healthBar.style.backgroundColor = '#ff3333';
+  healthBarContainer.appendChild(healthBar);
+  container.appendChild(healthBarContainer);
+
+  // Create shield bar container
+  const shieldBarContainer = document.createElement('div');
+  shieldBarContainer.style.width = '50px';
+  shieldBarContainer.style.height = '4px';
+  shieldBarContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  shieldBarContainer.style.margin = '2px';
+
+  // Create shield bar
+  const shieldBar = document.createElement('div');
+  shieldBar.style.width = `${shields}%`;
+  shieldBar.style.height = '100%';
+  shieldBar.style.backgroundColor = '#3333ff';
+  shieldBarContainer.appendChild(shieldBar);
+  container.appendChild(shieldBarContainer);
+
+  // Create CSS2D object and add to group
+  const labelObject = new CSS2DObject(container);
+  labelObject.position.set(0, 2, 0); // Position above the entity
+  group.add(labelObject);
+
+  return group;
+}
 
 export async function initializeThreeJs(
   component: GameComponent,
@@ -23,6 +83,14 @@ export async function initializeThreeJs(
   );
   component.renderer = new THREE.WebGLRenderer();
   component.renderer.setSize(window.innerWidth, window.innerHeight);
+
+  // Initialize CSS2D renderer
+  component.labelRenderer = new CSS2DRenderer();
+  component.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  component.labelRenderer.domElement.style.position = 'absolute';
+  component.labelRenderer.domElement.style.top = '0';
+  component.labelRenderer.domElement.style.pointerEvents = 'none';
+  document.body.appendChild(component.labelRenderer.domElement);
 
   component.renderer.domElement.style.position = 'absolute';
   component.renderer.domElement.style.top = '0';
@@ -40,7 +108,7 @@ export async function initializeThreeJs(
   component.controls.dampingFactor = 0.05;
 
   // Set initial camera position
-  component.camera.position.set(0, 0, 10);
+  component.camera.position.set(0, 50, 0);
   component.controls.target.set(0, 0, 0);
 
   // Add raycasting for left-click
@@ -74,6 +142,7 @@ export async function initializeThreeJs(
   const animate = () => {
     requestAnimationFrame(animate);
     component.renderer!.render(component.scene!, component.camera!);
+    component.labelRenderer!.render(component.scene!, component.camera!);
   };
 
   animate();
@@ -213,24 +282,38 @@ async function createSpacemapPlane(
   const width = spaceMapData.mapObject.size.width;
   const height = spaceMapData.mapObject.size.height;
 
+  console.log('Creating plane with dimensions:', { width, height });
+
   const geometry = new THREE.PlaneGeometry(width, height);
   const material = new THREE.MeshBasicMaterial({
     color: 0xffff00,
     transparent: true,
-    opacity: 0.2,
+    opacity: 0.5,
     side: THREE.DoubleSide,
     depthWrite: false,
+    depthTest: false,
+    blending: THREE.AdditiveBlending,
   });
 
   const plane = new THREE.Mesh(geometry, material);
   plane.rotation.x = Math.PI / 2;
-  plane.position.y = 0;
+  plane.position.y = 0.1;
   plane.name = 'spacemapPlane';
   plane.layers.set(LAYERS.RAYCAST);
   plane.userData = { type: 'plane' };
+  plane.renderOrder = 1;
+
+  const gridHelper = new THREE.GridHelper(Math.max(width, height), 10);
+  gridHelper.renderOrder = 0;
+  component.scene.add(gridHelper);
 
   component.scene.add(plane);
-  console.log('Spacemap plane added to scene:', plane);
+  console.log('Spacemap plane added to scene:', {
+    position: plane.position,
+    rotation: plane.rotation,
+    scale: plane.scale,
+    dimensions: { width, height }
+  });
 }
 
 function parsePositionDTOtoVector3(position: {

@@ -15,6 +15,7 @@ import { KeyboardService } from './services/keyboard.service';
 import { PlayerData } from '../models/player/PlayerData';
 import { AlienManager } from './AlienManager';
 import { PlayerManager } from './PlayerManager';
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 
 @Component({
   selector: 'app-game',
@@ -39,6 +40,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private frameCount: number = 0;
   private updateCount: number = 0;
   public isLoadingSpacemap: boolean = false;
+  public labelRenderer?: CSS2DRenderer;
 
   constructor(
     private hubService: HubService,

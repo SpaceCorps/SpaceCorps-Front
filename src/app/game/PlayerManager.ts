@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { createSelectionBox } from './game.utils';
+import { createSelectionBox, createEntityLabel } from './game.utils';
 
 interface PlayerData {
   id: string;
@@ -10,18 +10,18 @@ interface PlayerData {
   rotation: THREE.Euler;
 }
 
+interface PlayerMeshData {
+  instancedMeshes: THREE.InstancedMesh[];
+  matrixArrays: THREE.Matrix4[];
+  instanceIndex: number;
+  targetPosition?: THREE.Vector3;
+  selectionBox?: THREE.Mesh;
+  labelGroup?: THREE.Group;
+}
+
 export class PlayerManager {
   private scene: THREE.Scene;
-  private playerDictionary: Map<
-    string,
-    {
-      instancedMeshes: THREE.InstancedMesh[];
-      matrixArrays: THREE.Matrix4[];
-      instanceIndex: number;
-      targetPosition?: THREE.Vector3;
-      selectionBox?: THREE.Mesh;
-    }
-  > = new Map();
+  private playerDictionary: Map<string, PlayerMeshData> = new Map();
   private maxInstances: number = 100;
   private nextInstanceIndex: number = 0;
   private readonly MOVE_SPEED = 0.1; // Adjust this value to control movement speed
@@ -79,17 +79,23 @@ export class PlayerManager {
     if (!meshes) return;
 
     // Create selection box for raycasting
-    const selectionBox = createSelectionBox(3); // Size 3 units
+    const selectionBox = createSelectionBox(3);
     selectionBox.position.copy(playerData.position);
     selectionBox.userData = { type: 'player', id: playerData.id };
     this.scene.add(selectionBox);
+
+    // Create label group with health and shields
+    const labelGroup = createEntityLabel(playerData.name, 100, 100);
+    labelGroup.position.copy(playerData.position);
+    this.scene.add(labelGroup);
 
     this.playerDictionary.set(playerData.id, {
       instancedMeshes: meshes.instancedMeshes,
       matrixArrays: meshes.matrixArrays,
       instanceIndex: this.nextInstanceIndex++,
       targetPosition: undefined,
-      selectionBox // Store reference to selection box
+      selectionBox,
+      labelGroup
     });
   }
 
@@ -101,6 +107,10 @@ export class PlayerManager {
       if (playerData.selectionBox) {
         playerData.selectionBox.position.copy(position);
       }
+      // Update label position immediately
+      if (playerData.labelGroup) {
+        playerData.labelGroup.position.copy(position);
+      }
     }
   }
 
@@ -111,7 +121,11 @@ export class PlayerManager {
       if (playerData.selectionBox) {
         this.scene.remove(playerData.selectionBox);
       }
-      // Remove instanced meshes from scene
+      // Remove label group
+      if (playerData.labelGroup) {
+        this.scene.remove(playerData.labelGroup);
+      }
+      // Remove instanced meshes
       for (const mesh of playerData.instancedMeshes) {
         this.scene.remove(mesh);
       }
@@ -125,11 +139,14 @@ export class PlayerManager {
       if (playerData.selectionBox) {
         this.scene.remove(playerData.selectionBox);
       }
-      // Remove instanced meshes from scene
+      // Remove label groups
+      if (playerData.labelGroup) {
+        this.scene.remove(playerData.labelGroup);
+      }
+      // Remove instanced meshes
       for (const mesh of playerData.instancedMeshes) {
         this.scene.remove(mesh);
       }
-      this.removePlayer(id);
     }
     this.playerDictionary.clear();
     this.nextInstanceIndex = 0;
@@ -181,6 +198,11 @@ export class PlayerManager {
         // Update selection box position
         if (playerData.selectionBox) {
           playerData.selectionBox.position.copy(currentPosition);
+        }
+
+        // Update label group position
+        if (playerData.labelGroup) {
+          playerData.labelGroup.position.copy(currentPosition);
         }
 
         // If we're very close to the target, remove it
