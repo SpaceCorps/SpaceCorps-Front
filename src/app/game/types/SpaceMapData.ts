@@ -6,7 +6,7 @@ export type SpaceMapData = {
     aliens: AlienDto[];
     players: PlayerDto[];
     preferredColor: string;
-    Size: {
+    size: {
       width: number;
       height: number;
     }

@@ -32,6 +32,7 @@ export class PlayerManager {
 
   private async loadShipModel(
     shipName: string,
+    playerName: string,
   ): Promise<{
     instancedMeshes: THREE.InstancedMesh[];
     matrixArrays: THREE.Matrix4[];
@@ -54,6 +55,7 @@ export class PlayerManager {
             child.material,
             this.maxInstances,
           );
+          instancedMesh.name = playerName;
           instancedMeshes.push(instancedMesh);
           this.scene.add(instancedMesh);
         }
@@ -73,7 +75,7 @@ export class PlayerManager {
       return;
     }
 
-    const meshes = await this.loadShipModel(playerData.shipName);
+    const meshes = await this.loadShipModel(playerData.shipName, playerData.name);
     if (!meshes) return;
 
     // Create selection box for raycasting

@@ -210,8 +210,8 @@ async function createSpacemapPlane(
 
   await new Promise((resolve) => setTimeout(resolve, 0));
 
-  const width = spaceMapData.mapObject.Size.width;
-  const height = spaceMapData.mapObject.Size.height;
+  const width = spaceMapData.mapObject.size.width;
+  const height = spaceMapData.mapObject.size.height;
 
   const geometry = new THREE.PlaneGeometry(width, height);
   const material = new THREE.MeshBasicMaterial({
