@@ -103,14 +103,8 @@ export class PlayerManager {
     const playerData = this.playerDictionary.get(id);
     if (playerData) {
       playerData.targetPosition = position.clone();
-      // Update selection box position immediately
-      if (playerData.selectionBox) {
-        playerData.selectionBox.position.copy(position);
-      }
-      // Update label position immediately
-      if (playerData.labelGroup) {
-        playerData.labelGroup.position.copy(position);
-      }
+      // Don't update label and selection box positions immediately anymore
+      // They will be updated in the animate method along with the model
     }
   }
 
@@ -195,12 +189,10 @@ export class PlayerManager {
         );
         playerData.matrixArrays[playerData.instanceIndex] = matrix;
 
-        // Update selection box position
+        // Update selection box and label positions to match the interpolated position
         if (playerData.selectionBox) {
           playerData.selectionBox.position.copy(currentPosition);
         }
-
-        // Update label group position
         if (playerData.labelGroup) {
           playerData.labelGroup.position.copy(currentPosition);
         }

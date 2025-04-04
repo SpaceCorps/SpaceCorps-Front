@@ -64,14 +64,8 @@ export class AlienManager {
     const alienData = this.alienDictionary.get(id);
     if (alienData) {
       alienData.targetPosition = position.clone();
-      // Update selection box position immediately
-      if (alienData.selectionBox) {
-        alienData.selectionBox.position.copy(position);
-      }
-      // Update label position immediately
-      if (alienData.labelGroup) {
-        alienData.labelGroup.position.copy(position);
-      }
+      // Don't update label and selection box positions immediately anymore
+      // They will be updated in the animate method along with the model
     }
   }
 
@@ -133,12 +127,10 @@ export class AlienManager {
         );
         alienData.matrixArrays[alienData.instanceIndex] = matrix;
 
-        // Update selection box position
+        // Update selection box and label positions to match the interpolated position
         if (alienData.selectionBox) {
           alienData.selectionBox.position.copy(currentPosition);
         }
-
-        // Update label group position
         if (alienData.labelGroup) {
           alienData.labelGroup.position.copy(currentPosition);
         }

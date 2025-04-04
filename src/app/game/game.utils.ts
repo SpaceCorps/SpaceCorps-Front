@@ -116,7 +116,10 @@ export async function initializeThreeJs(
   raycaster.layers.set(LAYERS.RAYCAST);
   const mouse = new THREE.Vector2();
 
-  component.renderer.domElement.addEventListener('click', (event) => {
+  component.renderer.domElement.addEventListener('click', async (event) => {
+    // Only handle left clicks
+    if (event.button !== 0) return;
+    
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -135,6 +138,12 @@ export async function initializeThreeJs(
         console.log('Clicked alien:', userData['id']);
       } else if (userData['type'] === 'plane') {
         console.log('Clicked plane at:', intersect.point);
+        // Send movement request to backend
+        await component.movePlayerTo({
+          x: intersect.point.x,
+          y: 0, // Keep y at 0 for 2D movement
+          z: intersect.point.z
+        });
       }
     }
   });
@@ -149,7 +158,7 @@ export async function initializeThreeJs(
 }
 
 // Helper function to create a selection box
-export function createSelectionBox(size: number = 2): THREE.Mesh {
+export function createSelectionBox(size: number = 0.5): THREE.Mesh {
   const geometry = new THREE.BoxGeometry(size, size, size);
   const material = new THREE.MeshBasicMaterial({
     visible: false,

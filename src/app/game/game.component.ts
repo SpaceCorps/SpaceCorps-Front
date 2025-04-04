@@ -91,7 +91,13 @@ export class GameComponent implements OnInit, OnDestroy {
       console.log('HubMessage: Entities:', entities);
     });
 
+    hubService.on('moveFailed', (reason: string) => {
+      console.error('HubMessage: Movement failed:', reason);
+      // Here you could add UI feedback, like a toast notification
+    });
+
     hubService.on('spacemapUpdate', async (spaceMapData: SpaceMapData) => {
+      // console.log('HubMessage: Spacemap update:', spaceMapData);
       if (this.currentMapName != spaceMapData.mapName) {
         await loadNewSpacemap(this, spaceMapData);
         if (this.controls) {
@@ -164,6 +170,16 @@ export class GameComponent implements OnInit, OnDestroy {
     }
     if (this.scene) {
       this.scene.clear();
+    }
+  }
+
+  // Public method to handle player movement
+  public async movePlayerTo(position: { x: number; y: number; z: number }): Promise<void> {
+    if (this.playerData) {
+      await this.hubService.send('requestMove', {
+        username: this.playerData.username,
+        position: position
+      });
     }
   }
 }

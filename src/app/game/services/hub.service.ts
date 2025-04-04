@@ -60,6 +60,14 @@ export class HubService {
 type ServerRequestTypes = {
   requestLogin: RequestLogin;
   logEntities: null;
+  requestMove: {
+    username: string;
+    position: {
+      x: number;
+      y: number;
+      z: number;
+    }
+  };
 };
 
 type RequestLogin = {
