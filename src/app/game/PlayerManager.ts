@@ -1,219 +1,203 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createSelectionBox } from './game.utils';
+
+interface PlayerData {
+  id: string;
+  name: string;
+  shipName: string;
+  position: THREE.Vector3;
+  rotation: THREE.Euler;
+}
 
 export class PlayerManager {
-  private maxInstances: number;
   private scene: THREE.Scene;
   private playerDictionary: Map<
     string,
-    { shipName: string; instanceIndex: number }
-  >;
-  private shipMeshes: Map<
+    {
+      instancedMeshes: THREE.InstancedMesh[];
+      matrixArrays: THREE.Matrix4[];
+      instanceIndex: number;
+      targetPosition?: THREE.Vector3;
+      selectionBox?: THREE.Mesh;
+    }
+  > = new Map();
+  private maxInstances: number = 100;
+  private nextInstanceIndex: number = 0;
+  private readonly MOVE_SPEED = 0.1; // Adjust this value to control movement speed
+
+  constructor(scene: THREE.Scene) {
+    this.scene = scene;
+  }
+
+  private async loadShipModel(
+    shipName: string,
+  ): Promise<{
+    instancedMeshes: THREE.InstancedMesh[];
+    matrixArrays: THREE.Matrix4[];
+  }> {
+    const loader = new GLTFLoader();
+    try {
+      console.log(`Loading ship model: ${shipName}`);
+      const gltf = await loader.loadAsync(
+        `/models/ships/${shipName}/${shipName}.glb`,
+      );
+      const instancedMeshes: THREE.InstancedMesh[] = [];
+      const matrixArrays: THREE.Matrix4[] = new Array(this.maxInstances).fill(
+        new THREE.Matrix4(),
+      );
+
+      gltf.scene.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          const instancedMesh = new THREE.InstancedMesh(
+            child.geometry,
+            child.material,
+            this.maxInstances,
+          );
+          instancedMeshes.push(instancedMesh);
+          this.scene.add(instancedMesh);
+        }
+      });
+
+      return { instancedMeshes, matrixArrays };
+    } catch (error) {
+      console.error('Error loading ship model:', error);
+      return { instancedMeshes: [], matrixArrays: [] };
+    }
+  }
+
+  public async addPlayer(playerData: PlayerData): Promise<void> {
+    const existingPlayer = this.playerDictionary.get(playerData.id);
+    if (existingPlayer) {
+      this.updatePlayerPosition(playerData.id, playerData.position);
+      return;
+    }
+
+    const meshes = await this.loadShipModel(playerData.shipName);
+    if (!meshes) return;
+
+    // Create selection box for raycasting
+    const selectionBox = createSelectionBox(3); // Size 3 units
+    selectionBox.position.copy(playerData.position);
+    selectionBox.userData = { type: 'player', id: playerData.id };
+    this.scene.add(selectionBox);
+
+    this.playerDictionary.set(playerData.id, {
+      instancedMeshes: meshes.instancedMeshes,
+      matrixArrays: meshes.matrixArrays,
+      instanceIndex: this.nextInstanceIndex++,
+      targetPosition: undefined,
+      selectionBox // Store reference to selection box
+    });
+  }
+
+  public updatePlayerPosition(id: string, position: THREE.Vector3): void {
+    const playerData = this.playerDictionary.get(id);
+    if (playerData) {
+      playerData.targetPosition = position.clone();
+      // Update selection box position immediately
+      if (playerData.selectionBox) {
+        playerData.selectionBox.position.copy(position);
+      }
+    }
+  }
+
+  public async removePlayer(id: string): Promise<void> {
+    const playerData = this.playerDictionary.get(id);
+    if (playerData) {
+      // Remove selection box
+      if (playerData.selectionBox) {
+        this.scene.remove(playerData.selectionBox);
+      }
+      // Remove instanced meshes from scene
+      for (const mesh of playerData.instancedMeshes) {
+        this.scene.remove(mesh);
+      }
+      this.playerDictionary.delete(id);
+    }
+  }
+
+  public async removeAllPlayers(): Promise<void> {
+    for (const [id, playerData] of this.playerDictionary) {
+      // Remove selection boxes
+      if (playerData.selectionBox) {
+        this.scene.remove(playerData.selectionBox);
+      }
+      // Remove instanced meshes from scene
+      for (const mesh of playerData.instancedMeshes) {
+        this.scene.remove(mesh);
+      }
+      this.removePlayer(id);
+    }
+    this.playerDictionary.clear();
+    this.nextInstanceIndex = 0;
+  }
+
+  public getPlayerIds(): Map<
     string,
     {
       instancedMeshes: THREE.InstancedMesh[];
-      matrixArrays: THREE.Matrix4[][];
+      matrixArrays: THREE.Matrix4[];
+      instanceIndex: number;
     }
-  >;
-
-  constructor(scene: THREE.Scene, maxInstances: number = 1000) {
-    this.maxInstances = maxInstances;
-    this.scene = scene;
-    this.playerDictionary = new Map<
-      string,
-      { shipName: string; instanceIndex: number }
-    >();
-    this.shipMeshes = new Map<
-      string,
-      {
-        instancedMeshes: THREE.InstancedMesh[];
-        matrixArrays: THREE.Matrix4[][];
-      }
-    >();
+  > {
+    return this.playerDictionary;
   }
 
-  private async loadShipModel(shipName: string): Promise<void> {
-    if (this.shipMeshes.has(shipName)) return; // Ship already loaded
-
-    const loader = new GLTFLoader();
-    return new Promise((resolve, reject) => {
-      loader.load(
-        `/models/ships/${shipName}/${shipName}.glb`,
-        (gltf) => {
-          const instancedMeshes: THREE.InstancedMesh[] = [];
-          const matrixArrays: THREE.Matrix4[][] = [];
-
-          gltf.scene.traverse((child) => {
-            if (!(child instanceof THREE.Mesh)) {
-              return;
-            }
-            const geometry = child.geometry as THREE.BufferGeometry;
-            const material = child.material as THREE.Material;
-            const instancedMesh = new THREE.InstancedMesh(
-              geometry,
-              material,
-              this.maxInstances,
-            );
-            instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-            this.scene.add(instancedMesh);
-            instancedMeshes.push(instancedMesh);
-            matrixArrays.push(new Array(this.maxInstances));
-          });
-
-          if (instancedMeshes.length === 0) {
-            console.warn(`No meshes found in the ship model "${shipName}".`);
-            reject(new Error(`Ship model "${shipName}" has no meshes.`));
-            return;
-          }
-
-          this.shipMeshes.set(shipName, {
-            instancedMeshes,
-            matrixArrays,
-          });
-
-          console.log(
-            `Ship model "${shipName}" loaded with ${instancedMeshes.length} meshes.`,
-          );
-          resolve();
-        },
-        undefined,
-        (error) => {
-          console.error(`Failed to load ship model "${shipName}":`, error);
-          reject(error);
-        },
-      );
-    });
+  public hasPlayer(id: string): boolean {
+    return this.playerDictionary.has(id);
   }
 
-  /** Add a player with a specific ship */
-  public async addPlayer(
-    playerId: string,
-    shipName: string,
-    position: THREE.Vector3,
-    rotation: THREE.Euler,
-  ): Promise<void> {
-    if (this.playerDictionary.has(playerId)) return; // Player already exists
-
-    if (shipName === '') {
-      console.error('Ship name is empty! Loading default ship');
-      shipName = 'Echelon';
-    }
-
-    // Ensure the ship model for this shipName is loaded
-    await this.loadShipModel(shipName);
-
-    const shipData = this.shipMeshes.get(shipName);
-    if (!shipData) {
-      console.warn(`Ship "${shipName}" not found, cannot add player.`);
-      return;
-    }
-
-    const { instancedMeshes, matrixArrays } = shipData;
-
-    // Calculate the instance index for this ship
-    const instanceIndex = Array.from(this.playerDictionary.values()).filter(
-      (entry) => entry.shipName === shipName,
-    ).length;
-
-    if (instanceIndex >= this.maxInstances) {
-      console.warn(`Max instances reached for ship "${shipName}".`);
-      return;
-    }
-
-    // Add player to the dictionary
-    this.playerDictionary.set(playerId, { shipName, instanceIndex });
-
-    // Update each mesh for this ship
-    instancedMeshes.forEach((instancedMesh, meshIndex) => {
-      // Create a transformation matrix
-      const transformMatrix = new THREE.Matrix4();
-      transformMatrix.compose(
-        position,
-        new THREE.Quaternion().setFromEuler(rotation),
-        new THREE.Vector3(1, 1, 1),
-      );
-
-      // Update the instanced mesh and matrix array
-      instancedMesh.setMatrixAt(instanceIndex, transformMatrix);
-      matrixArrays[meshIndex][instanceIndex] = transformMatrix;
-    });
-
-    // Mark all meshes' instanceMatrix as needing an update
-    instancedMeshes.forEach((instancedMesh) => {
-      instancedMesh.instanceMatrix.needsUpdate = true;
-    });
-  }
-
-  /** Update the position and rotation of a player's ship */
-  public async updatePlayerPosition(
-    playerId: string,
-    position: THREE.Vector3,
-    rotation: THREE.Euler,
-  ): Promise<void> {
-    const playerData = this.playerDictionary.get(playerId);
-    if (!playerData) return;
-
-    const { shipName, instanceIndex } = playerData;
-    const shipData = this.shipMeshes.get(shipName);
-
-    if (!shipData) return;
-
-    const { instancedMeshes, matrixArrays } = shipData;
-
-    // Create a transformation matrix
-    const transformMatrix = new THREE.Matrix4();
-    transformMatrix.compose(
-      position,
-      new THREE.Quaternion().setFromEuler(rotation),
-      new THREE.Vector3(1, 1, 1),
-    );
-
-    // Update each mesh for this ship
-    instancedMeshes.forEach((instancedMesh, meshIndex) => {
-      matrixArrays[meshIndex][instanceIndex] = transformMatrix;
-      instancedMesh.setMatrixAt(instanceIndex, transformMatrix);
-      instancedMesh.instanceMatrix.needsUpdate = true;
-    });
-  }
-
-  /** Remove a player from the scene */
-  public async removePlayer(playerId: string): Promise<void> {
-    const playerData = this.playerDictionary.get(playerId);
-    if (!playerData) return;
-
-    const { shipName, instanceIndex } = playerData;
-    const shipData = this.shipMeshes.get(shipName);
-
-    if (!shipData) return;
-
-    const { instancedMeshes, matrixArrays } = shipData;
-
-    // Create an identity matrix (no transformation)
-    const identityMatrix = new THREE.Matrix4();
-
-    // Update each mesh for this ship
-    instancedMeshes.forEach((instancedMesh, meshIndex) => {
-      matrixArrays[meshIndex][instanceIndex] = identityMatrix;
-      instancedMesh.setMatrixAt(instanceIndex, identityMatrix);
-      instancedMesh.instanceMatrix.needsUpdate = true;
-    });
-
-    // Remove player from the dictionary
-    this.playerDictionary.delete(playerId);
-  }
-
-  /** Remove all players from the scene */
-  public async removeAllPlayers(): Promise<void> {
-    for (const playerId of this.playerDictionary.keys()) {
-      await this.removePlayer(playerId);
-    }
-  }
-
-  public getPlayerShip(playerId: string): THREE.Mesh | undefined {
-    const shipData = this.shipMeshes.get(playerId);
-    if (shipData && shipData.instancedMeshes.length > 0) {
-      return shipData.instancedMeshes[0];
+  public getPlayerShip(id: string): THREE.InstancedMesh | undefined {
+    const playerData = this.playerDictionary.get(id);
+    if (playerData && playerData.instancedMeshes.length > 0) {
+      return playerData.instancedMeshes[0];
     }
     return undefined;
+  }
+
+  public animate(): void {
+    for (const [_, playerData] of this.playerDictionary) {
+      if (playerData.targetPosition) {
+        // Get current position from the matrix
+        const currentMatrix = playerData.matrixArrays[playerData.instanceIndex];
+        const currentPosition = new THREE.Vector3();
+        currentMatrix.decompose(currentPosition, new THREE.Quaternion(), new THREE.Vector3());
+
+        // Interpolate towards target position
+        currentPosition.lerp(playerData.targetPosition, this.MOVE_SPEED);
+
+        // Update the matrix with new position
+        const matrix = new THREE.Matrix4();
+        matrix.compose(
+          currentPosition,
+          new THREE.Quaternion(),
+          new THREE.Vector3(1, 1, 1)
+        );
+        playerData.matrixArrays[playerData.instanceIndex] = matrix;
+
+        // Update selection box position
+        if (playerData.selectionBox) {
+          playerData.selectionBox.position.copy(currentPosition);
+        }
+
+        // If we're very close to the target, remove it
+        if (currentPosition.distanceTo(playerData.targetPosition) < 0.01) {
+          delete playerData.targetPosition;
+        }
+      }
+
+      // Update instance matrices
+      for (let i = 0; i < playerData.instancedMeshes.length; i++) {
+        const matrix = playerData.matrixArrays[playerData.instanceIndex];
+        if (matrix) {
+          // Add rotation to the matrix
+          const rotation = new THREE.Matrix4().makeRotationY(0.01);
+          matrix.multiply(rotation);
+          playerData.instancedMeshes[i].setMatrixAt(playerData.instanceIndex, matrix);
+          playerData.instancedMeshes[i].instanceMatrix.needsUpdate = true;
+        }
+      }
+    }
   }
 }

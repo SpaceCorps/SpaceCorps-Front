@@ -5,6 +5,12 @@ import { GameComponent } from './game.component';
 import { EntityDTO } from './types/Entity';
 import { PlayerManager } from './PlayerManager';
 
+// Define layers
+const LAYERS = {
+  DEFAULT: 0,
+  RAYCAST: 1
+};
+
 export async function initializeThreeJs(
   component: GameComponent,
 ): Promise<void> {
@@ -31,26 +37,38 @@ export async function initializeThreeJs(
   // Disable panning completely
   component.controls.enablePan = false;
   component.controls.enableDamping = true;
-  
+  component.controls.dampingFactor = 0.05;
+
   // Set initial camera position
-  component.camera.position.set(0, 0, 50);
-  component.controls.target.set(0, -10, 0); // Look at the center of the plane
+  component.camera.position.set(0, 0, 10);
+  component.controls.target.set(0, 0, 0);
 
   // Add raycasting for left-click
   const raycaster = new THREE.Raycaster();
+  raycaster.layers.set(LAYERS.RAYCAST);
   const mouse = new THREE.Vector2();
 
   component.renderer.domElement.addEventListener('click', (event) => {
-    // Calculate mouse position in normalized device coordinates
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    // Update the raycaster
     raycaster.setFromCamera(mouse, component.camera!);
 
-    // Calculate objects intersecting the picking ray
+    // Get all objects in the raycast layer
     const intersects = raycaster.intersectObjects(component.scene!.children);
-    console.log('Intersects:', intersects);
+    
+    if (intersects.length > 0) {
+      const intersect = intersects[0]; // Get the closest intersect
+      const userData = intersect.object.userData;
+      
+      if (userData['type'] === 'player') {
+        console.log('Clicked player:', userData['id']);
+      } else if (userData['type'] === 'alien') {
+        console.log('Clicked alien:', userData['id']);
+      } else if (userData['type'] === 'plane') {
+        console.log('Clicked plane at:', intersect.point);
+      }
+    }
   });
 
   const animate = () => {
@@ -61,18 +79,43 @@ export async function initializeThreeJs(
   animate();
 }
 
+// Helper function to create a selection box
+export function createSelectionBox(size: number = 2): THREE.Mesh {
+  const geometry = new THREE.BoxGeometry(size, size, size);
+  const material = new THREE.MeshBasicMaterial({
+    visible: false,
+    transparent: true,
+    opacity: 0,
+    side: THREE.DoubleSide
+  });
+  
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.layers.set(LAYERS.RAYCAST);
+  return mesh;
+}
+
 export async function loadNewSpacemap(
   component: GameComponent,
   spaceMapData: SpaceMapData,
 ): Promise<void> {
-  console.log('Loading new space map: ', spaceMapData);
-  component.currentMapName = spaceMapData.mapName;
-  await clearScene(component);
-  await loadMapEnvironment(component, spaceMapData);
+  if (component.isLoadingSpacemap) {
+    console.log('Skipping spacemap update - still loading previous map');
+    return;
+  }
 
-  // Load players and aliens for the new map
-  await loadPlayers(spaceMapData.mapObject.players, component);
-  await loadAliens(spaceMapData.mapObject.aliens, component);
+  try {
+    component.isLoadingSpacemap = true;
+    console.log('Loading new space map: ', spaceMapData);
+    component.currentMapName = spaceMapData.mapName;
+    await clearScene(component);
+    await loadMapEnvironment(component, spaceMapData);
+
+    // Load players and aliens for the new map
+    await loadPlayers(spaceMapData.mapObject.players, component);
+    await loadAliens(spaceMapData.mapObject.aliens, component);
+  } finally {
+    component.isLoadingSpacemap = false;
+  }
 }
 
 export async function clearScene(component: GameComponent): Promise<void> {
@@ -156,11 +199,16 @@ export async function createStaticEntities(
   // Implementation here
 }
 
-async function createSpacemapPlane(component: GameComponent, spaceMapData: SpaceMapData): Promise<void> {
+async function createSpacemapPlane(
+  component: GameComponent,
+  spaceMapData: SpaceMapData,
+): Promise<void> {
   if (!component.scene) {
     console.error('Scene not initialized');
     return;
   }
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
 
   const width = spaceMapData.mapObject.Size.width;
   const height = spaceMapData.mapObject.Size.height;
@@ -170,20 +218,19 @@ async function createSpacemapPlane(component: GameComponent, spaceMapData: Space
     color: 0xffff00,
     transparent: true,
     opacity: 0.2,
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    depthWrite: false,
   });
 
   const plane = new THREE.Mesh(geometry, material);
-  plane.rotation.x = Math.PI / 2; // Rotate to be horizontal
-  plane.position.y = -10; // Position the plane below the camera's initial position
-  
-  // Add a grid helper to make the plane more visible
-  const gridHelper = new THREE.GridHelper(width, 20, 0x000000, 0x000000);
-  gridHelper.position.y = -10;
-  gridHelper.rotation.x = Math.PI / 2;
-  
+  plane.rotation.x = Math.PI / 2;
+  plane.position.y = 0;
+  plane.name = 'spacemapPlane';
+  plane.layers.set(LAYERS.RAYCAST);
+  plane.userData = { type: 'plane' };
+
   component.scene.add(plane);
-  component.scene.add(gridHelper);
+  console.log('Spacemap plane added to scene:', plane);
 }
 
 function parsePositionDTOtoVector3(position: {
@@ -203,12 +250,13 @@ export async function loadPlayers(
     return;
   }
   for (const player of playerDtos) {
-    await component.playerManager.addPlayer(
-      player.id,
-      player.activeShipName,
-      parsePositionDTOtoVector3(player.position),
-      new THREE.Euler(0, 0, 0),
-    );
+    await component.playerManager.addPlayer({
+      id: player.id,
+      name: player.id,
+      shipName: player.activeShipName,
+      position: parsePositionDTOtoVector3(player.position),
+      rotation: new THREE.Euler(0, 0, 0),
+    });
   }
 }
 
@@ -222,10 +270,17 @@ export async function loadAliens(aliens: AlienDto[], component: GameComponent) {
       console.error('Alien ID is undefined:', alien);
       continue;
     }
-    await component.alienManager.addAlien(
-      alien.id,
-      parsePositionDTOtoVector3(alien.position),
-    );
+    const position = parsePositionDTOtoVector3(alien.position);
+    if (component.alienManager.hasAlien(alien.id)) {
+      component.alienManager.updateAlienPosition(alien.id, position);
+    } else {
+      await component.alienManager.addAlien({
+        id: alien.id,
+        name: alien.name,
+        position: position,
+        rotation: new THREE.Euler(0, 0, 0),
+      });
+    }
   }
 }
 
@@ -233,75 +288,97 @@ export async function updateSpacemap(
   component: GameComponent,
   spaceMapData: SpaceMapData,
 ): Promise<void> {
-  const entities = component.entities;
-  const entitiesIn = spaceMapData.mapObject.players;
-
-  // Update players
-  if (component.playerManager) {
-    for (const entity of entitiesIn) {
-      if (entities.has(entity.id)) {
-        const oldEntity = entities.get(entity.id)!;
-        const newEntity = entity;
-
-        //TODO: better check later, for now only based on position
-        if (
-          oldEntity.position.x !== newEntity.position.x ||
-          oldEntity.position.y !== newEntity.position.y ||
-          oldEntity.position.z !== newEntity.position.z
-        ) {
-          await component.playerManager.updatePlayerPosition(
-            entity.id,
-            parsePositionDTOtoVector3(entity.position),
-            new THREE.Euler(0, 0, 0),
-          );
-        }
-
-        oldEntity.position = newEntity.position;
-      } else {
-        entities.set(entity.id, entity);
-        await component.playerManager.addPlayer(
-          entity.id,
-          entity.activeShipName,
-          parsePositionDTOtoVector3(entity.position),
-          new THREE.Euler(0, 0, 0),
-        );
-      }
-    }
-
-    for (const entity of entities) {
-      if (!entitiesIn.find((e) => e.id === entity[0])) {
-        await component.playerManager.removePlayer(entity[0]);
-        entities.delete(entity[0]);
-      }
-    }
+  if (component.isLoadingSpacemap) {
+    console.log('Skipping spacemap update - still loading previous map');
+    return;
   }
 
-  // Update aliens
-  if (component.alienManager) {
-    const aliens = spaceMapData.mapObject.aliens;
-    const currentAlienIds = new Set(
-      aliens.map((alien) => alien.id).filter((id) => id !== undefined),
-    );
+  try {
+    component.isLoadingSpacemap = true;
+    const entities = component.entities;
+    const entitiesIn = spaceMapData.mapObject.players;
 
-    // Remove aliens that are no longer in the map
-    for (const [id, _] of component.alienManager.getAlienIds()) {
-      if (!currentAlienIds.has(id)) {
-        component.alienManager.removeAlien(id);
+    // Store the spacemap plane before clearing
+    const spacemapPlane = component.scene?.getObjectByName('spacemapPlane');
+
+    // Update players
+    if (component.playerManager) {
+      for (const entity of entitiesIn) {
+        if (entities.has(entity.id)) {
+          const oldEntity = entities.get(entity.id)!;
+          const newEntity = entity;
+
+          if (
+            oldEntity.position.x !== newEntity.position.x ||
+            oldEntity.position.y !== newEntity.position.y ||
+            oldEntity.position.z !== newEntity.position.z
+          ) {
+            component.playerManager.updatePlayerPosition(
+              entity.id,
+              parsePositionDTOtoVector3(entity.position),
+            );
+          }
+
+          oldEntity.position = newEntity.position;
+        } else {
+          entities.set(entity.id, entity);
+          await component.playerManager.addPlayer({
+            id: entity.id,
+            name: entity.id,
+            shipName: entity.activeShipName,
+            position: parsePositionDTOtoVector3(entity.position),
+            rotation: new THREE.Euler(0, 0, 0),
+          });
+        }
+      }
+
+      for (const entity of entities) {
+        if (!entitiesIn.find((e) => e.id === entity[0])) {
+          await component.playerManager.removePlayer(entity[0]);
+          entities.delete(entity[0]);
+        }
       }
     }
 
-    // Add or update aliens
-    for (const alien of aliens) {
-      if (alien.id === undefined) {
-        console.error('Alien ID is undefined:', alien);
-        continue;
+    // Update aliens
+    if (component.alienManager) {
+      const aliens = spaceMapData.mapObject.aliens;
+      const currentAlienIds = new Set(
+        aliens.map((alien) => alien.id).filter((id) => id !== undefined),
+      );
+
+      // Remove aliens that are no longer in the map
+      for (const [id, _] of component.alienManager.getAlienIds()) {
+        if (!currentAlienIds.has(id)) {
+          component.alienManager.removeAlien(id);
+        }
       }
-      const position = parsePositionDTOtoVector3(alien.position);
-      if (component.alienManager.hasAlien(alien.id)) {
-        component.alienManager.updateAlienPosition(alien.id, position);
-      } else {
-        await component.alienManager.addAlien(alien.id, position);
+
+      // Add or update aliens
+      for (const alien of aliens) {
+        if (alien.id === undefined) {
+          console.error('Alien ID is undefined:', alien);
+          continue;
+        }
+        const position = parsePositionDTOtoVector3(alien.position);
+        if (component.alienManager.hasAlien(alien.id)) {
+          component.alienManager.updateAlienPosition(alien.id, position);
+        } else {
+          await component.alienManager.addAlien({
+            id: alien.id,
+            name: alien.name,
+            position: position,
+            rotation: new THREE.Euler(0, 0, 0),
+          });
+        }
       }
     }
+
+    // Re-add the spacemap plane if it was removed
+    if (spacemapPlane && !component.scene?.getObjectByName('spacemapPlane')) {
+      component.scene?.add(spacemapPlane);
+    }
+  } finally {
+    component.isLoadingSpacemap = false;
   }
 }

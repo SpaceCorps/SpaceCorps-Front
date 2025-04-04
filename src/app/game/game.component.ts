@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
 import { HubService } from './services/hub.service';
 import { ActivatedRoute } from '@angular/router';
@@ -11,7 +11,6 @@ import {
   loadPlayers,
   updateSpacemap,
 } from './game.utils';
-import { EntityDTO } from './types/Entity';
 import { KeyboardService } from './services/keyboard.service';
 import { PlayerData } from '../models/player/PlayerData';
 import { AlienManager } from './AlienManager';
@@ -22,7 +21,7 @@ import { PlayerManager } from './PlayerManager';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss'],
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
   public camera?: THREE.PerspectiveCamera;
   public renderer?: THREE.WebGLRenderer;
   public scene?: THREE.Scene;
@@ -39,6 +38,7 @@ export class GameComponent implements OnInit {
   private lastTime: number = 0;
   private frameCount: number = 0;
   private updateCount: number = 0;
+  public isLoadingSpacemap: boolean = false;
 
   constructor(
     private hubService: HubService,
@@ -110,7 +110,7 @@ export class GameComponent implements OnInit {
 
   public async initializeGame(): Promise<void> {
     await initializeThreeJs(this);
-    this.playerManager = new PlayerManager(this.scene!, 100);
+    this.playerManager = new PlayerManager(this.scene!);
     this.alienManager = new AlienManager(this.scene!);
     this.setupSignalREvents(this.hubService);
     this.setupPerformanceMeters();
@@ -150,6 +150,18 @@ export class GameComponent implements OnInit {
 
     if (this.scene && this.camera && this.renderer) {
       this.renderer.render(this.scene, this.camera);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.renderer) {
+      this.renderer.dispose();
+    }
+    if (this.controls) {
+      this.controls.dispose();
+    }
+    if (this.scene) {
+      this.scene.clear();
     }
   }
 }
