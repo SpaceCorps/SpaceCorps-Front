@@ -208,4 +208,12 @@ export class PlayerManager {
       await this.removePlayer(playerId);
     }
   }
+
+  public getPlayerShip(playerId: string): THREE.Mesh | undefined {
+    const shipData = this.shipMeshes.get(playerId);
+    if (shipData && shipData.instancedMeshes.length > 0) {
+      return shipData.instancedMeshes[0];
+    }
+    return undefined;
+  }
 }

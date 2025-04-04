@@ -24,7 +24,7 @@ export type PlayerDto = {
 }
 
 export type AlienDto = {
-  id: number;
+  id: string;
   name: string;
   position: Position3;
   health: number;

@@ -4,6 +4,7 @@ import { HubService } from './services/hub.service';
 import { ActivatedRoute } from '@angular/router';
 import { PlayerDto, SpaceMapData } from './types/SpaceMapData';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
   initializeThreeJs,
   loadNewSpacemap,
@@ -29,9 +30,15 @@ export class GameComponent implements OnInit {
   public entities: Map<string, PlayerDto> = new Map();
   public alienManager?: AlienManager;
   public playerManager?: PlayerManager;
-
+  public stats?: Stats;
   public currentMapName?: string;
   public playerData: PlayerData | undefined;
+  public fps: number = 0;
+  public ups: number = 0;
+  public drawCalls: number = 0;
+  private lastTime: number = 0;
+  private frameCount: number = 0;
+  private updateCount: number = 0;
 
   constructor(
     private hubService: HubService,
@@ -52,10 +59,12 @@ export class GameComponent implements OnInit {
   }
 
   @HostListener('window:resize', ['$event'])
-  onWindowResize(event: Event): void {
-    this.renderer!.setSize(window.innerWidth, window.innerHeight);
-    this.camera!.aspect = window.innerWidth / window.innerHeight;
-    this.camera!.updateProjectionMatrix();
+  onResize(event: Event): void {
+    if (this.camera && this.renderer) {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
   }
 
   public setupSignalREvents(hubService: HubService): void {
@@ -83,31 +92,64 @@ export class GameComponent implements OnInit {
     hubService.on('spacemapUpdate', async (spaceMapData: SpaceMapData) => {
       if (this.currentMapName != spaceMapData.mapName) {
         await loadNewSpacemap(this, spaceMapData);
+        if (this.controls) {
+          this.controls.target = new THREE.Vector3(0, 0, 0);
+        }
       } else {
         await updateSpacemap(this, spaceMapData);
+      }
+
+      if (this.playerData && this.playerManager) {
+        const playerShip = this.playerManager.getPlayerShip(this.playerData.id);
+        if (playerShip && this.controls) {
+          this.controls.target = playerShip.position;
+        }
       }
     });
   }
 
-  private async initializeGame() {
+  public async initializeGame(): Promise<void> {
     await initializeThreeJs(this);
-    if (this.scene) {
-      this.alienManager = new AlienManager(this.scene);
-      this.playerManager = new PlayerManager(this.scene, 100);
-    }
-    this.setupGameLoop();
+    this.playerManager = new PlayerManager(this.scene!, 100);
+    this.alienManager = new AlienManager(this.scene!);
+    this.setupSignalREvents(this.hubService);
+    this.setupPerformanceMeters();
+    this.animate();
   }
 
-  private setupGameLoop() {
-    const animate = () => {
-      requestAnimationFrame(animate);
-      if (this.alienManager) {
-        this.alienManager.animate();
-      }
-      if (this.renderer && this.scene && this.camera) {
-        this.renderer.render(this.scene, this.camera);
-      }
-    };
-    animate();
+  private setupPerformanceMeters(): void {
+    this.stats = new Stats();
+    this.stats.dom.style.position = 'absolute';
+    this.stats.dom.style.bottom = '0';
+    this.stats.dom.style.left = '0';
+    document.body.appendChild(this.stats.dom);
+  }
+
+  private animate(): void {
+    requestAnimationFrame(() => this.animate());
+    const currentTime = performance.now();
+    const deltaTime = currentTime - this.lastTime;
+
+    this.frameCount++;
+    if (deltaTime >= 1000) {
+      this.fps = Math.round((this.frameCount * 1000) / deltaTime);
+      this.ups = Math.round((this.updateCount * 1000) / deltaTime);
+      this.drawCalls = this.renderer!.info.render.calls;
+      this.frameCount = 0;
+      this.updateCount = 0;
+      this.lastTime = currentTime;
+    }
+
+    if (this.stats) {
+      this.stats.update();
+    }
+
+    if (this.alienManager) {
+      this.alienManager.animate();
+    }
+
+    if (this.scene && this.camera && this.renderer) {
+      this.renderer.render(this.scene, this.camera);
+    }
   }
 }

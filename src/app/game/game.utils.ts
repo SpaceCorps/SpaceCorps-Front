@@ -28,8 +28,30 @@ export async function initializeThreeJs(
     component.renderer!.domElement,
   );
 
+  // Disable panning completely
+  component.controls.enablePan = false;
   component.controls.enableDamping = true;
-  component.camera.position.z = 5;
+  
+  // Set initial camera position
+  component.camera.position.set(0, 0, 50);
+  component.controls.target.set(0, -10, 0); // Look at the center of the plane
+
+  // Add raycasting for left-click
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  component.renderer.domElement.addEventListener('click', (event) => {
+    // Calculate mouse position in normalized device coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the raycaster
+    raycaster.setFromCamera(mouse, component.camera!);
+
+    // Calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects(component.scene!.children);
+    console.log('Intersects:', intersects);
+  });
 
   const animate = () => {
     requestAnimationFrame(animate);
@@ -70,6 +92,7 @@ async function loadMapEnvironment(
   await createLighting(component);
   await createSkybox(component, spaceMapData.mapName);
   await createStaticEntities(component);
+  await createSpacemapPlane(component, spaceMapData);
 }
 
 export async function createStars(component: GameComponent): Promise<void> {
@@ -131,6 +154,36 @@ export async function createStaticEntities(
   component: GameComponent,
 ): Promise<void> {
   // Implementation here
+}
+
+async function createSpacemapPlane(component: GameComponent, spaceMapData: SpaceMapData): Promise<void> {
+  if (!component.scene) {
+    console.error('Scene not initialized');
+    return;
+  }
+
+  const width = spaceMapData.mapObject.Size.width;
+  const height = spaceMapData.mapObject.Size.height;
+
+  const geometry = new THREE.PlaneGeometry(width, height);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffff00,
+    transparent: true,
+    opacity: 0.2,
+    side: THREE.DoubleSide
+  });
+
+  const plane = new THREE.Mesh(geometry, material);
+  plane.rotation.x = Math.PI / 2; // Rotate to be horizontal
+  plane.position.y = -10; // Position the plane below the camera's initial position
+  
+  // Add a grid helper to make the plane more visible
+  const gridHelper = new THREE.GridHelper(width, 20, 0x000000, 0x000000);
+  gridHelper.position.y = -10;
+  gridHelper.rotation.x = Math.PI / 2;
+  
+  component.scene.add(plane);
+  component.scene.add(gridHelper);
 }
 
 function parsePositionDTOtoVector3(position: {
