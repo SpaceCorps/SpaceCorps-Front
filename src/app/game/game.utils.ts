@@ -137,14 +137,18 @@ export async function initializeThreeJs(
       } else if (userData['type'] === 'alien') {
         console.log('Clicked alien:', userData['id']);
       } else if (userData['type'] === 'plane') {
-        console.log('Clicked plane at:', intersect.point);
+        const clickPoint = intersect.point;
+        console.log('[Movement] Clicked plane at:', clickPoint.toArray());
         // Send movement request to backend
         await component.movePlayerTo({
-          x: intersect.point.x,
+          x: clickPoint.x,
           y: 0, // Keep y at 0 for 2D movement
-          z: intersect.point.z
+          z: clickPoint.z
         });
+        console.log('[Movement] Sent move request to backend');
       }
+    } else {
+      console.log('[Movement] No intersection found');
     }
   });
 

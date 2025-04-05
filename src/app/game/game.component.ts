@@ -156,6 +156,10 @@ export class GameComponent implements OnInit, OnDestroy {
       this.alienManager.animate();
     }
 
+    if (this.playerManager) {
+      this.playerManager.animate();
+    }
+
     if (this.scene && this.camera && this.renderer) {
       this.renderer.render(this.scene, this.camera);
     }

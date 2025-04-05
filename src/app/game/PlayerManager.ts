@@ -25,9 +25,13 @@ export class PlayerManager {
   private maxInstances: number = 100;
   private nextInstanceIndex: number = 0;
   private readonly MOVE_SPEED = 0.1; // Adjust this value to control movement speed
+  private rootGroup: THREE.Group;
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
+    this.rootGroup = new THREE.Group();
+    this.rootGroup.name = 'players';
+    this.scene.add(this.rootGroup);
   }
 
   private async loadShipModel(
@@ -57,7 +61,7 @@ export class PlayerManager {
           );
           instancedMesh.name = playerName;
           instancedMeshes.push(instancedMesh);
-          this.scene.add(instancedMesh);
+          this.rootGroup.add(instancedMesh);
         }
       });
 
@@ -79,15 +83,15 @@ export class PlayerManager {
     if (!meshes) return;
 
     // Create selection box for raycasting
-    const selectionBox = createSelectionBox(3);
+    const selectionBox = createSelectionBox();
     selectionBox.position.copy(playerData.position);
     selectionBox.userData = { type: 'player', id: playerData.id };
-    this.scene.add(selectionBox);
+    this.rootGroup.add(selectionBox);
 
     // Create label group with health and shields
     const labelGroup = createEntityLabel(playerData.name, 100, 100);
     labelGroup.position.copy(playerData.position);
-    this.scene.add(labelGroup);
+    this.rootGroup.add(labelGroup);
 
     this.playerDictionary.set(playerData.id, {
       instancedMeshes: meshes.instancedMeshes,
@@ -102,9 +106,10 @@ export class PlayerManager {
   public updatePlayerPosition(id: string, position: THREE.Vector3): void {
     const playerData = this.playerDictionary.get(id);
     if (playerData) {
+      console.log(`[PlayerManager] Setting target position for player ${id}:`, position.toArray());
       playerData.targetPosition = position.clone();
-      // Don't update label and selection box positions immediately anymore
-      // They will be updated in the animate method along with the model
+    } else {
+      console.warn(`[PlayerManager] Tried to update position for non-existent player ${id}`);
     }
   }
 
@@ -113,15 +118,15 @@ export class PlayerManager {
     if (playerData) {
       // Remove selection box
       if (playerData.selectionBox) {
-        this.scene.remove(playerData.selectionBox);
+        this.rootGroup.remove(playerData.selectionBox);
       }
       // Remove label group
       if (playerData.labelGroup) {
-        this.scene.remove(playerData.labelGroup);
+        this.rootGroup.remove(playerData.labelGroup);
       }
       // Remove instanced meshes
       for (const mesh of playerData.instancedMeshes) {
-        this.scene.remove(mesh);
+        this.rootGroup.remove(mesh);
       }
       this.playerDictionary.delete(id);
     }
@@ -129,18 +134,7 @@ export class PlayerManager {
 
   public async removeAllPlayers(): Promise<void> {
     for (const [id, playerData] of this.playerDictionary) {
-      // Remove selection boxes
-      if (playerData.selectionBox) {
-        this.scene.remove(playerData.selectionBox);
-      }
-      // Remove label groups
-      if (playerData.labelGroup) {
-        this.scene.remove(playerData.labelGroup);
-      }
-      // Remove instanced meshes
-      for (const mesh of playerData.instancedMeshes) {
-        this.scene.remove(mesh);
-      }
+      await this.removePlayer(id);
     }
     this.playerDictionary.clear();
     this.nextInstanceIndex = 0;
@@ -170,26 +164,54 @@ export class PlayerManager {
   }
 
   public animate(): void {
-    for (const [_, playerData] of this.playerDictionary) {
+    for (const [playerId, playerData] of this.playerDictionary) {
       if (playerData.targetPosition) {
-        // Get current position from the matrix
-        const currentMatrix = playerData.matrixArrays[playerData.instanceIndex];
+        console.log(`[PlayerManager] Animating player ${playerId}`);
+        
+        // Get current position from the first instanced mesh's matrix
         const currentPosition = new THREE.Vector3();
-        currentMatrix.decompose(currentPosition, new THREE.Quaternion(), new THREE.Vector3());
+        const currentRotation = new THREE.Quaternion();
+        const currentScale = new THREE.Vector3();
+        
+        if (!playerData.matrixArrays[playerData.instanceIndex]) {
+          console.error(`[PlayerManager] No matrix found for player ${playerId} at index ${playerData.instanceIndex}`);
+          continue;
+        }
+
+        playerData.matrixArrays[playerData.instanceIndex].decompose(
+          currentPosition,
+          currentRotation,
+          currentScale
+        );
+
+        console.log(`[PlayerManager] Current position:`, currentPosition.toArray());
+        console.log(`[PlayerManager] Target position:`, playerData.targetPosition.toArray());
 
         // Interpolate towards target position
         currentPosition.lerp(playerData.targetPosition, this.MOVE_SPEED);
+        console.log(`[PlayerManager] Interpolated position:`, currentPosition.toArray());
 
-        // Update the matrix with new position
-        const matrix = new THREE.Matrix4();
-        matrix.compose(
-          currentPosition,
-          new THREE.Quaternion(),
-          new THREE.Vector3(1, 1, 1)
-        );
-        playerData.matrixArrays[playerData.instanceIndex] = matrix;
+        // Update all instanced meshes with new position
+        for (let i = 0; i < playerData.instancedMeshes.length; i++) {
+          const matrix = new THREE.Matrix4();
+          
+          // Add rotation
+          const rotationMatrix = new THREE.Matrix4().makeRotationY(0.01);
+          currentRotation.multiply(new THREE.Quaternion().setFromRotationMatrix(rotationMatrix));
+          
+          // Compose new matrix with updated position and rotation
+          matrix.compose(
+            currentPosition,
+            currentRotation,
+            currentScale
+          );
+          
+          playerData.matrixArrays[playerData.instanceIndex] = matrix;
+          playerData.instancedMeshes[i].setMatrixAt(playerData.instanceIndex, matrix);
+          playerData.instancedMeshes[i].instanceMatrix.needsUpdate = true;
+        }
 
-        // Update selection box and label positions to match the interpolated position
+        // Update selection box and label positions
         if (playerData.selectionBox) {
           playerData.selectionBox.position.copy(currentPosition);
         }
@@ -199,19 +221,8 @@ export class PlayerManager {
 
         // If we're very close to the target, remove it
         if (currentPosition.distanceTo(playerData.targetPosition) < 0.01) {
+          console.log(`[PlayerManager] Player ${playerId} reached target position`);
           delete playerData.targetPosition;
-        }
-      }
-
-      // Update instance matrices
-      for (let i = 0; i < playerData.instancedMeshes.length; i++) {
-        const matrix = playerData.matrixArrays[playerData.instanceIndex];
-        if (matrix) {
-          // Add rotation to the matrix
-          const rotation = new THREE.Matrix4().makeRotationY(0.01);
-          matrix.multiply(rotation);
-          playerData.instancedMeshes[i].setMatrixAt(playerData.instanceIndex, matrix);
-          playerData.instancedMeshes[i].instanceMatrix.needsUpdate = true;
         }
       }
     }
