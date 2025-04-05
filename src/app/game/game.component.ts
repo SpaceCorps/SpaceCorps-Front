@@ -33,7 +33,6 @@ export class GameComponent implements OnInit, OnDestroy {
   public stats?: Stats;
   public currentMapName?: string;
   public playerData: PlayerData | undefined;
-  public fps: number = 0;
   public ups: number = 0;
   public drawCalls: number = 0;
   private lastTime: number = 0;
@@ -71,7 +70,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   public setupSignalREvents(hubService: HubService): void {
     hubService.on('server-side-log', (data) => {
-      console.log('HubMessage: Received data:', data);
+      console.log('Server-side log:', data);
     });
 
     hubService.on('server-side-error', (error) => {
@@ -97,7 +96,17 @@ export class GameComponent implements OnInit, OnDestroy {
     });
 
     hubService.on('spacemapUpdate', async (spaceMapData: SpaceMapData) => {
-      // console.log('HubMessage: Spacemap update:', spaceMapData);
+      // Update UPS counter
+      this.updateCount++;
+      const currentTime = performance.now();
+      const deltaTime = currentTime - this.lastTime;
+      
+      if (deltaTime >= 1000) {
+        this.ups = Math.round((this.updateCount * 1000) / deltaTime);
+        this.updateCount = 0;
+        this.lastTime = currentTime;
+      }
+
       if (this.currentMapName != spaceMapData.mapName) {
         await loadNewSpacemap(this, spaceMapData);
         // Reset orbit controls to origin when switching maps
@@ -195,12 +204,8 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.frameCount++;
     if (deltaTime >= 1000) {
-      this.fps = Math.round((this.frameCount * 1000) / deltaTime);
-      this.ups = Math.round((this.updateCount * 1000) / deltaTime);
       this.drawCalls = this.renderer!.info.render.calls;
       this.frameCount = 0;
-      this.updateCount = 0;
-      this.lastTime = currentTime;
     }
 
     if (this.stats) {
