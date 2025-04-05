@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { createSelectionBox, createEntityLabel } from './game.utils';
+import { createSelectionBox } from './game.utils';
 
 // Static cache for geometries and materials
 const modelCache = new Map<string, {
@@ -22,7 +22,6 @@ interface AlienMeshData {
   instanceIndex: number;
   targetPosition?: THREE.Vector3;
   selectionBox?: THREE.Mesh;
-  labelGroup?: THREE.Group;
   currentPosition: THREE.Vector3;
   currentRotation: THREE.Quaternion;
   currentScale: THREE.Vector3;
@@ -31,20 +30,29 @@ interface AlienMeshData {
 export class AlienManager {
   private scene: THREE.Scene;
   private alienDictionary: Map<string, AlienMeshData> = new Map();
-  private maxInstances: number = 100;
+  private maxInstances: number = 512;
   private nextInstanceIndex: number = 0;
-  private readonly MOVE_SPEED = 0.1;
+  private readonly MOVE_SPEED = 10; // Units per second
   private rootGroup: THREE.Group;
+  private needsMatrixUpdate: boolean = false;
+  private lastUpdateTime: number = 0;
+  private readonly UPDATE_INTERVAL = 4; // ~240fps
+  private readonly ROTATION_SPEED = 0.2;
+  private tempVector: THREE.Vector3 = new THREE.Vector3();
+  private tempQuaternion: THREE.Quaternion = new THREE.Quaternion();
+  private tempMatrix: THREE.Matrix4 = new THREE.Matrix4();
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
     this.rootGroup = new THREE.Group();
     this.rootGroup.name = 'aliens';
     this.scene.add(this.rootGroup);
+    this.lastUpdateTime = performance.now();
   }
 
   private async loadShipModel(
     alienName: string,
+    position: THREE.Vector3
   ): Promise<{
     instancedMeshes: THREE.InstancedMesh[];
     matrixArrays: THREE.Matrix4[];
@@ -107,7 +115,7 @@ export class AlienManager {
       const matrixArrays: THREE.Matrix4[] = [];
       const initialMatrix = new THREE.Matrix4();
       initialMatrix.compose(
-        new THREE.Vector3(0, 0, 0),
+        position,
         new THREE.Quaternion(),
         new THREE.Vector3(1, 1, 1)
       );
@@ -127,29 +135,29 @@ export class AlienManager {
   }
 
   private updateAlienMatrices(alienData: AlienMeshData): void {
-    const matrix = new THREE.Matrix4();
-    matrix.compose(
+    this.tempMatrix.compose(
       alienData.currentPosition,
       alienData.currentRotation,
       alienData.currentScale
     );
 
     for (const mesh of alienData.instancedMeshes) {
-      mesh.setMatrixAt(alienData.instanceIndex, matrix);
+      mesh.setMatrixAt(alienData.instanceIndex, this.tempMatrix);
+    }
+    
+    // Only update instance matrix once per mesh
+    for (const mesh of alienData.instancedMeshes) {
       mesh.instanceMatrix.needsUpdate = true;
-      mesh.computeBoundingSphere(); // Force bounding sphere update
     }
   }
 
   public async addAlien(alienData: AlienData): Promise<void> {
-    const existingAlien = this.alienDictionary.get(alienData.id);
-    if (existingAlien) {
-      this.updateAlienPosition(alienData.id, alienData.position);
-      return;
+    if (this.hasAlien(alienData.id)) {
+      this.removeAlien(alienData.id);
     }
 
-    const meshes = await this.loadShipModel(alienData.name);
-    if (!meshes) return;
+    const meshes = await this.loadShipModel(alienData.name, alienData.position);
+    if (!meshes || meshes.instancedMeshes.length === 0) return;
 
     // Create selection box for raycasting
     const selectionBox = createSelectionBox();
@@ -157,45 +165,47 @@ export class AlienManager {
     selectionBox.userData = { type: 'alien', id: alienData.id };
     this.rootGroup.add(selectionBox);
 
-    // Create label group with health and shields
-    const labelGroup = createEntityLabel(alienData.name, 100, 100);
-    labelGroup.position.copy(alienData.position);
-    this.rootGroup.add(labelGroup);
-
-    this.alienDictionary.set(alienData.id, {
+    const alienMeshData: AlienMeshData = {
       instancedMeshes: meshes.instancedMeshes,
       matrixArrays: meshes.matrixArrays,
       instanceIndex: this.nextInstanceIndex++,
-      targetPosition: undefined,
-      selectionBox,
-      labelGroup,
       currentPosition: alienData.position.clone(),
       currentRotation: new THREE.Quaternion(),
-      currentScale: new THREE.Vector3(1, 1, 1)
-    });
+      currentScale: new THREE.Vector3(1, 1, 1),
+      targetPosition: undefined,
+      selectionBox
+    };
+
+    this.alienDictionary.set(alienData.id, alienMeshData);
+
+    // Set initial matrices for all meshes
+    this.updateAlienMatrices(alienMeshData);
   }
 
   public updateAlienPosition(id: string, position: THREE.Vector3): void {
     const alienData = this.alienDictionary.get(id);
     if (alienData) {
+      // Set target position for movement
       alienData.targetPosition = position.clone();
-      // Don't update label and selection box positions immediately anymore
-      // They will be updated in the animate method along with the model
+      
+      // Calculate movement direction for rotation
+      if (alienData.currentPosition && !alienData.currentPosition.equals(position)) {
+        this.tempVector.subVectors(position, alienData.currentPosition);
+        const targetRotation = Math.atan2(this.tempVector.x, this.tempVector.z);
+        this.tempQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetRotation);
+        alienData.currentRotation.slerp(this.tempQuaternion, this.ROTATION_SPEED);
+      }
+      
+      this.needsMatrixUpdate = true;
     }
   }
 
   public removeAlien(id: string): void {
     const alienData = this.alienDictionary.get(id);
     if (alienData) {
-      // Remove selection box
       if (alienData.selectionBox) {
         this.rootGroup.remove(alienData.selectionBox);
       }
-      // Remove label group
-      if (alienData.labelGroup) {
-        this.rootGroup.remove(alienData.labelGroup);
-      }
-      // Remove instanced meshes
       for (const mesh of alienData.instancedMeshes) {
         this.rootGroup.remove(mesh);
       }
@@ -212,44 +222,52 @@ export class AlienManager {
   }
 
   public animate(): void {
-    for (const [_, alienData] of this.alienDictionary) {
-      if (alienData.targetPosition) {
-        // Calculate movement direction
-        const moveDirection = new THREE.Vector3();
-        moveDirection.subVectors(alienData.targetPosition, alienData.currentPosition);
-        
-        // Only update rotation if we're actually moving
-        if (moveDirection.length() > 0.01) {
-          // Calculate the angle to rotate to
-          const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
-          
-          // Create quaternion for target rotation
-          const targetQuaternion = new THREE.Quaternion();
-          targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetRotation);
-          
-          // Smoothly interpolate current rotation to target rotation
-          alienData.currentRotation.slerp(targetQuaternion, 0.1);
-        }
+    const currentTime = performance.now();
+    const deltaTime = currentTime - this.lastUpdateTime;
 
-        // Interpolate towards target position
-        alienData.currentPosition.lerp(alienData.targetPosition, this.MOVE_SPEED);
+    // Update at high refresh rate for smooth movement
+    if (deltaTime >= this.UPDATE_INTERVAL) {
+      const deltaSeconds = deltaTime / 1000; // Convert to seconds
+      const moveDistance = this.MOVE_SPEED * deltaSeconds; // Distance to move this frame
 
-        // Update matrices for all meshes
-        this.updateAlienMatrices(alienData);
+      // Batch update all matrices
+      for (const [_, alienData] of this.alienDictionary) {
+        if (alienData.targetPosition) {
+          // Calculate direction to target
+          this.tempVector.subVectors(alienData.targetPosition, alienData.currentPosition);
+          const distanceToTarget = this.tempVector.length();
 
-        // Update selection box and label positions
-        if (alienData.selectionBox) {
-          alienData.selectionBox.position.copy(alienData.currentPosition);
-        }
-        if (alienData.labelGroup) {
-          alienData.labelGroup.position.copy(alienData.currentPosition);
-        }
+          if (distanceToTarget > 0.01) {
+            // Normalize direction vector
+            this.tempVector.normalize();
+            
+            // Move towards target at constant speed
+            if (distanceToTarget <= moveDistance) {
+              // If we would overshoot, just snap to target
+              alienData.currentPosition.copy(alienData.targetPosition);
+              delete alienData.targetPosition;
+            } else {
+              // Move at constant speed
+              this.tempVector.multiplyScalar(moveDistance);
+              alienData.currentPosition.add(this.tempVector);
+            }
 
-        // If we're very close to the target, remove it
-        if (alienData.currentPosition.distanceTo(alienData.targetPosition) < 0.01) {
-          delete alienData.targetPosition;
+            // Update selection box position
+            if (alienData.selectionBox) {
+              alienData.selectionBox.position.copy(alienData.currentPosition);
+            }
+
+            // Update matrices for all meshes
+            this.updateAlienMatrices(alienData);
+          } else {
+            // We're close enough, snap to target
+            alienData.currentPosition.copy(alienData.targetPosition);
+            delete alienData.targetPosition;
+          }
         }
       }
+
+      this.lastUpdateTime = currentTime;
     }
   }
 

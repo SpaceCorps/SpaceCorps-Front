@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { createSelectionBox, createEntityLabel } from './game.utils';
+import { createSelectionBox } from './game.utils';
 
 // Static cache for geometries and materials
 const modelCache = new Map<string, {
@@ -26,22 +26,29 @@ interface PlayerMeshData {
   currentRotation: THREE.Quaternion;
   currentScale: THREE.Vector3;
   selectionBox?: THREE.Mesh;
-  labelGroup?: THREE.Group;
 }
 
 export class PlayerManager {
   private scene: THREE.Scene;
   private playerDictionary: Map<string, PlayerMeshData> = new Map();
-  private maxInstances: number = 100;
+  private maxInstances: number = 512;
   private nextInstanceIndex: number = 0;
-  private readonly MOVE_SPEED = 0.1;
+  private readonly MOVE_SPEED = 5; // Units per second
   private rootGroup: THREE.Group;
+  private needsMatrixUpdate: boolean = false;
+  private lastUpdateTime: number = 0;
+  private readonly UPDATE_INTERVAL = 4; // ~240fps
+  private readonly ROTATION_SPEED = 0.2;
+  private tempVector: THREE.Vector3 = new THREE.Vector3();
+  private tempQuaternion: THREE.Quaternion = new THREE.Quaternion();
+  private tempMatrix: THREE.Matrix4 = new THREE.Matrix4();
 
   constructor(scene: THREE.Scene) {
     this.scene = scene;
     this.rootGroup = new THREE.Group();
     this.rootGroup.name = 'players';
     this.scene.add(this.rootGroup);
+    this.lastUpdateTime = performance.now();
   }
 
   private async loadShipModel(
@@ -129,10 +136,7 @@ export class PlayerManager {
   }
 
   public async addPlayer(playerData: PlayerData): Promise<void> {
-    // First check if we already have this player
-    const existingPlayer = this.playerDictionary.get(playerData.id);
-    if (existingPlayer) {
-      // If we have an existing player, remove it first to ensure clean state
+    if (this.hasPlayer(playerData.id)) {
       this.removePlayer(playerData.id);
     }
 
@@ -145,11 +149,6 @@ export class PlayerManager {
     selectionBox.userData = { type: 'player', id: playerData.id };
     this.rootGroup.add(selectionBox);
 
-    // Create label group with health and shields
-    const labelGroup = createEntityLabel(playerData.name, 100, 100);
-    labelGroup.position.copy(playerData.position);
-    this.rootGroup.add(labelGroup);
-
     const playerMeshData: PlayerMeshData = {
       instancedMeshes: meshes.instancedMeshes,
       matrixArrays: meshes.matrixArrays,
@@ -158,8 +157,7 @@ export class PlayerManager {
       currentRotation: new THREE.Quaternion(),
       currentScale: new THREE.Vector3(1, 1, 1),
       targetPosition: undefined,
-      selectionBox,
-      labelGroup
+      selectionBox
     };
 
     this.playerDictionary.set(playerData.id, playerMeshData);
@@ -169,24 +167,37 @@ export class PlayerManager {
   }
 
   private updatePlayerMatrices(playerData: PlayerMeshData): void {
-    const matrix = new THREE.Matrix4();
-    matrix.compose(
+    this.tempMatrix.compose(
       playerData.currentPosition,
       playerData.currentRotation,
       playerData.currentScale
     );
 
     for (const mesh of playerData.instancedMeshes) {
-      mesh.setMatrixAt(playerData.instanceIndex, matrix);
+      mesh.setMatrixAt(playerData.instanceIndex, this.tempMatrix);
+    }
+    
+    // Only update instance matrix once per mesh
+    for (const mesh of playerData.instancedMeshes) {
       mesh.instanceMatrix.needsUpdate = true;
-      mesh.computeBoundingSphere(); // Force bounding sphere update
     }
   }
 
   public updatePlayerPosition(id: string, position: THREE.Vector3): void {
     const playerData = this.playerDictionary.get(id);
     if (playerData) {
+      // Set target position for movement
       playerData.targetPosition = position.clone();
+      
+      // Calculate movement direction for rotation
+      if (playerData.currentPosition && !playerData.currentPosition.equals(position)) {
+        this.tempVector.subVectors(position, playerData.currentPosition);
+        const targetRotation = Math.atan2(this.tempVector.x, this.tempVector.z);
+        this.tempQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetRotation);
+        playerData.currentRotation.slerp(this.tempQuaternion, this.ROTATION_SPEED);
+      }
+      
+      this.needsMatrixUpdate = true;
     }
   }
 
@@ -195,9 +206,6 @@ export class PlayerManager {
     if (playerData) {
       if (playerData.selectionBox) {
         this.rootGroup.remove(playerData.selectionBox);
-      }
-      if (playerData.labelGroup) {
-        this.rootGroup.remove(playerData.labelGroup);
       }
       for (const mesh of playerData.instancedMeshes) {
         this.rootGroup.remove(mesh);
@@ -215,44 +223,52 @@ export class PlayerManager {
   }
 
   public animate(): void {
-    for (const [_, playerData] of this.playerDictionary) {
-      if (playerData.targetPosition) {
-        // Calculate movement direction
-        const moveDirection = new THREE.Vector3();
-        moveDirection.subVectors(playerData.targetPosition, playerData.currentPosition);
-        
-        // Only update rotation if we're actually moving
-        if (moveDirection.length() > 0.01) {
-          // Calculate the angle to rotate to
-          const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
-          
-          // Create quaternion for target rotation
-          const targetQuaternion = new THREE.Quaternion();
-          targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetRotation);
-          
-          // Smoothly interpolate current rotation to target rotation
-          playerData.currentRotation.slerp(targetQuaternion, 0.1);
-        }
+    const currentTime = performance.now();
+    const deltaTime = currentTime - this.lastUpdateTime;
 
-        // Interpolate towards target position
-        playerData.currentPosition.lerp(playerData.targetPosition, this.MOVE_SPEED);
+    // Update at high refresh rate for smooth movement
+    if (deltaTime >= this.UPDATE_INTERVAL) {
+      const deltaSeconds = deltaTime / 1000; // Convert to seconds
+      const moveDistance = this.MOVE_SPEED * deltaSeconds; // Distance to move this frame
 
-        // Update matrices for all meshes
-        this.updatePlayerMatrices(playerData);
+      // Batch update all matrices
+      for (const [_, playerData] of this.playerDictionary) {
+        if (playerData.targetPosition) {
+          // Calculate direction to target
+          this.tempVector.subVectors(playerData.targetPosition, playerData.currentPosition);
+          const distanceToTarget = this.tempVector.length();
 
-        // Update selection box and label positions
-        if (playerData.selectionBox) {
-          playerData.selectionBox.position.copy(playerData.currentPosition);
-        }
-        if (playerData.labelGroup) {
-          playerData.labelGroup.position.copy(playerData.currentPosition);
-        }
+          if (distanceToTarget > 0.01) {
+            // Normalize direction vector
+            this.tempVector.normalize();
+            
+            // Move towards target at constant speed
+            if (distanceToTarget <= moveDistance) {
+              // If we would overshoot, just snap to target
+              playerData.currentPosition.copy(playerData.targetPosition);
+              delete playerData.targetPosition;
+            } else {
+              // Move at constant speed
+              this.tempVector.multiplyScalar(moveDistance);
+              playerData.currentPosition.add(this.tempVector);
+            }
 
-        // If we're very close to the target, remove it
-        if (playerData.currentPosition.distanceTo(playerData.targetPosition) < 0.01) {
-          delete playerData.targetPosition;
+            // Update selection box position
+            if (playerData.selectionBox) {
+              playerData.selectionBox.position.copy(playerData.currentPosition);
+            }
+
+            // Update matrices for all meshes
+            this.updatePlayerMatrices(playerData);
+          } else {
+            // We're close enough, snap to target
+            playerData.currentPosition.copy(playerData.targetPosition);
+            delete playerData.targetPosition;
+          }
         }
       }
+
+      this.lastUpdateTime = currentTime;
     }
   }
 

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { PlayerDto, SpaceMapData, AlienDto } from './types/SpaceMapData';
 import { GameComponent } from './game.component';
 
@@ -10,63 +10,17 @@ const LAYERS = {
   RAYCAST: 1
 };
 
-// Helper function to create entity labels (health bar, shields, nickname)
-export function createEntityLabel(name: string, health: number = 100, shields: number = 100): THREE.Group {
-  const group = new THREE.Group();
-
-  // Create container div for all labels
-  const container = document.createElement('div');
-  container.style.pointerEvents = 'none';
-  container.style.display = 'flex';
-  container.style.flexDirection = 'column';
-  container.style.alignItems = 'center';
-  container.style.width = '100px';
-
-  // Create nickname label
-  const nameDiv = document.createElement('div');
-  nameDiv.textContent = name;
-  nameDiv.style.color = 'white';
-  nameDiv.style.fontSize = '12px';
-  nameDiv.style.fontWeight = 'bold';
-  nameDiv.style.textShadow = '2px 2px 2px black';
-  container.appendChild(nameDiv);
-
-  // Create health bar container
-  const healthBarContainer = document.createElement('div');
-  healthBarContainer.style.width = '50px';
-  healthBarContainer.style.height = '4px';
-  healthBarContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-  healthBarContainer.style.margin = '2px';
-
-  // Create health bar
-  const healthBar = document.createElement('div');
-  healthBar.style.width = `${health}%`;
-  healthBar.style.height = '100%';
-  healthBar.style.backgroundColor = '#ff3333';
-  healthBarContainer.appendChild(healthBar);
-  container.appendChild(healthBarContainer);
-
-  // Create shield bar container
-  const shieldBarContainer = document.createElement('div');
-  shieldBarContainer.style.width = '50px';
-  shieldBarContainer.style.height = '4px';
-  shieldBarContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-  shieldBarContainer.style.margin = '2px';
-
-  // Create shield bar
-  const shieldBar = document.createElement('div');
-  shieldBar.style.width = `${shields}%`;
-  shieldBar.style.height = '100%';
-  shieldBar.style.backgroundColor = '#3333ff';
-  shieldBarContainer.appendChild(shieldBar);
-  container.appendChild(shieldBarContainer);
-
-  // Create CSS2D object and add to group
-  const labelObject = new CSS2DObject(container);
-  labelObject.position.set(0, 2, 0); // Position above the entity
-  group.add(labelObject);
-
-  return group;
+// Helper function to create selection box for raycasting
+export function createSelectionBox(): THREE.Mesh {
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0
+  });
+  const box = new THREE.Mesh(geometry, material);
+  box.layers.set(LAYERS.RAYCAST);
+  return box;
 }
 
 export async function initializeThreeJs(
@@ -163,21 +117,6 @@ export async function initializeThreeJs(
   };
 
   animate();
-}
-
-// Helper function to create a selection box
-export function createSelectionBox(size: number = 0.5): THREE.Mesh {
-  const geometry = new THREE.BoxGeometry(size, size, size);
-  const material = new THREE.MeshBasicMaterial({
-    visible: false,
-    transparent: true,
-    opacity: 0,
-    side: THREE.DoubleSide
-  });
-  
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.layers.set(LAYERS.RAYCAST);
-  return mesh;
 }
 
 export async function loadNewSpacemap(
