@@ -61,6 +61,7 @@ export class AlienManager {
             this.maxInstances,
           );
           instancedMesh.name = alienName;
+          instancedMesh.frustumCulled = false; // Disable frustum culling
           instancedMeshes.push(instancedMesh);
           this.rootGroup.add(instancedMesh);
         }
@@ -70,6 +71,21 @@ export class AlienManager {
     } catch (error) {
       console.error('Error loading alien model:', error);
       return { instancedMeshes: [], matrixArrays: [] };
+    }
+  }
+
+  private updateAlienMatrices(alienData: AlienMeshData): void {
+    const matrix = new THREE.Matrix4();
+    matrix.compose(
+      alienData.currentPosition,
+      alienData.currentRotation,
+      alienData.currentScale
+    );
+
+    for (const mesh of alienData.instancedMeshes) {
+      mesh.setMatrixAt(alienData.instanceIndex, matrix);
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.computeBoundingSphere(); // Force bounding sphere update
     }
   }
 
@@ -167,17 +183,7 @@ export class AlienManager {
         alienData.currentPosition.lerp(alienData.targetPosition, this.MOVE_SPEED);
 
         // Update matrices for all meshes
-        const matrix = new THREE.Matrix4();
-        matrix.compose(
-          alienData.currentPosition,
-          alienData.currentRotation,
-          alienData.currentScale
-        );
-        
-        for (const mesh of alienData.instancedMeshes) {
-          mesh.setMatrixAt(alienData.instanceIndex, matrix);
-          mesh.instanceMatrix.needsUpdate = true;
-        }
+        this.updateAlienMatrices(alienData);
 
         // Update selection box and label positions
         if (alienData.selectionBox) {
