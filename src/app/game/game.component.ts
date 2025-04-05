@@ -120,7 +120,6 @@ export class GameComponent implements OnInit, OnDestroy {
     await initializeThreeJs(this);
     this.playerManager = new PlayerManager(this.scene!);
     this.alienManager = new AlienManager(this.scene!);
-    this.setupSignalREvents(this.hubService);
     this.setupPerformanceMeters();
     this.animate();
   }
