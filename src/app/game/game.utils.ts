@@ -3,8 +3,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { PlayerDto, SpaceMapData, AlienDto } from './types/SpaceMapData';
 import { GameComponent } from './game.component';
-import { EntityDTO } from './types/Entity';
-import { PlayerManager } from './PlayerManager';
 
 // Define layers
 const LAYERS = {
@@ -349,7 +347,7 @@ export async function loadPlayers(
     await component.playerManager.addPlayer({
       id: player.id,
       name: player.id,
-      shipName: player.activeShipName,
+      activeShipName: player.activeShipName,
       position: parsePositionDTOtoVector3(player.position),
       rotation: new THREE.Euler(0, 0, 0),
     });
@@ -421,7 +419,7 @@ export async function updateSpacemap(
           await component.playerManager.addPlayer({
             id: entity.id,
             name: entity.id,
-            shipName: entity.activeShipName,
+            activeShipName: entity.activeShipName,
             position: parsePositionDTOtoVector3(entity.position),
             rotation: new THREE.Euler(0, 0, 0),
           });
@@ -430,7 +428,7 @@ export async function updateSpacemap(
 
       for (const entity of entities) {
         if (!entitiesIn.find((e) => e.id === entity[0])) {
-          await component.playerManager.removePlayer(entity[0]);
+          component.playerManager.removePlayer(entity[0]);
           entities.delete(entity[0]);
         }
       }
