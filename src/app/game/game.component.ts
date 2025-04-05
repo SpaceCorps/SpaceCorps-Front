@@ -100,17 +100,30 @@ export class GameComponent implements OnInit, OnDestroy {
       // console.log('HubMessage: Spacemap update:', spaceMapData);
       if (this.currentMapName != spaceMapData.mapName) {
         await loadNewSpacemap(this, spaceMapData);
+        // Reset orbit controls to origin when switching maps
         if (this.controls) {
-          this.controls.target = new THREE.Vector3(0, 0, 0);
+          this.controls.target.set(0, 0, 0);
+          this.camera!.position.set(0, 50, 0);
         }
       } else {
         await updateSpacemap(this, spaceMapData);
       }
 
+      // Update orbit controls to follow player if available
       if (this.playerData && this.playerManager) {
         const playerShip = this.playerManager.getPlayerShip(this.playerData.id);
         if (playerShip && this.controls) {
-          this.controls.target = playerShip.position;
+          // Calculate the offset from the current camera position to the target
+          const cameraOffset = new THREE.Vector3().subVectors(
+            this.camera!.position,
+            this.controls.target
+          );
+          
+          // Update the target to the player's position
+          this.controls.target.copy(playerShip.position);
+          
+          // Update the camera position to maintain the same relative offset
+          this.camera!.position.copy(playerShip.position).add(cameraOffset);
         }
       }
     });
@@ -132,8 +145,51 @@ export class GameComponent implements OnInit, OnDestroy {
     document.body.appendChild(this.stats.dom);
   }
 
-  private animate(): void {
-    requestAnimationFrame(() => this.animate());
+  private animate = (): void => {
+    requestAnimationFrame(this.animate);
+
+    // Update player and alien animations
+    if (this.playerManager) {
+      this.playerManager.animate();
+    }
+    if (this.alienManager) {
+      this.alienManager.animate();
+    }
+
+    // Update orbit controls to follow player if available
+    if (this.playerData && this.playerManager && this.controls) {
+      const playerPosition = this.playerManager.getPlayerPosition(this.playerData.id);
+      if (playerPosition) {
+        // Calculate the offset from the current camera position to the target
+        const cameraOffset = new THREE.Vector3().subVectors(
+          this.camera!.position,
+          this.controls.target
+        );
+        
+        // Update the target to the player's position
+        this.controls.target.copy(playerPosition);
+        
+        // Update the camera position to maintain the same relative offset
+        this.camera!.position.copy(playerPosition).add(cameraOffset);
+      }
+    }
+
+    // Update controls and render
+    if (this.controls) {
+      this.controls.update();
+    }
+    if (this.renderer && this.scene && this.camera) {
+      this.renderer.render(this.scene, this.camera);
+      if (this.labelRenderer) {
+        this.labelRenderer.render(this.scene, this.camera);
+      }
+    }
+
+    // Update performance metrics
+    this.updatePerformanceMeters();
+  };
+
+  private updatePerformanceMeters(): void {
     const currentTime = performance.now();
     const deltaTime = currentTime - this.lastTime;
 
@@ -149,18 +205,6 @@ export class GameComponent implements OnInit, OnDestroy {
 
     if (this.stats) {
       this.stats.update();
-    }
-
-    if (this.alienManager) {
-      this.alienManager.animate();
-    }
-
-    if (this.playerManager) {
-      this.playerManager.animate();
-    }
-
-    if (this.scene && this.camera && this.renderer) {
-      this.renderer.render(this.scene, this.camera);
     }
   }
 

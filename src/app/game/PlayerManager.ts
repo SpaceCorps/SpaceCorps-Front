@@ -70,6 +70,7 @@ export class PlayerManager {
             this.maxInstances,
           );
           instancedMesh.name = playerName;
+          instancedMesh.frustumCulled = false; // Disable frustum culling
           
           // Initialize all matrices for this mesh
           const meshMatrices: THREE.Matrix4[] = [];
@@ -94,10 +95,11 @@ export class PlayerManager {
   }
 
   public async addPlayer(playerData: PlayerData): Promise<void> {
+    // First check if we already have this player
     const existingPlayer = this.playerDictionary.get(playerData.id);
     if (existingPlayer) {
-      this.updatePlayerPosition(playerData.id, playerData.position);
-      return;
+      // If we have an existing player, remove it first to ensure clean state
+      this.removePlayer(playerData.id);
     }
 
     const meshes = await this.loadShipModel(playerData.name, playerData.position);
@@ -143,6 +145,7 @@ export class PlayerManager {
     for (const mesh of playerData.instancedMeshes) {
       mesh.setMatrixAt(playerData.instanceIndex, matrix);
       mesh.instanceMatrix.needsUpdate = true;
+      mesh.computeBoundingSphere(); // Force bounding sphere update
     }
   }
 
@@ -201,17 +204,7 @@ export class PlayerManager {
         playerData.currentPosition.lerp(playerData.targetPosition, this.MOVE_SPEED);
 
         // Update matrices for all meshes
-        const matrix = new THREE.Matrix4();
-        matrix.compose(
-          playerData.currentPosition,
-          playerData.currentRotation,
-          playerData.currentScale
-        );
-        
-        for (const mesh of playerData.instancedMeshes) {
-          mesh.setMatrixAt(playerData.instanceIndex, matrix);
-          mesh.instanceMatrix.needsUpdate = true;
-        }
+        this.updatePlayerMatrices(playerData);
 
         // Update selection box and label positions
         if (playerData.selectionBox) {
@@ -231,6 +224,14 @@ export class PlayerManager {
 
   public hasPlayer(id: string): boolean {
     return this.playerDictionary.has(id);
+  }
+
+  public getPlayerPosition(id: string): THREE.Vector3 | undefined {
+    const playerData = this.playerDictionary.get(id);
+    if (playerData) {
+      return playerData.currentPosition.clone();
+    }
+    return undefined;
   }
 
   public getPlayerIds(): IterableIterator<[string, PlayerMeshData]> {

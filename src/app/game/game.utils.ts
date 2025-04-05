@@ -76,11 +76,15 @@ export async function initializeThreeJs(
   component.camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
-    0.1,
-    1000,
+    0.1,  // Near plane - increased from default
+    10000  // Far plane - increased from default 1000
   );
-  component.renderer = new THREE.WebGLRenderer();
+  component.renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    logarithmicDepthBuffer: true  // Enable logarithmic depth buffer for better depth precision
+  });
   component.renderer.setSize(window.innerWidth, window.innerHeight);
+  component.renderer.setPixelRatio(window.devicePixelRatio);
 
   // Initialize CSS2D renderer
   component.labelRenderer = new CSS2DRenderer();
@@ -104,6 +108,8 @@ export async function initializeThreeJs(
   component.controls.enablePan = false;
   component.controls.enableDamping = true;
   component.controls.dampingFactor = 0.05;
+  component.controls.minDistance = 5;  // Minimum zoom distance
+  component.controls.maxDistance = 1000;  // Maximum zoom distance
 
   // Set initial camera position
   component.camera.position.set(0, 50, 0);
