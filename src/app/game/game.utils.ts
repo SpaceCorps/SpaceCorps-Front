@@ -295,6 +295,7 @@ async function createSpacemapPlane(
 
   console.log('Creating plane with dimensions:', { width, height });
 
+  // Create plane geometry centered at origin
   const geometry = new THREE.PlaneGeometry(width, height);
   const material = new THREE.MeshBasicMaterial({
     color: 0xffff00,
@@ -314,16 +315,68 @@ async function createSpacemapPlane(
   plane.userData = { type: 'plane' };
   plane.renderOrder = 1;
 
-  const gridHelper = new THREE.GridHelper(Math.max(width, height), 10);
-  gridHelper.renderOrder = 0;
-  component.scene.add(gridHelper);
+  // Create custom grid geometry to match exact dimensions
+  const gridGeometry = new THREE.BufferGeometry();
+  const gridMaterial = new THREE.LineBasicMaterial({ color: 0x444444 });
+  
+  const gridVertices = [];
+  const cellSize = 10; // Size of each grid cell
+  
+  // Calculate number of lines needed
+  const xLines = Math.ceil(width / cellSize);
+  const zLines = Math.ceil(height / cellSize);
+  
+  // Create vertical lines (along Z)
+  for (let x = 0; x <= xLines; x++) {
+    const xPos = (x * cellSize) - (width / 2);
+    if (xPos > width / 2) continue;
+    gridVertices.push(
+      xPos, 0, -height / 2,
+      xPos, 0, height / 2
+    );
+  }
+  
+  // Create horizontal lines (along X)
+  for (let z = 0; z <= zLines; z++) {
+    const zPos = (z * cellSize) - (height / 2);
+    if (zPos > height / 2) continue;
+    gridVertices.push(
+      -width / 2, 0, zPos,
+      width / 2, 0, zPos
+    );
+  }
+  
+  gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridVertices, 3));
+  const grid = new THREE.LineSegments(gridGeometry, gridMaterial);
+  grid.renderOrder = 0;
 
+  // Create bounds to show the actual spacemap limits
+  const boundsMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  const boundsGeometry = new THREE.BufferGeometry();
+  
+  // Create a rectangle of points for the bounds
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  const boundsVertices = new Float32Array([
+    -halfWidth, 0, -halfHeight,  // Start at bottom-left
+    halfWidth, 0, -halfHeight,   // Bottom-right
+    halfWidth, 0, halfHeight,    // Top-right
+    -halfWidth, 0, halfHeight,   // Top-left
+    -halfWidth, 0, -halfHeight   // Back to start to close the rectangle
+  ]);
+  
+  boundsGeometry.setAttribute('position', new THREE.BufferAttribute(boundsVertices, 3));
+  const bounds = new THREE.Line(boundsGeometry, boundsMaterial);
+  bounds.renderOrder = 2;
+
+  component.scene.add(grid);
   component.scene.add(plane);
-  console.log('Spacemap plane added to scene:', {
-    position: plane.position,
-    rotation: plane.rotation,
-    scale: plane.scale,
-    dimensions: { width, height }
+  component.scene.add(bounds);
+
+  console.log('Spacemap plane and grid added to scene:', {
+    dimensions: { width, height },
+    gridCellSize: cellSize,
+    gridLines: { x: xLines, z: zLines }
   });
 }
 
