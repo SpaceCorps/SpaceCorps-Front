@@ -2,6 +2,13 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createSelectionBox, createEntityLabel } from './game.utils';
 
+// Static cache for geometries and materials
+const modelCache = new Map<string, {
+  geometries: Map<string, THREE.BufferGeometry>;
+  materials: Map<string, THREE.Material>;
+  instancedMeshes: THREE.InstancedMesh[];
+}>();
+
 interface AlienData {
   id: string;
   name: string;
@@ -45,29 +52,74 @@ export class AlienManager {
     const loader = new GLTFLoader();
     try {
       console.log(`Loading alien model for: ${alienName}`);
-      const gltf = await loader.loadAsync(
-        `/models/ships/Protos/Protos.glb`,
-      );
-      const instancedMeshes: THREE.InstancedMesh[] = [];
-      const matrixArrays: THREE.Matrix4[] = new Array(this.maxInstances).fill(
-        new THREE.Matrix4(),
-      );
+      
+      // Check if we already have this model in cache
+      let cache = modelCache.get('Protos');
+      if (!cache) {
+        cache = {
+          geometries: new Map(),
+          materials: new Map(),
+          instancedMeshes: []
+        };
+        modelCache.set('Protos', cache);
 
-      gltf.scene.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
+        const gltf = await loader.loadAsync(
+          `/models/ships/Protos/Protos.glb`,
+        );
+
+        // Process all meshes and cache geometries/materials
+        const meshData: { geometry: THREE.BufferGeometry, material: THREE.Material }[] = [];
+        
+        gltf.scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            const geometryKey = child.geometry.uuid;
+            const materialKey = child.material.uuid;
+
+            if (!cache!.geometries.has(geometryKey)) {
+              cache!.geometries.set(geometryKey, child.geometry);
+            }
+            if (!cache!.materials.has(materialKey)) {
+              cache!.materials.set(materialKey, child.material);
+            }
+
+            meshData.push({
+              geometry: cache!.geometries.get(geometryKey)!,
+              material: cache!.materials.get(materialKey)!
+            });
+          }
+        });
+
+        // Create instanced meshes using the original geometry-material pairs
+        for (const { geometry, material } of meshData) {
           const instancedMesh = new THREE.InstancedMesh(
-            child.geometry,
-            child.material,
-            this.maxInstances,
+            geometry,
+            material,
+            this.maxInstances
           );
-          instancedMesh.name = alienName;
-          instancedMesh.frustumCulled = false; // Disable frustum culling
-          instancedMeshes.push(instancedMesh);
+          instancedMesh.name = `Protos_instanced`;
+          instancedMesh.frustumCulled = false;
+          cache.instancedMeshes.push(instancedMesh);
           this.rootGroup.add(instancedMesh);
         }
-      });
+      }
 
-      return { instancedMeshes, matrixArrays };
+      // Create matrices for this instance
+      const matrixArrays: THREE.Matrix4[] = [];
+      const initialMatrix = new THREE.Matrix4();
+      initialMatrix.compose(
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Quaternion(),
+        new THREE.Vector3(1, 1, 1)
+      );
+
+      for (const mesh of cache.instancedMeshes) {
+        const matrix = initialMatrix.clone();
+        matrixArrays.push(matrix);
+        mesh.setMatrixAt(this.nextInstanceIndex, matrix);
+        mesh.instanceMatrix.needsUpdate = true;
+      }
+
+      return { instancedMeshes: cache.instancedMeshes, matrixArrays };
     } catch (error) {
       console.error('Error loading alien model:', error);
       return { instancedMeshes: [], matrixArrays: [] };

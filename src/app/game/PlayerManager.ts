@@ -2,6 +2,13 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createSelectionBox, createEntityLabel } from './game.utils';
 
+// Static cache for geometries and materials
+const modelCache = new Map<string, {
+  geometries: Map<string, THREE.BufferGeometry>;
+  materials: Map<string, THREE.Material>;
+  instancedMeshes: THREE.InstancedMesh[];
+}>();
+
 interface PlayerData {
   id: string;
   name: string;
@@ -47,14 +54,59 @@ export class PlayerManager {
     const loader = new GLTFLoader();
     try {
       console.log(`Loading player model for: ${playerName}`);
-      const gltf = await loader.loadAsync(
-        `/models/ships/Protos/Protos.glb`,
-      );
+      
+      // Check if we already have this model in cache
+      let cache = modelCache.get('Protos');
+      if (!cache) {
+        cache = {
+          geometries: new Map(),
+          materials: new Map(),
+          instancedMeshes: []
+        };
+        modelCache.set('Protos', cache);
 
-      const instancedMeshes: THREE.InstancedMesh[] = [];
+        const gltf = await loader.loadAsync(
+          `/models/ships/Protos/Protos.glb`,
+        );
+
+        // Process all meshes and cache geometries/materials
+        const meshData: { geometry: THREE.BufferGeometry, material: THREE.Material }[] = [];
+        
+        gltf.scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            const geometryKey = child.geometry.uuid;
+            const materialKey = child.material.uuid;
+
+            if (!cache!.geometries.has(geometryKey)) {
+              cache!.geometries.set(geometryKey, child.geometry);
+            }
+            if (!cache!.materials.has(materialKey)) {
+              cache!.materials.set(materialKey, child.material);
+            }
+
+            meshData.push({
+              geometry: cache!.geometries.get(geometryKey)!,
+              material: cache!.materials.get(materialKey)!
+            });
+          }
+        });
+
+        // Create instanced meshes using the original geometry-material pairs
+        for (const { geometry, material } of meshData) {
+          const instancedMesh = new THREE.InstancedMesh(
+            geometry,
+            material,
+            this.maxInstances
+          );
+          instancedMesh.name = `Protos_instanced`;
+          instancedMesh.frustumCulled = false;
+          cache.instancedMeshes.push(instancedMesh);
+          this.rootGroup.add(instancedMesh);
+        }
+      }
+
+      // Create matrices for this instance
       const matrixArrays: THREE.Matrix4[] = [];
-
-      // Create a single initial matrix for this instance
       const initialMatrix = new THREE.Matrix4();
       initialMatrix.compose(
         initialPosition,
@@ -62,32 +114,14 @@ export class PlayerManager {
         new THREE.Vector3(1, 1, 1)
       );
 
-      gltf.scene.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          const instancedMesh = new THREE.InstancedMesh(
-            child.geometry,
-            child.material,
-            this.maxInstances,
-          );
-          instancedMesh.name = playerName;
-          instancedMesh.frustumCulled = false; // Disable frustum culling
-          
-          // Initialize all matrices for this mesh
-          const meshMatrices: THREE.Matrix4[] = [];
-          for (let i = 0; i < this.maxInstances; i++) {
-            const matrix = initialMatrix.clone();
-            meshMatrices.push(matrix);
-            instancedMesh.setMatrixAt(i, matrix);
-          }
-          
-          instancedMesh.instanceMatrix.needsUpdate = true;
-          matrixArrays.push(...meshMatrices);
-          instancedMeshes.push(instancedMesh);
-          this.rootGroup.add(instancedMesh);
-        }
-      });
+      for (const mesh of cache.instancedMeshes) {
+        const matrix = initialMatrix.clone();
+        matrixArrays.push(matrix);
+        mesh.setMatrixAt(this.nextInstanceIndex, matrix);
+        mesh.instanceMatrix.needsUpdate = true;
+      }
 
-      return { instancedMeshes, matrixArrays };
+      return { instancedMeshes: cache.instancedMeshes, matrixArrays };
     } catch (error) {
       console.error('Error loading player model:', error);
       return { instancedMeshes: [], matrixArrays: [] };
