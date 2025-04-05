@@ -180,15 +180,38 @@ export class PlayerManager {
   public animate(): void {
     for (const [_, playerData] of this.playerDictionary) {
       if (playerData.targetPosition) {
+        // Calculate movement direction
+        const moveDirection = new THREE.Vector3();
+        moveDirection.subVectors(playerData.targetPosition, playerData.currentPosition);
+        
+        // Only update rotation if we're actually moving
+        if (moveDirection.length() > 0.01) {
+          // Calculate the angle to rotate to
+          const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
+          
+          // Create quaternion for target rotation
+          const targetQuaternion = new THREE.Quaternion();
+          targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetRotation);
+          
+          // Smoothly interpolate current rotation to target rotation
+          playerData.currentRotation.slerp(targetQuaternion, 0.1);
+        }
+
         // Interpolate towards target position
         playerData.currentPosition.lerp(playerData.targetPosition, this.MOVE_SPEED);
 
-        // Add rotation
-        const rotationMatrix = new THREE.Matrix4().makeRotationY(0.01);
-        playerData.currentRotation.multiply(new THREE.Quaternion().setFromRotationMatrix(rotationMatrix));
-
         // Update matrices for all meshes
-        this.updatePlayerMatrices(playerData);
+        const matrix = new THREE.Matrix4();
+        matrix.compose(
+          playerData.currentPosition,
+          playerData.currentRotation,
+          playerData.currentScale
+        );
+        
+        for (const mesh of playerData.instancedMeshes) {
+          mesh.setMatrixAt(playerData.instanceIndex, matrix);
+          mesh.instanceMatrix.needsUpdate = true;
+        }
 
         // Update selection box and label positions
         if (playerData.selectionBox) {

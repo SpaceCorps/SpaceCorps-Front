@@ -16,6 +16,9 @@ interface AlienMeshData {
   targetPosition?: THREE.Vector3;
   selectionBox?: THREE.Mesh;
   labelGroup?: THREE.Group;
+  currentPosition: THREE.Vector3;
+  currentRotation: THREE.Quaternion;
+  currentScale: THREE.Vector3;
 }
 
 export class AlienManager {
@@ -97,7 +100,10 @@ export class AlienManager {
       instanceIndex: this.nextInstanceIndex++,
       targetPosition: undefined,
       selectionBox,
-      labelGroup
+      labelGroup,
+      currentPosition: alienData.position.clone(),
+      currentRotation: new THREE.Quaternion(),
+      currentScale: new THREE.Vector3(1, 1, 1)
     });
   }
 
@@ -140,50 +146,49 @@ export class AlienManager {
   public animate(): void {
     for (const [_, alienData] of this.alienDictionary) {
       if (alienData.targetPosition) {
-        // Get current position from the first instanced mesh's matrix
-        const currentPosition = new THREE.Vector3();
-        const currentRotation = new THREE.Quaternion();
-        const currentScale = new THREE.Vector3();
+        // Calculate movement direction
+        const moveDirection = new THREE.Vector3();
+        moveDirection.subVectors(alienData.targetPosition, alienData.currentPosition);
         
-        alienData.matrixArrays[alienData.instanceIndex].decompose(
-          currentPosition,
-          currentRotation,
-          currentScale
-        );
+        // Only update rotation if we're actually moving
+        if (moveDirection.length() > 0.01) {
+          // Calculate the angle to rotate to
+          const targetRotation = Math.atan2(moveDirection.x, moveDirection.z);
+          
+          // Create quaternion for target rotation
+          const targetQuaternion = new THREE.Quaternion();
+          targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetRotation);
+          
+          // Smoothly interpolate current rotation to target rotation
+          alienData.currentRotation.slerp(targetQuaternion, 0.1);
+        }
 
         // Interpolate towards target position
-        currentPosition.lerp(alienData.targetPosition, this.MOVE_SPEED);
+        alienData.currentPosition.lerp(alienData.targetPosition, this.MOVE_SPEED);
 
-        // Update all instanced meshes with new position
-        for (let i = 0; i < alienData.instancedMeshes.length; i++) {
-          const matrix = new THREE.Matrix4();
-          
-          // Add rotation
-          const rotationMatrix = new THREE.Matrix4().makeRotationY(0.01);
-          currentRotation.multiply(new THREE.Quaternion().setFromRotationMatrix(rotationMatrix));
-          
-          // Compose new matrix with updated position and rotation
-          matrix.compose(
-            currentPosition,
-            currentRotation,
-            currentScale
-          );
-          
-          alienData.matrixArrays[alienData.instanceIndex] = matrix;
-          alienData.instancedMeshes[i].setMatrixAt(alienData.instanceIndex, matrix);
-          alienData.instancedMeshes[i].instanceMatrix.needsUpdate = true;
+        // Update matrices for all meshes
+        const matrix = new THREE.Matrix4();
+        matrix.compose(
+          alienData.currentPosition,
+          alienData.currentRotation,
+          alienData.currentScale
+        );
+        
+        for (const mesh of alienData.instancedMeshes) {
+          mesh.setMatrixAt(alienData.instanceIndex, matrix);
+          mesh.instanceMatrix.needsUpdate = true;
         }
 
         // Update selection box and label positions
         if (alienData.selectionBox) {
-          alienData.selectionBox.position.copy(currentPosition);
+          alienData.selectionBox.position.copy(alienData.currentPosition);
         }
         if (alienData.labelGroup) {
-          alienData.labelGroup.position.copy(currentPosition);
+          alienData.labelGroup.position.copy(alienData.currentPosition);
         }
 
         // If we're very close to the target, remove it
-        if (currentPosition.distanceTo(alienData.targetPosition) < 0.01) {
+        if (alienData.currentPosition.distanceTo(alienData.targetPosition) < 0.01) {
           delete alienData.targetPosition;
         }
       }
