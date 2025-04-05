@@ -1,6 +1,6 @@
 {
   "name": "space-corps-front",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "dist/electron/main.js",
   "reqBackendVersion": "0.2.0",
   "scripts": {
