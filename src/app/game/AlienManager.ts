@@ -32,7 +32,8 @@ export class AlienManager {
   private alienDictionary: Map<string, AlienMeshData> = new Map();
   private maxInstances: number = 512;
   private nextInstanceIndex: number = 0;
-  private readonly MOVE_SPEED = 10; // Units per second
+  private readonly INTERPOLATION_FACTOR = 0.3; // Smooth interpolation factor (0-1)
+  private readonly POSITION_THRESHOLD = 0.1; // Distance threshold to snap to target
   private rootGroup: THREE.Group;
   private needsMatrixUpdate: boolean = false;
   private lastUpdateTime: number = 0;
@@ -185,7 +186,7 @@ export class AlienManager {
   public updateAlienPosition(id: string, position: THREE.Vector3): void {
     const alienData = this.alienDictionary.get(id);
     if (alienData) {
-      // Set target position for movement
+      // Set the target position
       alienData.targetPosition = position.clone();
       
       // Calculate movement direction for rotation
@@ -227,30 +228,16 @@ export class AlienManager {
 
     // Update at high refresh rate for smooth movement
     if (deltaTime >= this.UPDATE_INTERVAL) {
-      const deltaSeconds = deltaTime / 1000; // Convert to seconds
-      const moveDistance = this.MOVE_SPEED * deltaSeconds; // Distance to move this frame
-
       // Batch update all matrices
       for (const [_, alienData] of this.alienDictionary) {
         if (alienData.targetPosition) {
-          // Calculate direction to target
+          // Calculate distance to target
           this.tempVector.subVectors(alienData.targetPosition, alienData.currentPosition);
           const distanceToTarget = this.tempVector.length();
 
-          if (distanceToTarget > 0.01) {
-            // Normalize direction vector
-            this.tempVector.normalize();
-            
-            // Move towards target at constant speed
-            if (distanceToTarget <= moveDistance) {
-              // If we would overshoot, just snap to target
-              alienData.currentPosition.copy(alienData.targetPosition);
-              delete alienData.targetPosition;
-            } else {
-              // Move at constant speed
-              this.tempVector.multiplyScalar(moveDistance);
-              alienData.currentPosition.add(this.tempVector);
-            }
+          if (distanceToTarget > this.POSITION_THRESHOLD) {
+            // Smoothly interpolate towards target position
+            alienData.currentPosition.lerp(alienData.targetPosition, this.INTERPOLATION_FACTOR);
 
             // Update selection box position
             if (alienData.selectionBox) {

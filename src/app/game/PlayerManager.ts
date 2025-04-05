@@ -33,7 +33,8 @@ export class PlayerManager {
   private playerDictionary: Map<string, PlayerMeshData> = new Map();
   private maxInstances: number = 512;
   private nextInstanceIndex: number = 0;
-  private readonly MOVE_SPEED = 5; // Units per second
+  private readonly MOVE_SPEED = 50; // Units per second (increased from 5)
+  private readonly MAX_CATCHUP_DISTANCE = 10; // Maximum distance to catch up in one frame
   private rootGroup: THREE.Group;
   private needsMatrixUpdate: boolean = false;
   private lastUpdateTime: number = 0;
@@ -186,8 +187,19 @@ export class PlayerManager {
   public updatePlayerPosition(id: string, position: THREE.Vector3): void {
     const playerData = this.playerDictionary.get(id);
     if (playerData) {
-      // Set target position for movement
-      playerData.targetPosition = position.clone();
+      // Calculate distance to target
+      this.tempVector.subVectors(position, playerData.currentPosition);
+      const distanceToTarget = this.tempVector.length();
+
+      // If we're too far behind, move faster to catch up
+      if (distanceToTarget > this.MAX_CATCHUP_DISTANCE) {
+        // Move directly towards target at maximum catchup speed
+        this.tempVector.normalize().multiplyScalar(this.MAX_CATCHUP_DISTANCE);
+        playerData.currentPosition.add(this.tempVector);
+      } else {
+        // Normal movement
+        playerData.targetPosition = position.clone();
+      }
       
       // Calculate movement direction for rotation
       if (playerData.currentPosition && !playerData.currentPosition.equals(position)) {
