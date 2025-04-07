@@ -19,10 +19,10 @@
         </button>
 
         @if (showPatchInfo) {
-          <div class="patch-info-container absolute top-full mt-2 right-0">
+          <div class="patch-info-container absolute top-full mt-2 right-0 h-full">
             <div class="card w-94 bg-base-100 shadow-xl">
               <div class="card-body p-0">
-                <div class="h-[300px] overflow-y-auto">
+                <div class="h-[600px] overflow-y-auto resize-y min-h-[300px] max-h-[900px]">
                   <app-github-timeline></app-github-timeline>
                 </div>
               </div>
