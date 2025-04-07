@@ -1,36 +1,53 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  inject,
+  HostListener,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { AsyncPipe } from '@angular/common';
-import { MainMenuComponent } from "../main-menu/main-menu.component";
-import { UserCredentialsLoginRequest } from '../../models/auth/UserCredentialsLoginRequest';
+import { AsyncPipe, CommonModule } from '@angular/common'; // Import CommonModule here
+import { MainMenuComponent } from '../main-menu/main-menu.component';
+import { GithubTimelineComponent } from '../github-timeline/github-timeline.component';
 
 @Component({
-    selector: 'app-navbar',
-    imports: [
-        RouterLink,
-        AsyncPipe,
-        MainMenuComponent,    ],
-    templateUrl: './navbar.component.html',
-    styleUrl: './navbar.component.scss'
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [
+    RouterLink,
+    AsyncPipe,
+    CommonModule,
+    MainMenuComponent,
+    GithubTimelineComponent,
+  ],
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent {
-
-  authService = inject(AuthService)
+  authService = inject(AuthService);
   authState$ = this.authService.authState$;
+
+  showPatchInfo = false;
+
+  @ViewChild('patchInfoContainer', { static: false })
+  patchInfoContainer!: ElementRef;
 
   logOut() {
     this.authService.logOut();
   }
 
-  toggleLogin ($event: UserCredentialsLoginRequest) {
-    this.authService.logIn($event).subscribe({
-      next: (response) => {
-        this.authService.fetchUserAfterSuccessfulLogin(response);
-      },
-      error: (err) => {
-        throw err;
-      }
-    })
+  togglePatchInfo() {
+    this.showPatchInfo = !this.showPatchInfo;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    if (
+      this.patchInfoContainer &&
+      !this.patchInfoContainer.nativeElement.contains(event.target)
+    ) {
+      this.showPatchInfo = false;
+    }
   }
 }
