@@ -1,7 +1,7 @@
 <form
   [formGroup]="loginForm"
   (ngSubmit)="handleLogin()"
-  class="flex flex-col gap-4 align-middle justify-between w-64 h-56 mx-auto mt-4"
+  class="flex flex-col gap-4 align-middle w-64 min-h-[224px] mx-auto mt-4"
 >
   <div class="form-control">
     <input
@@ -43,7 +43,7 @@
     }
   </div>
 
-  <div class="flex flex-row justify-around mt-4">
+  <div class="flex flex-row justify-around mt-2">
     <button
       type="submit"
       class="btn btn-primary max-w-32"

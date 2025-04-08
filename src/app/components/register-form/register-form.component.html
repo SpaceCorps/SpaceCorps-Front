@@ -1,7 +1,7 @@
 <form
   [formGroup]="registerForm"
   (ngSubmit)="handleRegister()"
-  class="flex flex-col gap-4 align-middle justify-between w-64 h-72 mx-auto mt-4"
+  class="flex flex-col gap-4 align-middle w-64 min-h-[288px] mx-auto mt-4"
 >
   <div class="form-control">
     <input
@@ -23,9 +23,7 @@
           <span>Username must be at most 20 characters</span>
         }
         @if (username?.errors?.["pattern"]) {
-          <span
-            >Username can only contain letters, numbers, and underscores</span
-          >
+          <span>Username can only contain letters, numbers, and underscores</span>
         }
       </div>
     }
@@ -68,10 +66,7 @@
           <span>Password must be at least 8 characters</span>
         }
         @if (password?.errors?.["pattern"]) {
-          <span
-            >Password must contain at least one uppercase letter, one lowercase
-            letter, one number, and one special character</span
-          >
+          <span>Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character</span>
         }
       </div>
     }
@@ -85,9 +80,8 @@
       class="input input-bordered"
       [ngClass]="{
         'input-error':
-          (confirmPassword?.invalid ||
-            registerForm.errors?.['passwordMismatch']) &&
-          confirmPassword?.touched,
+          (confirmPassword?.invalid || registerForm.errors?.['passwordMismatch']) &&
+          confirmPassword?.touched
       }"
     />
     @if (confirmPassword?.invalid && confirmPassword?.touched) {
@@ -97,16 +91,14 @@
         }
       </div>
     }
-    @if (
-      registerForm.errors?.["passwordMismatch"] && confirmPassword?.touched
-    ) {
+    @if (registerForm.errors?.["passwordMismatch"] && confirmPassword?.touched) {
       <div class="text-error text-sm mt-1">
         <span>Passwords do not match</span>
       </div>
     }
   </div>
 
-  <div class="flex flex-row justify-around mt-4">
+  <div class="flex flex-row justify-around mt-2">
     <button
       type="submit"
       class="btn btn-primary max-w-32"
@@ -114,7 +106,7 @@
     >
       Register
     </button>
-    <button type="button" class="btn btn-ghost max-w-32" (click)="toggleView()">
+    <button type="button" class="btn max-w-32" (click)="toggleView()">
       To Login
     </button>
   </div>
