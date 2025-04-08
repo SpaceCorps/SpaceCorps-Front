@@ -1,57 +1,121 @@
-
 <form
   [formGroup]="registerForm"
   (ngSubmit)="handleRegister()"
-  class="flex flex-col gap-4 align-middle justify-between max-w-xs mx-auto mt-4"
+  class="flex flex-col gap-4 align-middle justify-between w-64 h-72 mx-auto mt-4"
 >
-  <input
-    type="text"
-    placeholder="Username..."
-    formControlName="username"
-    class="input input-bordered"
-  >
-  <input
-    type="email"
-    placeholder="e-Mail..."
-    formControlName="email"
-    class="input input-bordered"
-  >
-  <input
-    type="password"
-    placeholder="Password..."
-    formControlName="password"
-    class="input input-bordered"
-  >
-  <input
-    type="password"
-    placeholder="Confirm password..."
-    formControlName="confirmPassword"
-    class="input input-bordered"
-  >
+  <div class="form-control">
+    <input
+      type="text"
+      placeholder="Username..."
+      formControlName="username"
+      class="input input-bordered"
+      [ngClass]="{ 'input-error': username?.invalid && username?.touched }"
+    />
+    @if (username?.invalid && username?.touched) {
+      <div class="text-error text-sm mt-1">
+        @if (username?.errors?.["required"]) {
+          <span>Username is required</span>
+        }
+        @if (username?.errors?.["minlength"]) {
+          <span>Username must be at least 3 characters</span>
+        }
+        @if (username?.errors?.["maxlength"]) {
+          <span>Username must be at most 20 characters</span>
+        }
+        @if (username?.errors?.["pattern"]) {
+          <span
+            >Username can only contain letters, numbers, and underscores</span
+          >
+        }
+      </div>
+    }
+  </div>
 
-  <span
-    class="flex flex-row justify-around"
-  >
-    <button
-      class="btn max-w-32"
+  <div class="form-control">
+    <input
+      type="email"
+      placeholder="Email..."
+      formControlName="email"
+      class="input input-bordered"
+      [ngClass]="{ 'input-error': email?.invalid && email?.touched }"
+    />
+    @if (email?.invalid && email?.touched) {
+      <div class="text-error text-sm mt-1">
+        @if (email?.errors?.["required"]) {
+          <span>Email is required</span>
+        }
+        @if (email?.errors?.["email"]) {
+          <span>Please enter a valid email address</span>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="form-control">
+    <input
+      type="password"
+      placeholder="Password..."
+      formControlName="password"
+      class="input input-bordered"
+      [ngClass]="{ 'input-error': password?.invalid && password?.touched }"
+    />
+    @if (password?.invalid && password?.touched) {
+      <div class="text-error text-sm mt-1">
+        @if (password?.errors?.["required"]) {
+          <span>Password is required</span>
+        }
+        @if (password?.errors?.["minlength"]) {
+          <span>Password must be at least 8 characters</span>
+        }
+        @if (password?.errors?.["pattern"]) {
+          <span
+            >Password must contain at least one uppercase letter, one lowercase
+            letter, one number, and one special character</span
+          >
+        }
+      </div>
+    }
+  </div>
+
+  <div class="form-control">
+    <input
+      type="password"
+      placeholder="Confirm password..."
+      formControlName="confirmPassword"
+      class="input input-bordered"
       [ngClass]="{
-            'btn-disabled':
-            !registerForm.get('username')?.value ||
-            !registerForm.get('email')?.value ||
-            !registerForm.get('password')?.value ||
-            !registerForm.get('confirmPassword')?.value,
-          }"
+        'input-error':
+          (confirmPassword?.invalid ||
+            registerForm.errors?.['passwordMismatch']) &&
+          confirmPassword?.touched,
+      }"
+    />
+    @if (confirmPassword?.invalid && confirmPassword?.touched) {
+      <div class="text-error text-sm mt-1">
+        @if (confirmPassword?.errors?.["required"]) {
+          <span>Please confirm your password</span>
+        }
+      </div>
+    }
+    @if (
+      registerForm.errors?.["passwordMismatch"] && confirmPassword?.touched
+    ) {
+      <div class="text-error text-sm mt-1">
+        <span>Passwords do not match</span>
+      </div>
+    }
+  </div>
+
+  <div class="flex flex-row justify-around mt-4">
+    <button
+      type="submit"
+      class="btn btn-primary max-w-32"
+      [disabled]="registerForm.invalid || registerForm.pending"
     >
       Register
     </button>
-
-    <a
-      class="btn max-w-32"
-      (click)="toggleView()"
-    >
+    <button type="button" class="btn btn-ghost max-w-32" (click)="toggleView()">
       To Login
-    </a>
-  </span>
-
-
+    </button>
+  </div>
 </form>

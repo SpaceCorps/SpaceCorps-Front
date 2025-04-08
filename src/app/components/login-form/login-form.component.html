@@ -1,43 +1,58 @@
 <form
   [formGroup]="loginForm"
   (ngSubmit)="handleLogin()"
-  class="
-    flex flex-col gap-4 align-middle
-    justify-between max-w-xs mx-auto
-    mt-4
-  "
+  class="flex flex-col gap-4 align-middle justify-between w-64 h-56 mx-auto mt-4"
 >
-  <input
-    type="text"
-    placeholder="Email or username..."
-    formControlName="login"
-    class="input input-bordered"
-  >
-  <input
-    type="password"
-    placeholder="Password..."
-    formControlName="password"
-    class="input input-bordered">
+  <div class="form-control">
+    <input
+      type="text"
+      placeholder="Email or username..."
+      formControlName="login"
+      class="input input-bordered"
+      [ngClass]="{ 'input-error': login?.invalid && login?.touched }"
+    />
+    @if (login?.invalid && login?.touched) {
+      <div class="text-error text-sm mt-1">
+        @if (login?.errors?.["required"]) {
+          <span>Login is required</span>
+        }
+        @if (login?.errors?.["minlength"]) {
+          <span>Login must be at least 3 characters</span>
+        }
+      </div>
+    }
+  </div>
 
-  <span
-    class="flex flex-row justify-around"
-  >
-      <button
-        class="btn max-w-32"
-        [disabled]="!loginForm.valid"
-        [ngClass]="{
-          'btn-disabled':
-            !loginForm.get('login')?.value ||
-            !loginForm.get('password')?.value
-        }">
-        Login
-      </button>
-      <a
-        class="btn max-w-32"
-        (click)="toggleView()"
-      >
-        To Register
-      </a>
-  </span>
+  <div class="form-control">
+    <input
+      type="password"
+      placeholder="Password..."
+      formControlName="password"
+      class="input input-bordered"
+      [ngClass]="{ 'input-error': password?.invalid && password?.touched }"
+    />
+    @if (password?.invalid && password?.touched) {
+      <div class="text-error text-sm mt-1">
+        @if (password?.errors?.["required"]) {
+          <span>Password is required</span>
+        }
+        @if (password?.errors?.["minlength"]) {
+          <span>Password must be at least 6 characters</span>
+        }
+      </div>
+    }
+  </div>
 
+  <div class="flex flex-row justify-around mt-4">
+    <button
+      type="submit"
+      class="btn btn-primary max-w-32"
+      [disabled]="loginForm.invalid || loginForm.pending"
+    >
+      Login
+    </button>
+    <button type="button" class="btn max-w-32" (click)="toggleView()">
+      To Register
+    </button>
+  </div>
 </form>
