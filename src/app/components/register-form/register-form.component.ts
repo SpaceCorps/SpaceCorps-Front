@@ -7,12 +7,12 @@ import {
   ValidatorFn,
   AbstractControl,
 } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { UserCredentialsCreateRequest } from '../../models/auth/UserCredentialsCreateRequest';
 
 @Component({
   selector: 'app-register-form',
-  imports: [ReactiveFormsModule, NgClass, NgIf],
+  imports: [ReactiveFormsModule, NgClass],
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.scss',
 })
