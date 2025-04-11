@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Commit } from '../components/github-timeline/dtos';
+import { Commit } from '../components/github-timeline/commit';
 
 @Injectable({
   providedIn: 'root',

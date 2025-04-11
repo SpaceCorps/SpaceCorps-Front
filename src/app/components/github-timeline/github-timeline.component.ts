@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { GitHubService } from '../../services/git-hub.service';
 import { DatePipe } from '@angular/common';
-import { Commit } from './dtos';
+import { Commit } from './commit';
 
 @Component({
   selector: 'app-github-timeline',
