@@ -19,7 +19,6 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const ORDERED_CATEGORIES = [
   'Ship',
@@ -138,7 +137,7 @@ export class InventoryAllItemsComponent implements OnInit, OnChanges {
     }
 
     // Sort items within each category by name
-    for (const [category, items] of this.categorizedItems.entries()) {
+    for (const [, items] of this.categorizedItems.entries()) {
       items.sort((a, b) => a.name.localeCompare(b.name));
     }
   }
@@ -147,7 +146,7 @@ export class InventoryAllItemsComponent implements OnInit, OnChanges {
     event.preventDefault();
   }
 
-  onDrop(event: DragEvent) {}
+  onDrop() {}
 
   onDragStart(event: DragEvent, item: SellableItems) {
     event.dataTransfer?.setData('text/plain', JSON.stringify(item));

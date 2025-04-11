@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Commit } from '../components/github-timeline/dtos';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,6 @@ export class GitHubService {
   constructor(private http: HttpClient) {}
 
   getCommits() {
-    return this.http.get(this.apiUrl);
+    return this.http.get<Commit[]>(this.apiUrl);
   }
 }

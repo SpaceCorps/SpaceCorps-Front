@@ -65,10 +65,10 @@ export class ItemEntryEditorComponent {
 
   protected fetchItems(category: SellableItems['itemType']) {
     this.apiService.getItemEntriesByCategory(category).subscribe({
-      next: (data: any) => {
+      next: (data) => {
         this.items = data;
       },
-      error: (err: any) => {
+      error: (err) => {
         console.error('Error fetching items', err);
       },
     });
@@ -81,7 +81,7 @@ export class ItemEntryEditorComponent {
         next: () => {
           this.fetchItems(oldCategory);
         },
-        error: (err: any) => {
+        error: (err) => {
           console.error('Error creating new item', err);
         },
       });
@@ -93,14 +93,14 @@ export class ItemEntryEditorComponent {
     category: SellableItems['itemType']
   ): SellableItems {
     const fields = getFieldsForItemCategory(category);
-    const newItem: { [key: string]: any } = { itemType: category };
+    const newItem: Partial<SellableItems> = { itemType: category };
     fields.forEach((field) => {
       newItem[field.key] = '';
     });
     return newItem as SellableItems;
   }
 
-  trackByKey(index: number, item: any): any {
+  trackByKey(index: number, item: { key: string }): string {
     return item.key;
   }
 
@@ -111,7 +111,7 @@ export class ItemEntryEditorComponent {
         next: () => {
           this.fetchItems(oldCategory);
         },
-        error: (err: any) => {
+        error: (err) => {
           console.error('Error deleting item', err);
         },
       });

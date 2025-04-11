@@ -156,14 +156,14 @@ async function loadMapEnvironment(
   component: GameComponent,
   spaceMapData: SpaceMapData
 ): Promise<void> {
-  await createStars(component);
+  await createStars();
   await createLighting(component);
   await createSkybox(component, spaceMapData.mapName);
-  await createStaticEntities(component);
+  await createStaticEntities();
   await createSpacemapPlane(component, spaceMapData);
 }
 
-export async function createStars(component: GameComponent): Promise<void> {
+export async function createStars(): Promise<void> {
   // Implementation here
 }
 
@@ -218,9 +218,7 @@ export async function createSkybox(
   }
 }
 
-export async function createStaticEntities(
-  component: GameComponent
-): Promise<void> {
+export async function createStaticEntities(): Promise<void> {
   // Implementation here
 }
 
@@ -450,7 +448,7 @@ export async function updateSpacemap(
       );
 
       // Remove aliens that are no longer in the map
-      for (const [id, _] of component.alienManager.getAlienIds()) {
+      for (const [id] of component.alienManager.getAlienIds()) {
         if (!currentAlienIds.has(id)) {
           component.alienManager.removeAlien(id);
         }

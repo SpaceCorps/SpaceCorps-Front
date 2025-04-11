@@ -8,7 +8,6 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
   initializeThreeJs,
   loadNewSpacemap,
-  loadPlayers,
   updateSpacemap,
 } from './game.utils';
 import { KeyboardService } from './services/keyboard.service';
@@ -60,7 +59,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event: Event): void {
+  onResize(): void {
     if (this.camera && this.renderer) {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();

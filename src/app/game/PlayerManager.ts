@@ -243,7 +243,7 @@ export class PlayerManager {
   }
 
   public removeAllPlayers(): void {
-    for (const [id, _] of this.playerDictionary) {
+    for (const [id] of this.playerDictionary) {
       this.removePlayer(id);
     }
     this.playerDictionary.clear();
@@ -260,7 +260,7 @@ export class PlayerManager {
       const moveDistance = this.MOVE_SPEED * deltaSeconds; // Distance to move this frame
 
       // Batch update all matrices
-      for (const [_, playerData] of this.playerDictionary) {
+      for (const [, playerData] of this.playerDictionary) {
         if (playerData.targetPosition) {
           // Calculate direction to target
           this.tempVector.subVectors(

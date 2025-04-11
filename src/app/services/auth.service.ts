@@ -7,6 +7,7 @@ import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLogin
 import { GetPlayerInfoRequest } from '../models/player/GetPlayerInfoRequest';
 import { SessionService } from './session.service';
 import { tap } from 'rxjs';
+import { PlayerData } from '../models/player/PlayerData';
 
 @Injectable({
   providedIn: 'root',
@@ -52,9 +53,9 @@ export class AuthService extends ComponentStore<AuthState> {
     );
   }
 
-  fetchUserAfterSuccessfulLogin(response: any) {
+  fetchUserAfterSuccessfulLogin(request: PlayerData) {
     const getPlayerInfoRequest: GetPlayerInfoRequest = {
-      username: response.username,
+      username: request.username,
     };
     this.apiService.getPlayerInfo(getPlayerInfoRequest).subscribe({
       next: (response) => {

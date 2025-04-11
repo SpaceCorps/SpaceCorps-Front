@@ -5,12 +5,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { UserCredentialsLoginRequest } from '../../models/auth/UserCredentialsLoginRequest';
 
 @Component({
   selector: 'app-login-form',
-  imports: [ReactiveFormsModule, NgClass, NgIf],
+  imports: [ReactiveFormsModule, NgClass],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',
 })

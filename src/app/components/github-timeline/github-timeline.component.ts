@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { GitHubService } from '../../services/git-hub.service';
 import { DatePipe } from '@angular/common';
+import { Commit } from './dtos';
 
 @Component({
   selector: 'app-github-timeline',
@@ -9,14 +10,14 @@ import { DatePipe } from '@angular/common';
   styleUrl: './github-timeline.component.scss',
 })
 export class GithubTimelineComponent {
-  commits: any[] = [];
+  commits: Commit[] = [];
 
   constructor(private gitHubService: GitHubService) {}
 
   ngOnInit() {
-    this.gitHubService.getCommits().subscribe((data: any) => {
+    this.gitHubService.getCommits().subscribe((data: Commit[]) => {
       this.commits = data.filter(
-        (commit: any) =>
+        (commit: Commit) =>
           this.isBigRelease(commit.commit.message) ||
           this.isMergePullRequest(commit.commit.message)
       );
@@ -33,7 +34,7 @@ export class GithubTimelineComponent {
     return regex.test(message);
   }
 
-  isLastCommit(commit: any): boolean {
+  isLastCommit(commit: Commit): boolean {
     return this.commits.indexOf(commit) === this.commits.length - 1;
   }
 }

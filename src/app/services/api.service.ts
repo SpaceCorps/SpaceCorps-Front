@@ -38,11 +38,11 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   createNewUser(request: UserCredentialsCreateRequest) {
-    return this.http.post(`${this.url}/UserCredentials/Create`, request);
+    return this.http.post<PlayerData>(`${this.url}/UserCredentials/Create`, request);
   }
 
   logIn(request: UserCredentialsLoginRequest) {
-    return this.http.post(`${this.url}/UserCredentials/Verify`, request);
+    return this.http.post<PlayerData>(`${this.url}/UserCredentials/Verify`, request);
   }
 
   getPlayerInfo(request: GetPlayerInfoRequest) {
@@ -109,7 +109,7 @@ export class ApiService {
   }
 
   getItemEntriesByCategory(category: SellableItems['itemType']) {
-    return this.http.get(`${this.url}/ItemEntries/${category}s`);
+    return this.http.get<SellableItems[]>(`${this.url}/ItemEntries/${category}s`);
   }
 
   createNewItemEntry<T extends SellableItems>(newItem: T) {

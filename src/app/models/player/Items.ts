@@ -17,6 +17,7 @@ export type InventoryItem = {
 export type SellableItem = InventoryItem & {
   priceCats: number;
   priceThulium: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 

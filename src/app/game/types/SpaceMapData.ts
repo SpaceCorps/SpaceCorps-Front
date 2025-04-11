@@ -10,7 +10,7 @@ export type SpaceMapData = {
       width: number;
       height: number;
     };
-    staticEntities: any[];
+    staticEntities: unknown[];
   };
 };
 

@@ -30,11 +30,11 @@ export class HubService {
     });
   }
 
-  public on(event: string, callback: (...args: any[]) => void): void {
+  public on<T = unknown>(event: string, callback: (...args: T[]) => void): void {
     this.hubConnection?.on(event, callback);
   }
 
-  public off(event: string, callback: (...args: any[]) => void): void {
+  public off<T = unknown>(event: string, callback: (...args: T[]) => void): void {
     this.hubConnection?.off(event, callback);
   }
 

@@ -57,7 +57,7 @@ export class PlayerInfoStatisticsComponent {
     },
   };
 
-  getCategoryValue(category: string): any {
+  getCategoryValue(category: string): string | number | null {
     if (!this.statistics) return null;
     switch (category) {
       case 'Experience':

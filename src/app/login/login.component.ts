@@ -42,7 +42,7 @@ export class LoginComponent {
   onRegister($event: UserCredentialsCreateRequest) {
     const result = this.authService.register($event);
     result.subscribe({
-      next: (response) => {
+      next: () => {
         this.onToggleView();
       },
       error: (err: HttpErrorResponse) => {

@@ -65,7 +65,7 @@ export class PilotInventoryComponent implements OnInit {
     this.selectedItem = $event;
   }
 
-  handleItemDragged(item: SellableItems) {
+  handleItemDragged() {
     // console.log('Dragged item:', item);
   }
 
@@ -96,7 +96,7 @@ export class PilotInventoryComponent implements OnInit {
                   laserAmpId: draggedItem.id,
                 })
                 .subscribe({
-                  next: (response) => {
+                  next: () => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
                       (item) => item.id !== draggedItem.id
@@ -115,7 +115,7 @@ export class PilotInventoryComponent implements OnInit {
                   laserId: draggedItem.id,
                 })
                 .subscribe({
-                  next: (response) => {
+                  next: () => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
                       (item) => item.id !== draggedItem.id
@@ -134,7 +134,7 @@ export class PilotInventoryComponent implements OnInit {
                   shieldId: this.selectedItem.id,
                 })
                 .subscribe({
-                  next: (response) => {
+                  next: () => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
                       (item) => item.id !== draggedItem.id
@@ -153,7 +153,7 @@ export class PilotInventoryComponent implements OnInit {
                   shipId: this.selectedItem.id,
                 })
                 .subscribe({
-                  next: (response) => {
+                  next: () => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
                       (item) => item.id !== draggedItem.id
@@ -172,7 +172,7 @@ export class PilotInventoryComponent implements OnInit {
                   shipId: this.selectedItem.id,
                 })
                 .subscribe({
-                  next: (response) => {
+                  next: () => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
                       (item) => item.id !== draggedItem.id
@@ -191,7 +191,7 @@ export class PilotInventoryComponent implements OnInit {
                   engineId: this.selectedItem.id,
                 })
                 .subscribe({
-                  next: (response) => {
+                  next: () => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
                       (item) => item.id !== draggedItem.id
@@ -229,7 +229,7 @@ export class PilotInventoryComponent implements OnInit {
             laserAmpId: event.childId,
           })
           .subscribe({
-            next: (response) => {
+            next: () => {
               const laser = this.inventory!.items.find(
                 (i) => i.id === event.parentId
               ) as Laser;
@@ -255,7 +255,7 @@ export class PilotInventoryComponent implements OnInit {
             laserId: event.childId,
           })
           .subscribe({
-            next: (response) => {
+            next: () => {
               const ship = this.inventory!.items.find(
                 (i) => i.id === event.parentId
               ) as Ship;
@@ -279,7 +279,7 @@ export class PilotInventoryComponent implements OnInit {
             shieldId: event.parentId,
           })
           .subscribe({
-            next: (response) => {
+            next: () => {
               const shield = this.inventory!.items.find(
                 (i) => i.id === event.parentId
               ) as Shield;
@@ -305,7 +305,7 @@ export class PilotInventoryComponent implements OnInit {
             shipId: event.parentId,
           })
           .subscribe({
-            next: (response) => {
+            next: () => {
               const ship = this.inventory!.items.find(
                 (i) => i.id === event.parentId
               ) as Ship;

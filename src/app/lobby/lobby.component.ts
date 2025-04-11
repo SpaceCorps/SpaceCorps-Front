@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { ThemePickerComponent } from '../components/theme-picker/theme-picker.component';
 
 @Component({
   selector: 'app-lobby',

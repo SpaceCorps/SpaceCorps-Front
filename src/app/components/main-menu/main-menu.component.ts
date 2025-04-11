@@ -9,13 +9,19 @@ import { RouterLink } from '@angular/router';
 })
 export class MainMenuComponent {
   openItem: string | null = null;
-  closeTimeout: any;
+  closeTimeout: ReturnType<typeof setTimeout> | null = null;
 
   toggleItem(item: string) {
     this.openItem = this.openItem === item ? null : item;
   }
 
   openItemOnHover(item: string) {
+    if (this.openItem === item) {
+      return;
+    }
+    if (!this.closeTimeout) {
+      return;
+    }
     clearTimeout(this.closeTimeout);
     this.openItem = item;
   }

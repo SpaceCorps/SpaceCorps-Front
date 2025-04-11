@@ -228,7 +228,7 @@ export class AlienManager {
   }
 
   public removeAllAliens(): void {
-    for (const [id, _] of this.alienDictionary) {
+    for (const [id, ] of this.alienDictionary) {
       this.removeAlien(id);
     }
     this.alienDictionary.clear();
@@ -242,7 +242,7 @@ export class AlienManager {
     // Update at high refresh rate for smooth movement
     if (deltaTime >= this.UPDATE_INTERVAL) {
       // Batch update all matrices
-      for (const [_, alienData] of this.alienDictionary) {
+      for (const [, alienData] of this.alienDictionary) {
         if (alienData.targetPosition) {
           // Calculate distance to target
           this.tempVector.subVectors(

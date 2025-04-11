@@ -4,7 +4,13 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { filter } from 'rxjs';
 import { FooterComponent } from './components/footer/footer.component';
 
-declare const window: any;
+interface ElectronWindow extends Window {
+  electron?: {
+    on: (channel: string, listener: (url: string) => void) => void;
+  };
+}
+
+declare const window: ElectronWindow;
 
 @Component({
   selector: 'app-root',

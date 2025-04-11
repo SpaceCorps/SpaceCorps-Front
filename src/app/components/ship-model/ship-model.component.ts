@@ -20,7 +20,7 @@ export class ShipModelComponent implements OnInit {
   private scene!: THREE.Scene | undefined;
   private camera!: THREE.PerspectiveCamera | undefined;
   private renderer!: THREE.WebGLRenderer | undefined;
-  private model: any;
+  private model: THREE.Object3D | undefined;
 
   ngOnInit(): void {
     this.initThreeJS();
