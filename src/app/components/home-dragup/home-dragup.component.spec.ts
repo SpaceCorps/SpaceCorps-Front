@@ -8,9 +8,8 @@ describe('HomeDragupComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HomeDragupComponent]
-    })
-    .compileComponents();
+      imports: [HomeDragupComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HomeDragupComponent);
     component = fixture.componentInstance;

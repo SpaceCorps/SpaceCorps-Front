@@ -6,6 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './home-carousel.component.html',
   styleUrl: './home-carousel.component.scss',
 })
-export class HomeCarouselComponent {
-
-}
+export class HomeCarouselComponent {}

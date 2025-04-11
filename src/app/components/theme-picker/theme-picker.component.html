@@ -4,7 +4,8 @@
     id="theme-select"
     [value]="selectedTheme"
     (change)="onThemeChange($event)"
-    class="select">
+    class="select"
+  >
     @for (theme of themes; track theme) {
       <option value="{{ theme }}">{{ theme }}</option>
     }

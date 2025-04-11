@@ -2,13 +2,13 @@ export type EquipLaserAmpRequest = {
   username: string;
   laserAmpId: number;
   laserId: number;
-}
+};
 
 export type UnequipLaserAmpRequest = {
   username: string;
   laserAmpId: number;
   laserId: number;
-}
+};
 
 export type EquipShieldCellRequest = {
   username: string;

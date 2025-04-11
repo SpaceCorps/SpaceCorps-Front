@@ -13,10 +13,10 @@
     />
     @if (login?.invalid && login?.touched) {
       <div class="text-error text-sm mt-1">
-        @if (login?.errors?.["required"]) {
+        @if (login?.errors?.['required']) {
           <span>Login is required</span>
         }
-        @if (login?.errors?.["minlength"]) {
+        @if (login?.errors?.['minlength']) {
           <span>Login must be at least 3 characters</span>
         }
       </div>
@@ -33,10 +33,10 @@
     />
     @if (password?.invalid && password?.touched) {
       <div class="text-error text-sm mt-1">
-        @if (password?.errors?.["required"]) {
+        @if (password?.errors?.['required']) {
           <span>Password is required</span>
         }
-        @if (password?.errors?.["minlength"]) {
+        @if (password?.errors?.['minlength']) {
           <span>Password must be at least 6 characters</span>
         }
       </div>

@@ -40,14 +40,14 @@ const ORDERED_CATEGORIES = [
         style({ opacity: 0, transform: 'translateX(-100%)' }),
         animate(
           '300ms ease-out',
-          style({ opacity: 1, transform: 'translateX(0%)' }),
+          style({ opacity: 1, transform: 'translateX(0%)' })
         ),
       ]),
       transition(':leave', [
         style({ opacity: 1, transform: 'translateX(0)' }),
         animate(
           '300ms ease-in',
-          style({ opacity: 0, transform: 'translateX(-100%)' }),
+          style({ opacity: 0, transform: 'translateX(-100%)' })
         ),
       ]),
     ]),
@@ -60,11 +60,11 @@ const ORDERED_CATEGORIES = [
             stagger(50, [
               animate(
                 '300ms ease-out',
-                style({ opacity: 1, transform: 'translateY(0)' }),
+                style({ opacity: 1, transform: 'translateY(0)' })
               ),
             ]),
           ],
-          { optional: true },
+          { optional: true }
         ),
         query(
           ':leave',
@@ -72,11 +72,11 @@ const ORDERED_CATEGORIES = [
             stagger(50, [
               animate(
                 '300ms ease-in',
-                style({ opacity: 0, transform: 'translateY(20px)' }),
+                style({ opacity: 0, transform: 'translateY(20px)' })
               ),
             ]),
           ],
-          { optional: true },
+          { optional: true }
         ),
         query('@*', animateChild(), { optional: true }),
       ]),
@@ -102,7 +102,7 @@ export class InventoryAllItemsComponent implements OnInit, OnChanges {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -127,7 +127,7 @@ export class InventoryAllItemsComponent implements OnInit, OnChanges {
   categorizeItems() {
     // Start each category as an empty array, preserving order
     this.categorizedItems = new Map<string, SellableItems[]>(
-      ORDERED_CATEGORIES.map((category) => [category, []]),
+      ORDERED_CATEGORIES.map((category) => [category, []])
     );
 
     // Place incoming items into their respective category arrays

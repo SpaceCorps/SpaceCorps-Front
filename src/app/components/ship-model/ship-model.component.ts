@@ -1,18 +1,21 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
-import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 @Component({
   selector: 'app-ship-model',
   templateUrl: './ship-model.component.html',
-  styleUrls: ['./ship-model.component.scss']
+  styleUrls: ['./ship-model.component.scss'],
 })
 export class ShipModelComponent implements OnInit {
-  @ViewChild('rendererContainer', {static: true}) rendererContainer: ElementRef | undefined;
+  @ViewChild('rendererContainer', { static: true }) rendererContainer:
+    | ElementRef
+    | undefined;
 
   @Input({
-    required: true
-  }) shipModelName: string | undefined;
+    required: true,
+  })
+  shipModelName: string | undefined;
 
   private scene!: THREE.Scene | undefined;
   private camera!: THREE.PerspectiveCamera | undefined;
@@ -29,8 +32,11 @@ export class ShipModelComponent implements OnInit {
       return;
     }
 
-    if(!this.shipModelName) {
-      console.warn('Ship model name not found, loading default one!', this.shipModelName);
+    if (!this.shipModelName) {
+      console.warn(
+        'Ship model name not found, loading default one!',
+        this.shipModelName
+      );
       this.shipModelName = 'Protos';
     }
 
@@ -39,10 +45,15 @@ export class ShipModelComponent implements OnInit {
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
     this.scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
 
-    this.camera = new THREE.PerspectiveCamera(75, this.getAspectRatio(), 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(
+      75,
+      this.getAspectRatio(),
+      0.1,
+      1000
+    );
     this.camera.position.z = 1;
 
-    this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+    this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.setSize(this.getContainerWidth(), this.getContainerHeight());
     this.renderer.setClearColor(0x000000, 0);
     this.rendererContainer.nativeElement.appendChild(this.renderer.domElement);

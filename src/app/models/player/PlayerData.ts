@@ -10,4 +10,4 @@ export type PlayerData = {
   cats: number;
   thulium: number;
   currentMap: string;
-}
+};

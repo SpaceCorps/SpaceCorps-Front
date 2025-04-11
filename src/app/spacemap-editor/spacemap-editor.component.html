@@ -280,7 +280,9 @@
                     class="input input-bordered read-only:cursor-not-allowed"
                     readonly
                   />
-                  <label for="alien-spawn-limit-{{ alien.id }}">Spawn Limit:</label>
+                  <label for="alien-spawn-limit-{{ alien.id }}"
+                    >Spawn Limit:</label
+                  >
                   <input
                     id="alien-spawn-limit-{{ alien.id }}"
                     [(ngModel)]="alien.spawnLimit"

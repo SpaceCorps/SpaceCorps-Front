@@ -1,14 +1,10 @@
 import { Component } from '@angular/core';
-import {HomeCarouselComponent} from "../home-carousel/home-carousel.component";
+import { HomeCarouselComponent } from '../home-carousel/home-carousel.component';
 
 @Component({
   selector: 'app-home-dragup',
-    imports: [
-        HomeCarouselComponent
-    ],
+  imports: [HomeCarouselComponent],
   templateUrl: './home-dragup.component.html',
-  styleUrl: './home-dragup.component.scss'
+  styleUrl: './home-dragup.component.scss',
 })
-export class HomeDragupComponent {
-
-}
+export class HomeDragupComponent {}

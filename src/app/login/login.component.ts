@@ -6,8 +6,8 @@ import { UserCredentialsCreateRequest } from '../models/auth/UserCredentialsCrea
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLoginRequest';
 import { Router } from '@angular/router';
-import { LoginAsAdminBtnComponent } from "../components/login-as-admin-btn/login-as-admin-btn.component";
-import { ErrorModalComponent } from "../components/error-modal/error-modal.component";
+import { LoginAsAdminBtnComponent } from '../components/login-as-admin-btn/login-as-admin-btn.component';
+import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
 import { AsyncPipe } from '@angular/common';
 
 @Component({
@@ -17,13 +17,12 @@ import { AsyncPipe } from '@angular/common';
     RegisterFormComponent,
     LoginAsAdminBtnComponent,
     ErrorModalComponent,
-    AsyncPipe
-],
+    AsyncPipe,
+  ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-
   authService = inject(AuthService);
   isLoginView = true;
   error: HttpErrorResponse | null = null;
@@ -49,7 +48,7 @@ export class LoginComponent {
       error: (err: HttpErrorResponse) => {
         this.error = err;
         console.log(err);
-      }
+      },
     });
   }
 
@@ -62,7 +61,7 @@ export class LoginComponent {
         this.isLoading = false;
         this.clearLoginError();
         try {
-          this.authService.fetchUserAfterSuccessfulLogin(response)
+          this.authService.fetchUserAfterSuccessfulLogin(response);
           void this.router.navigate(['lobby']);
         } catch (err) {
           this.error = err as HttpErrorResponse;
@@ -73,7 +72,7 @@ export class LoginComponent {
         this.isLoading = false;
         this.error = err;
         console.log(err);
-      }
+      },
     });
   }
 }

@@ -1,16 +1,20 @@
-import {Component, input, OnChanges, SimpleChanges, ViewContainerRef} from '@angular/core';
-import {HttpErrorResponse} from '@angular/common/http';
+import {
+  Component,
+  input,
+  OnChanges,
+  SimpleChanges,
+  ViewContainerRef,
+} from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-error-modal',
   imports: [],
   templateUrl: './error-modal.component.html',
-  styleUrl: './error-modal.component.scss'
+  styleUrl: './error-modal.component.scss',
 })
 export class ErrorModalComponent implements OnChanges {
-
-  constructor(private viewContainerRef: ViewContainerRef) {
-  }
+  constructor(private viewContainerRef: ViewContainerRef) {}
 
   error = input.required<HttpErrorResponse>();
 
@@ -21,15 +25,18 @@ export class ErrorModalComponent implements OnChanges {
   }
 
   openModal() {
-    const modal = document.getElementById('login-form__errorModal') as HTMLDialogElement;
+    const modal = document.getElementById(
+      'login-form__errorModal'
+    ) as HTMLDialogElement;
     if (modal) {
       modal.showModal();
     }
   }
 
-  
   closeModal() {
-    const modal = document.getElementById('login-form__errorModal') as HTMLDialogElement;
+    const modal = document.getElementById(
+      'login-form__errorModal'
+    ) as HTMLDialogElement;
     if (modal) {
       modal.close();
     }

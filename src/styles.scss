@@ -1,8 +1,9 @@
-@use "tailwindcss";
+@use 'tailwindcss';
 
 @plugin "daisyui" {
-  themes: dark, light, black, dracula, night, sunset, business, abyss, winter, acid
-} ;
+  themes:
+    dark, light, black, dracula, night, sunset, business, abyss, winter, acid;
+}
 
 @plugin "daisyui/theme" {
   name: sc_default;

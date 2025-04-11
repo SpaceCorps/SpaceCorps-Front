@@ -1,4 +1,4 @@
-import { ShieldCell } from "../../player/Items";
+import { ShieldCell } from '../../player/Items';
 
 export const defaultShieldCells: ShieldCell[] = [
   {
@@ -10,6 +10,6 @@ export const defaultShieldCells: ShieldCell[] = [
     addPassiveRechargeRate: 0,
     addAbsorbance: 0,
     priceCats: 10000,
-    priceThulium: 0
-  }
-]
+    priceThulium: 0,
+  },
+];

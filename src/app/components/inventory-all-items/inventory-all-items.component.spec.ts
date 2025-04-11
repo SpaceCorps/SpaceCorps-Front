@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InventoryAllItemsComponent } from './inventory-all-items.component';
-import {provideHttpClient} from '@angular/common/http';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('InventoryAllItemsComponent', () => {
   let component: InventoryAllItemsComponent;
@@ -11,12 +11,8 @@ describe('InventoryAllItemsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [InventoryAllItemsComponent],
-      providers: [
-      provideHttpClient(),
-        provideHttpClientTesting()
-      ]
-    })
-    .compileComponents();
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(InventoryAllItemsComponent);
     component = fixture.componentInstance;

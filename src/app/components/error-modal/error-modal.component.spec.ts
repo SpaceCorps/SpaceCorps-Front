@@ -10,17 +10,15 @@ describe('ErrorModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ErrorModalComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
-
-      ]
-    })
-      .compileComponents();
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ErrorModalComponent);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('error', new HttpErrorResponse({ status: 404 }));
+    fixture.componentRef.setInput(
+      'error',
+      new HttpErrorResponse({ status: 404 })
+    );
     fixture.detectChanges();
   });
 

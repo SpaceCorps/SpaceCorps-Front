@@ -8,9 +8,8 @@ describe('HomeCarouselComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HomeCarouselComponent]
-    })
-    .compileComponents();
+      imports: [HomeCarouselComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HomeCarouselComponent);
     component = fixture.componentInstance;

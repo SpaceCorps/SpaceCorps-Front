@@ -1,11 +1,12 @@
-import {Component} from '@angular/core';
-import {ApiService} from '../services/api.service';
-import {FormsModule} from '@angular/forms';
-import {faArrowsRotate} from '@fortawesome/free-solid-svg-icons/faArrowsRotate';
-import {FaIconComponent} from '@fortawesome/angular-fontawesome';
-import {firstValueFrom} from 'rxjs';
+import { Component } from '@angular/core';
+import { ApiService } from '../services/api.service';
+import { FormsModule } from '@angular/forms';
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons/faArrowsRotate';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { firstValueFrom } from 'rxjs';
 import {
-  Engine, getFieldsForItemCategory,
+  Engine,
+  getFieldsForItemCategory,
   LaserAmmo,
   LaserAmp,
   Laser,
@@ -13,7 +14,7 @@ import {
   ShieldCell,
   Shield,
   Ship,
-  Thruster
+  Thruster,
 } from '../models/player/Items';
 import {
   defaultEngines,
@@ -23,20 +24,16 @@ import {
   defaultShields,
   defaultShieldCells,
   defaultShips,
-  defaultLaserAmmos
+  defaultLaserAmmos,
 } from '../models/dataEntries/itemEntryGenScripts';
 
 @Component({
   selector: 'app-itemEntry-editor',
-  imports: [
-    FormsModule,
-    FaIconComponent
-  ],
+  imports: [FormsModule, FaIconComponent],
   templateUrl: './itemEntry-editor.component.html',
-  styleUrl: './itemEntry-editor.component.scss'
+  styleUrl: './itemEntry-editor.component.scss',
 })
 export class ItemEntryEditorComponent {
-
   protected selectedCategory: SellableItems['itemType'] | null = null;
   protected itemCategories: SellableItems['itemType'][] = [
     'Engine',
@@ -47,16 +44,14 @@ export class ItemEntryEditorComponent {
     'Shield',
     'ShieldCell',
     'Ship',
-  ]
+  ];
 
   protected items: SellableItems[] = [];
   protected newItem: SellableItems | null = null;
 
-  constructor(private apiService: ApiService) {
-  }
+  constructor(private apiService: ApiService) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   protected selectCategory(category: SellableItems['itemType']) {
     if (this.selectedCategory === category) {
@@ -69,16 +64,14 @@ export class ItemEntryEditorComponent {
   }
 
   protected fetchItems(category: SellableItems['itemType']) {
-    this.apiService.getItemEntriesByCategory(category).subscribe(
-      {
-        next: (data: any) => {
-          this.items = data;
-        },
-        error: (err: any) => {
-          console.error('Error fetching items', err);
-        }
-      }
-    );
+    this.apiService.getItemEntriesByCategory(category).subscribe({
+      next: (data: any) => {
+        this.items = data;
+      },
+      error: (err: any) => {
+        console.error('Error fetching items', err);
+      },
+    });
   }
 
   protected createNewItem() {
@@ -90,16 +83,18 @@ export class ItemEntryEditorComponent {
         },
         error: (err: any) => {
           console.error('Error creating new item', err);
-        }
+        },
       });
       this.newItem = null;
     }
   }
 
-  protected createNewItemForCategory(category: SellableItems['itemType']): SellableItems {
+  protected createNewItemForCategory(
+    category: SellableItems['itemType']
+  ): SellableItems {
     const fields = getFieldsForItemCategory(category);
-    const newItem: { [key: string]: any } = {itemType: category};
-    fields.forEach(field => {
+    const newItem: { [key: string]: any } = { itemType: category };
+    fields.forEach((field) => {
       newItem[field.key] = '';
     });
     return newItem as SellableItems;
@@ -118,7 +113,7 @@ export class ItemEntryEditorComponent {
         },
         error: (err: any) => {
           console.error('Error deleting item', err);
-        }
+        },
       });
     }
   }
@@ -161,49 +156,49 @@ export class ItemEntryEditorComponent {
 
   private generateDefaultEngineItems() {
     defaultEngines.map(async (engine: Engine) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(engine))
+      await firstValueFrom(this.apiService.createNewItemEntry(engine));
     });
   }
 
   private generateDefaultThrusterItems() {
     defaultThrusters.map(async (thruster: Thruster) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(thruster))
+      await firstValueFrom(this.apiService.createNewItemEntry(thruster));
     });
   }
 
   private generateDefaultLaserItems() {
     defaultLasers.map(async (laser: Laser) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(laser))
+      await firstValueFrom(this.apiService.createNewItemEntry(laser));
     });
   }
 
   private generateDefaultLaserAmpItems() {
     defaultLaserAmps.map(async (laserAmp: LaserAmp) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(laserAmp))
+      await firstValueFrom(this.apiService.createNewItemEntry(laserAmp));
     });
   }
 
   private generateDefaultShieldItems() {
     defaultShields.map(async (shield: Shield) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(shield))
+      await firstValueFrom(this.apiService.createNewItemEntry(shield));
     });
   }
 
   private generateDefaultShieldCellItems() {
     defaultShieldCells.map(async (shieldCell: ShieldCell) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(shieldCell))
+      await firstValueFrom(this.apiService.createNewItemEntry(shieldCell));
     });
   }
 
   private generateDefaultShipItems() {
     defaultShips.map(async (ship: Ship) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(ship))
+      await firstValueFrom(this.apiService.createNewItemEntry(ship));
     });
   }
 
   private generateDefaultLaserAmmoItems() {
     defaultLaserAmmos.map(async (laserAmmo: LaserAmmo) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(laserAmmo))
+      await firstValueFrom(this.apiService.createNewItemEntry(laserAmmo));
     });
   }
 
@@ -220,7 +215,7 @@ export class ItemEntryEditorComponent {
     setTimeout(() => {
       if (!this.selectedCategory) return;
       this.fetchItems(this.selectedCategory!);
-    }, 300)
+    }, 300);
   }
 
   protected readonly getFieldsForItemCategory = getFieldsForItemCategory;

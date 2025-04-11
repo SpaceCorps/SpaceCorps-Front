@@ -55,56 +55,56 @@ export class ApiService {
 
   getSpaceMapDataEntryNames() {
     return this.http.get<string[]>(
-      `${this.url}/SpaceMapDataEntries/GetAllNames`,
+      `${this.url}/SpaceMapDataEntries/GetAllNames`
     );
   }
 
   getSpaceMapDataEntry(name: string) {
     return this.http.get<SpaceMapDataEntry>(
-      `${this.url}/SpaceMapDataEntries/Get/${name}`,
+      `${this.url}/SpaceMapDataEntries/Get/${name}`
     );
   }
 
   postSpaceMapDataEntry(mapName: string) {
     return this.http.post<SpaceMapDataEntry>(
       `${this.url}/SpaceMapDataEntries/Add`,
-      { name: mapName },
+      { name: mapName }
     );
   }
 
   updateSpaceMapDataEntry(
     mapName: string,
-    request: UpdateSpaceMapDataEntryRequest,
+    request: UpdateSpaceMapDataEntryRequest
   ) {
     return this.http.patch<SpaceMapDataEntry>(
       `${this.url}/SpaceMapDataEntries/Update/${mapName}`,
-      request,
+      request
     );
   }
 
   deleteSpaceMapDataEntry(mapName: string) {
     return this.http.delete(
-      `${this.url}/SpaceMapDataEntries/Delete/${mapName}`,
+      `${this.url}/SpaceMapDataEntries/Delete/${mapName}`
     );
   }
 
   addStaticEntityToMap(
     selectedSpaceMapDataEntryName: string,
-    newStaticEntity: CreateStaticEntityRequest,
+    newStaticEntity: CreateStaticEntityRequest
   ) {
     return this.http.post(
       `${this.url}/SpaceMapDataEntries/addStaticEntityToSpaceMap/${selectedSpaceMapDataEntryName}`,
-      newStaticEntity,
+      newStaticEntity
     );
   }
 
   deleteStaticEntityFromMap(
     mapName: string,
-    staticEntity: DeleteStaticEntityRequest,
+    staticEntity: DeleteStaticEntityRequest
   ) {
     return this.http.delete(
       `${this.url}/SpaceMapDataEntries/deleteStaticEntityFromSpaceMap/${mapName}`,
-      { body: staticEntity },
+      { body: staticEntity }
     );
   }
 
@@ -115,14 +115,14 @@ export class ApiService {
   createNewItemEntry<T extends SellableItems>(newItem: T) {
     return this.http.post<T>(
       `${this.url}/ItemEntries/${newItem.itemType.replace('Entrie', '')}s/Add`,
-      newItem,
+      newItem
     );
   }
 
   deleteItemEntry<T extends SellableItems>(item: T) {
     return this.http.delete(
       `${this.url}/ItemEntries/${item.itemType.replace('Entrie', '')}s/Delete`,
-      { body: { id: item.id } },
+      { body: { id: item.id } }
     );
   }
 
@@ -141,13 +141,13 @@ export class ApiService {
     return this.http.post<void>(
       `${this.url}/Players/UserEditorCommand`,
       JSON.stringify(command),
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
   getUserInventory(username: string) {
     return this.http.get<Inventory>(
-      `${this.url}/Players/Inventory/${username}`,
+      `${this.url}/Players/Inventory/${username}`
     );
   }
 
@@ -156,7 +156,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/EquipLaserAmp`,
       equipLaserAmpRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -165,7 +165,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/UnequipLaserAmp`,
       unequipLaserAmpRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -174,7 +174,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/EquipShieldCell`,
       equipShieldCellRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -183,7 +183,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/UnequipShieldCell`,
       unequipShieldCellRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -200,7 +200,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/UnequipLaser`,
       unequipLaserRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -209,7 +209,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/EquipShield`,
       equipShieldRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -218,7 +218,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/UnequipShield`,
       unequipShieldRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -227,7 +227,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/EquipEngine`,
       equipEngineRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -236,7 +236,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/UnequipEngine`,
       unequipEngineRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -245,7 +245,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/EquipThruster`,
       equipThrusterRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 
@@ -254,7 +254,7 @@ export class ApiService {
     return this.http.post(
       `${this.url}/Players/UnequipThruster`,
       unequipThrusterRequest,
-      { headers, responseType: 'text' as 'json' },
+      { headers, responseType: 'text' as 'json' }
     );
   }
 }

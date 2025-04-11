@@ -1,32 +1,31 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-theme-picker',
   imports: [],
   templateUrl: './theme-picker.component.html',
-  styleUrl: './theme-picker.component.scss'
+  styleUrl: './theme-picker.component.scss',
 })
 export class ThemePickerComponent implements OnInit {
   themes = [
-    "sc-default",
-    "dark",
-    "light",
-    "abyss",
-    "acid",
-    "black",
-    "dracula",
-    "night",
-    "sunset",
-    "business",
-    "winter"
-  ]
+    'sc-default',
+    'dark',
+    'light',
+    'abyss',
+    'acid',
+    'black',
+    'dracula',
+    'night',
+    'sunset',
+    'business',
+    'winter',
+  ];
 
-  selectedTheme = "dark";
-
+  selectedTheme = 'dark';
 
   ngOnInit() {
     const savedTheme = localStorage.getItem('selectedTheme');
-    if(savedTheme) {
+    if (savedTheme) {
       this.selectedTheme = savedTheme;
       this.applyTheme(savedTheme);
     } else {

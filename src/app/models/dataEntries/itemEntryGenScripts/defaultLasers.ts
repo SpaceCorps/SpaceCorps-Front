@@ -9,7 +9,7 @@ export const defaultLasers: Laser[] = [
     criticalChance: 0.1,
     laserAmpSlotCount: 1,
     priceCats: 10000,
-    priceThulium: 0
+    priceThulium: 0,
   },
   {
     name: 'Quantum Laser 2',
@@ -19,7 +19,7 @@ export const defaultLasers: Laser[] = [
     criticalChance: 0.2,
     laserAmpSlotCount: 2,
     priceCats: 20000,
-    priceThulium: 0
+    priceThulium: 0,
   },
   {
     name: 'Quantum Laser 3',
@@ -29,6 +29,6 @@ export const defaultLasers: Laser[] = [
     criticalChance: 0.3,
     laserAmpSlotCount: 3,
     priceCats: 0,
-    priceThulium: 10000
-  }
-]
+    priceThulium: 10000,
+  },
+];

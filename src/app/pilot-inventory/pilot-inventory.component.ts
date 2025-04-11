@@ -44,14 +44,14 @@ export class PilotInventoryComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     const playerData = this.authService.getPlayerData();
     if (!playerData)
       return console.error(
-        'No player data found thus cannot get username and load inventory',
+        'No player data found thus cannot get username and load inventory'
       );
     this.username = playerData?.username;
     this.apiService
@@ -80,7 +80,7 @@ export class PilotInventoryComponent implements OnInit {
 
     console.log(
       `Dragged "${draggedItem.name}" from inventory to ${mapping.title} slot #${slotIndex}`,
-      draggedItem,
+      draggedItem
     );
     if (this.selectedItem) {
       const childArray = this.selectedItem[mapping.childrenKey];
@@ -99,7 +99,7 @@ export class PilotInventoryComponent implements OnInit {
                   next: (response) => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id,
+                      (item) => item.id !== draggedItem.id
                     );
                   },
                   error: (err) => {
@@ -118,7 +118,7 @@ export class PilotInventoryComponent implements OnInit {
                   next: (response) => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id,
+                      (item) => item.id !== draggedItem.id
                     );
                   },
                   error: (err) => {
@@ -137,7 +137,7 @@ export class PilotInventoryComponent implements OnInit {
                   next: (response) => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id,
+                      (item) => item.id !== draggedItem.id
                     );
                   },
                   error: (err) => {
@@ -156,7 +156,7 @@ export class PilotInventoryComponent implements OnInit {
                   next: (response) => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id,
+                      (item) => item.id !== draggedItem.id
                     );
                   },
                   error: (err) => {
@@ -175,7 +175,7 @@ export class PilotInventoryComponent implements OnInit {
                   next: (response) => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id,
+                      (item) => item.id !== draggedItem.id
                     );
                   },
                   error: (err) => {
@@ -194,7 +194,7 @@ export class PilotInventoryComponent implements OnInit {
                   next: (response) => {
                     childArray[slotIndex] = draggedItem;
                     this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id,
+                      (item) => item.id !== draggedItem.id
                     );
                   },
                   error: (err) => {
@@ -208,7 +208,7 @@ export class PilotInventoryComponent implements OnInit {
           }
         } else {
           console.warn(
-            `Slot ${slotIndex} in ${mapping.title} is already occupied.`,
+            `Slot ${slotIndex} in ${mapping.title} is already occupied.`
           );
         }
       }
@@ -231,14 +231,14 @@ export class PilotInventoryComponent implements OnInit {
           .subscribe({
             next: (response) => {
               const laser = this.inventory!.items.find(
-                (i) => i.id === event.parentId,
+                (i) => i.id === event.parentId
               ) as Laser;
               const laserAmp = laser.laserAmps!.find(
-                (i) => i.id === event.childId,
+                (i) => i.id === event.childId
               ) as LaserAmp;
               this.inventory!.items = [...this.inventory!.items, laserAmp];
               laser.laserAmps = laser.laserAmps!.filter(
-                (i) => i.id !== event.childId,
+                (i) => i.id !== event.childId
               );
               this.selectedItem = laser;
             },
@@ -257,10 +257,10 @@ export class PilotInventoryComponent implements OnInit {
           .subscribe({
             next: (response) => {
               const ship = this.inventory!.items.find(
-                (i) => i.id === event.parentId,
+                (i) => i.id === event.parentId
               ) as Ship;
               const laser = ship.lasers!.find(
-                (i) => i.id === event.childId,
+                (i) => i.id === event.childId
               ) as Laser;
               this.inventory!.items = [...this.inventory!.items, laser];
               ship.lasers = ship.lasers!.filter((i) => i.id !== event.childId);
@@ -281,14 +281,14 @@ export class PilotInventoryComponent implements OnInit {
           .subscribe({
             next: (response) => {
               const shield = this.inventory!.items.find(
-                (i) => i.id === event.parentId,
+                (i) => i.id === event.parentId
               ) as Shield;
               const shieldCell = shield.shieldCells!.find(
-                (i) => i.id === event.childId,
+                (i) => i.id === event.childId
               ) as ShieldCell;
               this.inventory!.items = [...this.inventory!.items, shieldCell];
               shield.shieldCells = shield.shieldCells!.filter(
-                (i) => i.id !== event.childId,
+                (i) => i.id !== event.childId
               );
               this.selectedItem = shield;
             },
@@ -307,14 +307,14 @@ export class PilotInventoryComponent implements OnInit {
           .subscribe({
             next: (response) => {
               const ship = this.inventory!.items.find(
-                (i) => i.id === event.parentId,
+                (i) => i.id === event.parentId
               ) as Ship;
               const shield = ship.shields!.find(
-                (i) => i.id === event.childId,
+                (i) => i.id === event.childId
               ) as Shield;
               this.inventory!.items = [...this.inventory!.items, shield];
               ship.shields = ship.shields!.filter(
-                (i) => i.id !== event.childId,
+                (i) => i.id !== event.childId
               );
               this.selectedItem = ship;
             },
@@ -333,14 +333,14 @@ export class PilotInventoryComponent implements OnInit {
           .subscribe({
             next: () => {
               const ship = this.inventory!.items.find(
-                (i) => i.id === event.parentId,
+                (i) => i.id === event.parentId
               ) as Ship;
               const engine = ship.engines!.find(
-                (i) => i.id === event.childId,
+                (i) => i.id === event.childId
               ) as Engine;
               this.inventory!.items = [...this.inventory!.items, engine];
               ship.engines = ship.engines!.filter(
-                (i) => i.id !== event.childId,
+                (i) => i.id !== event.childId
               );
               this.selectedItem = ship;
             },
@@ -359,14 +359,14 @@ export class PilotInventoryComponent implements OnInit {
           .subscribe({
             next: () => {
               const engine = this.inventory!.items.find(
-                (i) => i.id === event.parentId,
+                (i) => i.id === event.parentId
               ) as Engine;
               const thruster = engine.thrusters!.find(
-                (i) => i.id === event.childId,
+                (i) => i.id === event.childId
               ) as Thruster;
               this.inventory!.items = [...this.inventory!.items, thruster];
               engine.thrusters = engine.thrusters!.filter(
-                (i) => i.id !== event.childId,
+                (i) => i.id !== event.childId
               );
               this.selectedItem = engine;
             },

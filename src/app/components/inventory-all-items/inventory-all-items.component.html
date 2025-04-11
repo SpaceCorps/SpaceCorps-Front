@@ -2,15 +2,20 @@
   @for (category of categorizedItems.keys(); track category) {
     <li class="card bg-base-200 flex flex-col gap-4 card-body">
       <h3 class="card-title">{{ category }}</h3>
-      <div class="grid grid-cols-4 gap-2 overflow-y-auto max-h-64" @listAnimation>
+      <div
+        class="grid grid-cols-4 gap-2 overflow-y-auto max-h-64"
+        @listAnimation
+      >
         @for (item of categorizedItems.get(category); track item.id) {
-          <div class="card bg-base-100 hover:cursor-grab hover:bg-base-300 dragstart:cursor-grabbing"
-               @slideInFromLeft
-               (click)="itemSelected.emit(item)"
-               (dragstart)="onDragStart($event, item)"
-               (dragover)="onDragOver($event)"
-               (drop)="onDrop($event)"
-               draggable="true">
+          <div
+            class="card bg-base-100 hover:cursor-grab hover:bg-base-300 dragstart:cursor-grabbing"
+            @slideInFromLeft
+            (click)="itemSelected.emit(item)"
+            (dragstart)="onDragStart($event, item)"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event)"
+            draggable="true"
+          >
             <div class="card-body">
               <div class="card-title">
                 {{ item.name }}

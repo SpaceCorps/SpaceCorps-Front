@@ -4,7 +4,7 @@
       <h3
         class="flex items-center mb-1 text-lg font-semibold text-base-content"
       >
-        {{ "— " + commit.commit.message }}
+        {{ '— ' + commit.commit.message }}
 
         @if (isBigRelease(commit.commit.message)) {
           <span class="badge badge-primary text-sm font-medium ml-2"
@@ -16,7 +16,7 @@
       <time
         class="block mb-2 text-sm font-normal leading-none text-base-content/70"
       >
-        {{ commit.commit.author.date | date: "medium" }}
+        {{ commit.commit.author.date | date: 'medium' }}
       </time>
 
       <p class="mb-4 text-base font-normal text-base-content">

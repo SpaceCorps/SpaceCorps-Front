@@ -1,14 +1,14 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {AsyncPipe, NgClass} from '@angular/common';
-import {AuthService} from '../../services/auth.service';
-import {ApiService} from '../../services/api.service';
-import {PlayerInfoStatisticsComponent} from '../player-info-statistics/player-info-statistics.component';
+import { Component, inject, OnInit } from '@angular/core';
+import { AsyncPipe, NgClass } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { ApiService } from '../../services/api.service';
+import { PlayerInfoStatisticsComponent } from '../player-info-statistics/player-info-statistics.component';
 
 @Component({
   selector: 'app-player-info-general-info',
   imports: [NgClass, AsyncPipe, PlayerInfoStatisticsComponent],
   templateUrl: './player-info-general-info.component.html',
-  styleUrl: './player-info-general-info.component.scss'
+  styleUrl: './player-info-general-info.component.scss',
 })
 export class PlayerInfoGeneralInfoComponent implements OnInit {
   authService = inject(AuthService);
@@ -32,8 +32,8 @@ export class PlayerInfoGeneralInfoComponent implements OnInit {
       },
       error: (err) => {
         throw err;
-      }
-    })
+      },
+    });
   }
 
   getPlayerInfo(username: string) {

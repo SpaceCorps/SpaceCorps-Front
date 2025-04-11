@@ -4,16 +4,16 @@ header {
 
 :host ::ng-deep .patch-info-container {
   position: absolute;
-  top: 100%;  
+  top: 100%;
   right: 0;
-  width: 400px; 
+  width: 400px;
 
   background: var(--theme-bg);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   height: auto;
   z-index: 9999;
-  margin-top: 10px; 
+  margin-top: 10px;
   padding: 10px;
   border: 1px solid var(--theme-border);
   background-color: var(--theme-bg-solid);

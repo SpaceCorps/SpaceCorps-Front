@@ -1,7 +1,7 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {LobbyComponent} from './lobby.component';
-import {provideHttpClient} from '@angular/common/http';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LobbyComponent } from './lobby.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('LobbyComponent', () => {
   let component: LobbyComponent;
@@ -10,12 +10,8 @@ describe('LobbyComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LobbyComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
-      ]
-    })
-      .compileComponents();
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LobbyComponent);
     component = fixture.componentInstance;

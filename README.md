@@ -19,16 +19,21 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 This project includes an Electron wrapper for desktop deployment. To build and run the Electron application:
 
 1. Development mode:
+
    ```bash
    npm run start-electron
    ```
+
    This will build the Angular app, compile Electron code, and start the application in development mode.
 
 2. Create distributable executables:
+
    ```bash
    npm run dist-electron
    ```
+
    This will create platform-specific executables in the `dist/electron` directory:
+
    - Windows: NSIS installer (x64 and arm64)
    - macOS: DMG package
    - Linux: AppImage

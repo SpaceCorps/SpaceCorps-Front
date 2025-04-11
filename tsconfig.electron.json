@@ -8,10 +8,6 @@
     "moduleResolution": "node",
     "sourceMap": true
   },
-  "include": [
-    "electron/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["electron/**/*.ts"],
+  "exclude": ["node_modules"]
 }

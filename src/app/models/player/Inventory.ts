@@ -5,4 +5,4 @@ export type Inventory = {
   thulium: number;
   activeShipName: string;
   items: SellableItems[];
-}
+};

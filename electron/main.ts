@@ -10,7 +10,7 @@ function createWindow(): void {
       nodeIntegration: false,
       sandbox: true,
       webSecurity: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
@@ -24,14 +24,17 @@ function createWindow(): void {
           "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
           "style-src 'self' 'unsafe-inline';",
           "img-src 'self' data: file:;",
-          "connect-src 'self' http: https: ws: wss:;"
-        ].join(' ')
-      }
+          "connect-src 'self' http: https: ws: wss:;",
+        ].join(' '),
+      },
     });
   });
 
   // Load the Angular app
-  const indexPath = path.join(__dirname, '../../dist/space-corps-front/browser/index.html');
+  const indexPath = path.join(
+    __dirname,
+    '../../dist/space-corps-front/browser/index.html'
+  );
   win.loadFile(indexPath);
 
   // Handle Angular routing

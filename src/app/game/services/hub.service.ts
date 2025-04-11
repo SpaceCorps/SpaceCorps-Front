@@ -2,25 +2,28 @@ import { Injectable } from '@angular/core';
 import * as SignalR from '@microsoft/signalr';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HubService {
-
   private hubConnection?: SignalR.HubConnection;
 
   async initializeSignalR(username: string) {
-
-    console.log(username)
+    console.log(username);
     this.hubConnection = new SignalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:5274/gameHub?username=${encodeURIComponent(username)}`)
+      .withUrl(
+        `http://localhost:5274/gameHub?username=${encodeURIComponent(username)}`
+      )
       .build();
 
-    await this.hubConnection.start()
+    await this.hubConnection
+      .start()
       .then(() => console.log('SignalR Connected'))
-      .catch(err => console.error('Error while starting SignalR connection: ' + err))
+      .catch((err) =>
+        console.error('Error while starting SignalR connection: ' + err)
+      )
       .then(() => {
         this.send('requestLogin', { username: username });
-      })
+      });
 
     this.hubConnection.onclose(async () => {
       console.error('SignalR connection closed unexpectedly.');
@@ -35,8 +38,10 @@ export class HubService {
     this.hubConnection?.off(event, callback);
   }
 
-  public async send<T extends keyof ServerRequestTypes>
-    (event: T, args: ServerRequestTypes[T]): Promise<void> {
+  public async send<T extends keyof ServerRequestTypes>(
+    event: T,
+    args: ServerRequestTypes[T]
+  ): Promise<void> {
     console.log('Sending SignalR message: ' + event, args ? args : '');
 
     if (!this.hubConnection) {
@@ -45,7 +50,7 @@ export class HubService {
     }
 
     try {
-      if(args === null) {
+      if (args === null) {
         return await this.hubConnection.invoke(event);
       } else {
         return await this.hubConnection.invoke(event, args);
@@ -66,7 +71,7 @@ type ServerRequestTypes = {
       x: number;
       y: number;
       z: number;
-    }
+    };
   };
 };
 

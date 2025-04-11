@@ -4,9 +4,9 @@ export type StaticEntity = {
     x: number;
     y: number;
     z: number;
-  }
+  };
   id: number;
   locationName: string;
   safeZoneRadii: number;
   destination: string;
-}
+};

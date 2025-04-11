@@ -1,16 +1,19 @@
 <main class="p-4">
   <section class="flex flex-wrap gap-4">
-
     <!-- Navigation: Display Item Entry Categories -->
     <nav>
       <ul class="menu bg-base-200 rounded-box w-48 items-center gap-2">
         <li class="menu-title">Item Entry Category</li>
-        @for(item of itemCategories; track item){
-        <li class="menu-item">
-          <a (click)="selectCategory(item)" [class]="item === selectedCategory ? 'active' : ''" class="menu-link">
-            {{ item }}
-          </a>
-        </li>
+        @for (item of itemCategories; track item) {
+          <li class="menu-item">
+            <a
+              (click)="selectCategory(item)"
+              [class]="item === selectedCategory ? 'active' : ''"
+              class="menu-link"
+            >
+              {{ item }}
+            </a>
+          </li>
         }
         <li>
           <button class="btn bg-base-300" (click)="createAllDefaultItems()">
@@ -21,76 +24,98 @@
     </nav>
 
     <!-- Section: Create new Item Entry in selected category -->
-    @if(selectedCategory){
-    <section aria-labelledby="create-new-item" class="mb-4">
-      <header>
-        <h2 id="create-new-item" class="sr-only">Create New Item</h2>
-      </header>
-      <article>
-        <div class="card bg-base-200 max-w-96">
-          <div class="card-body flex flex-col gap-2 justify-center">
-            <div class="flex flex-row justify-between items-center">
-              <h2 class="card-title">Create New Item</h2>
-              <button class="btn bg-base-300 btn-xs btn-square mt-4" (click)="fetchItems(selectedCategory);"
-                title="Refresh">
-                <fa-icon [icon]="faArrowsRotate"></fa-icon>
-              </button>
-            </div>
-            <form class="flex flex-col gap-2" (ngSubmit)="createNewItem()">
-              @for(field of getFieldsForItemCategory(selectedCategory); track field.key){
-              @if(field.key !== 'id'){
-              <div class="flex flex-col gap-2">
-                <label for="{{field.key}}">{{ field.label }}</label>
-                <input id="{{field.key}}" [(ngModel)]="newItem![field.key]" [name]="field.key"
-                  class="input input-bordered" />
+    @if (selectedCategory) {
+      <section aria-labelledby="create-new-item" class="mb-4">
+        <header>
+          <h2 id="create-new-item" class="sr-only">Create New Item</h2>
+        </header>
+        <article>
+          <div class="card bg-base-200 max-w-96">
+            <div class="card-body flex flex-col gap-2 justify-center">
+              <div class="flex flex-row justify-between items-center">
+                <h2 class="card-title">Create New Item</h2>
+                <button
+                  class="btn bg-base-300 btn-xs btn-square mt-4"
+                  (click)="fetchItems(selectedCategory)"
+                  title="Refresh"
+                >
+                  <fa-icon [icon]="faArrowsRotate"></fa-icon>
+                </button>
               </div>
-              }
-              }
-              <button type="submit" class="btn bg-base-300 mt-4">Add</button>
-            </form>
+              <form class="flex flex-col gap-2" (ngSubmit)="createNewItem()">
+                @for (
+                  field of getFieldsForItemCategory(selectedCategory);
+                  track field.key
+                ) {
+                  @if (field.key !== 'id') {
+                    <div class="flex flex-col gap-2">
+                      <label for="{{ field.key }}">{{ field.label }}</label>
+                      <input
+                        id="{{ field.key }}"
+                        [(ngModel)]="newItem![field.key]"
+                        [name]="field.key"
+                        class="input input-bordered"
+                      />
+                    </div>
+                  }
+                }
+                <button type="submit" class="btn bg-base-300 mt-4">Add</button>
+              </form>
+            </div>
           </div>
-        </div>
-      </article>
-    </section>
+        </article>
+      </section>
     }
 
     <!-- Section: Display Item Entries in selected category -->
-    @if(selectedCategory){
-    <section aria-labelledby="item-entries">
-      <header class="flex flex-row items-center p-4 gap-4">
-        <h2 id="item-entries">{{ selectedCategory }} Items</h2>
-        <button class="btn bg-base-300 my-auto" (click)="generateDefaultItemsForCategory(selectedCategory)">
-          Generate Default {{ selectedCategory }}
-        </button>
-      </header>
-      <article>
-        <div class="card">
-          <div class="card-body">
-            <ul class="flex flex-wrap gap-4">
-              @for(item of items; track item.id){
-              <li class="card bg-base-200 p-4 max-w-96">
-                <div class="flex flex-col gap-2">
-                  @for(field of getFieldsForItemCategory(selectedCategory); track field.key){
-                  <div class="flex flex-col gap-2 min-w-60">
-                    <label for="{{field.key}}">{{ field.label }}</label>
-                    <span id="{{field.key}}"
-                      class="input input-bordered read-only:cursor-not-allowed text-center flex items-center justify-center">
-                      {{ item[field.key] }}
-                    </span>
-                  </div>
-                  }
-                  <div class="flex flex-row justify-between items-center">
-                    <button class="btn btn-error btn-xs btn-square" (click)="deleteItem(item)">X</button>
-                  </div>
-                </div>
-              </li>
-              }
-            </ul>
+    @if (selectedCategory) {
+      <section aria-labelledby="item-entries">
+        <header class="flex flex-row items-center p-4 gap-4">
+          <h2 id="item-entries">{{ selectedCategory }} Items</h2>
+          <button
+            class="btn bg-base-300 my-auto"
+            (click)="generateDefaultItemsForCategory(selectedCategory)"
+          >
+            Generate Default {{ selectedCategory }}
+          </button>
+        </header>
+        <article>
+          <div class="card">
+            <div class="card-body">
+              <ul class="flex flex-wrap gap-4">
+                @for (item of items; track item.id) {
+                  <li class="card bg-base-200 p-4 max-w-96">
+                    <div class="flex flex-col gap-2">
+                      @for (
+                        field of getFieldsForItemCategory(selectedCategory);
+                        track field.key
+                      ) {
+                        <div class="flex flex-col gap-2 min-w-60">
+                          <label for="{{ field.key }}">{{ field.label }}</label>
+                          <span
+                            id="{{ field.key }}"
+                            class="input input-bordered read-only:cursor-not-allowed text-center flex items-center justify-center"
+                          >
+                            {{ item[field.key] }}
+                          </span>
+                        </div>
+                      }
+                      <div class="flex flex-row justify-between items-center">
+                        <button
+                          class="btn btn-error btn-xs btn-square"
+                          (click)="deleteItem(item)"
+                        >
+                          X
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                }
+              </ul>
+            </div>
           </div>
-        </div>
-      </article>
-    </section>
+        </article>
+      </section>
     }
-
   </section>
 </main>

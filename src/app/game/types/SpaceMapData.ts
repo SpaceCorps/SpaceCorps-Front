@@ -1,4 +1,4 @@
-import {Position3} from '../../models/entity/Position3';
+import { Position3 } from '../../models/entity/Position3';
 
 export type SpaceMapData = {
   mapName: string;
@@ -9,10 +9,9 @@ export type SpaceMapData = {
     size: {
       width: number;
       height: number;
-    }
+    };
     staticEntities: any[];
-  }
-
+  };
 };
 
 export type PlayerDto = {
@@ -21,7 +20,7 @@ export type PlayerDto = {
   id: string;
   position: Position3;
   username: string;
-}
+};
 
 export type AlienDto = {
   id: string;
@@ -29,4 +28,4 @@ export type AlienDto = {
   position: Position3;
   health: number;
   type: string;
-}
+};

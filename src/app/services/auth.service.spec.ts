@@ -8,7 +8,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [HttpClient, HttpHandler]
+      providers: [HttpClient, HttpHandler],
     });
     service = TestBed.inject(AuthService);
   });
@@ -19,7 +19,7 @@ describe('AuthService', () => {
 
   it('should log out', () => {
     service.logOut();
-    service.authState$.subscribe(state => {
+    service.authState$.subscribe((state) => {
       expect(state.isLoggedIn).toBeFalse();
     });
   });

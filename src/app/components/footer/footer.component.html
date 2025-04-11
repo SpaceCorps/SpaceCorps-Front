@@ -55,15 +55,17 @@
       </a>
     </nav>
     <div class="flex flex-col">
-      <p class="text-base-content/70 flex gap-4">Version: {{ clientVersion }}</p>
+      <p class="text-base-content/70 flex gap-4">
+        Version: {{ clientVersion }}
+      </p>
 
       @if (serverVersion) {
         <p
           class="text-base-content/70 flex gap-4"
           [ngClass]="{
-          'red-color': outDated,
-          'text-base-content': outDated,
-        }"
+            'red-color': outDated,
+            'text-base-content': outDated,
+          }"
         >
           Server Version: {{ serverVersion }}
         </p>

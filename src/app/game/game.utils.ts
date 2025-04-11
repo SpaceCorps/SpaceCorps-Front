@@ -7,7 +7,7 @@ import { GameComponent } from './game.component';
 // Define layers
 const LAYERS = {
   DEFAULT: 0,
-  RAYCAST: 1
+  RAYCAST: 1,
 };
 
 // Helper function to create selection box for raycasting
@@ -16,7 +16,7 @@ export function createSelectionBox(): THREE.Mesh {
   const material = new THREE.MeshBasicMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0
+    opacity: 0,
   });
   const box = new THREE.Mesh(geometry, material);
   box.layers.set(LAYERS.RAYCAST);
@@ -24,18 +24,18 @@ export function createSelectionBox(): THREE.Mesh {
 }
 
 export async function initializeThreeJs(
-  component: GameComponent,
+  component: GameComponent
 ): Promise<void> {
   component.scene = new THREE.Scene();
   component.camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
-    0.1,  // Near plane - increased from default
-    10000  // Far plane - increased from default 1000
+    0.1, // Near plane - increased from default
+    10000 // Far plane - increased from default 1000
   );
   component.renderer = new THREE.WebGLRenderer({
     antialias: true,
-    logarithmicDepthBuffer: true  // Enable logarithmic depth buffer for better depth precision
+    logarithmicDepthBuffer: true, // Enable logarithmic depth buffer for better depth precision
   });
   component.renderer.setSize(window.innerWidth, window.innerHeight);
   component.renderer.setPixelRatio(window.devicePixelRatio);
@@ -55,15 +55,15 @@ export async function initializeThreeJs(
 
   component.controls = new OrbitControls(
     component.camera!,
-    component.renderer!.domElement,
+    component.renderer!.domElement
   );
 
   // Disable panning completely
   component.controls.enablePan = false;
   component.controls.enableDamping = true;
   component.controls.dampingFactor = 0.05;
-  component.controls.minDistance = 5;  // Minimum zoom distance
-  component.controls.maxDistance = 1000;  // Maximum zoom distance
+  component.controls.minDistance = 5; // Minimum zoom distance
+  component.controls.maxDistance = 1000; // Maximum zoom distance
 
   // Set initial camera position
   component.camera.position.set(0, 50, 0);
@@ -77,7 +77,7 @@ export async function initializeThreeJs(
   component.renderer.domElement.addEventListener('click', async (event) => {
     // Only handle left clicks
     if (event.button !== 0) return;
-    
+
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -85,11 +85,11 @@ export async function initializeThreeJs(
 
     // Get all objects in the raycast layer
     const intersects = raycaster.intersectObjects(component.scene!.children);
-    
+
     if (intersects.length > 0) {
       const intersect = intersects[0]; // Get the closest intersect
       const userData = intersect.object.userData;
-      
+
       if (userData['type'] === 'player') {
         console.log('Clicked player:', userData['id']);
       } else if (userData['type'] === 'alien') {
@@ -101,7 +101,7 @@ export async function initializeThreeJs(
         await component.movePlayerTo({
           x: clickPoint.x,
           y: 0, // Keep y at 0 for 2D movement
-          z: clickPoint.z
+          z: clickPoint.z,
         });
         console.log('[Movement] Sent move request to backend');
       }
@@ -121,7 +121,7 @@ export async function initializeThreeJs(
 
 export async function loadNewSpacemap(
   component: GameComponent,
-  spaceMapData: SpaceMapData,
+  spaceMapData: SpaceMapData
 ): Promise<void> {
   if (component.isLoadingSpacemap) {
     console.log('Skipping spacemap update - still loading previous map');
@@ -154,7 +154,7 @@ export async function clearScene(component: GameComponent): Promise<void> {
 
 async function loadMapEnvironment(
   component: GameComponent,
-  spaceMapData: SpaceMapData,
+  spaceMapData: SpaceMapData
 ): Promise<void> {
   await createStars(component);
   await createLighting(component);
@@ -181,7 +181,7 @@ export async function createLighting(component: GameComponent): Promise<void> {
 
 export async function createSkybox(
   component: GameComponent,
-  mapname?: string,
+  mapname?: string
 ): Promise<void> {
   if (!component.scene) {
     console.error('Scene not initialized');
@@ -212,21 +212,21 @@ export async function createSkybox(
   } catch (error) {
     console.error(
       `Failed to load skybox for ${mapname}, loading default skybox`,
-      error,
+      error
     );
     component.scene.background = loadSkybox(defaultMapname);
   }
 }
 
 export async function createStaticEntities(
-  component: GameComponent,
+  component: GameComponent
 ): Promise<void> {
   // Implementation here
 }
 
 async function createSpacemapPlane(
   component: GameComponent,
-  spaceMapData: SpaceMapData,
+  spaceMapData: SpaceMapData
 ): Promise<void> {
   if (!component.scene) {
     console.error('Scene not initialized');
@@ -263,54 +263,64 @@ async function createSpacemapPlane(
   // Create custom grid geometry to match exact dimensions
   const gridGeometry = new THREE.BufferGeometry();
   const gridMaterial = new THREE.LineBasicMaterial({ color: 0x444444 });
-  
+
   const gridVertices = [];
   const cellSize = 10; // Size of each grid cell
-  
+
   // Calculate number of lines needed
   const xLines = Math.ceil(width / cellSize);
   const zLines = Math.ceil(height / cellSize);
-  
+
   // Create vertical lines (along Z)
   for (let x = 0; x <= xLines; x++) {
-    const xPos = (x * cellSize) - (width / 2);
+    const xPos = x * cellSize - width / 2;
     if (xPos > width / 2) continue;
-    gridVertices.push(
-      xPos, 0, -height / 2,
-      xPos, 0, height / 2
-    );
+    gridVertices.push(xPos, 0, -height / 2, xPos, 0, height / 2);
   }
-  
+
   // Create horizontal lines (along X)
   for (let z = 0; z <= zLines; z++) {
-    const zPos = (z * cellSize) - (height / 2);
+    const zPos = z * cellSize - height / 2;
     if (zPos > height / 2) continue;
-    gridVertices.push(
-      -width / 2, 0, zPos,
-      width / 2, 0, zPos
-    );
+    gridVertices.push(-width / 2, 0, zPos, width / 2, 0, zPos);
   }
-  
-  gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(gridVertices, 3));
+
+  gridGeometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(gridVertices, 3)
+  );
   const grid = new THREE.LineSegments(gridGeometry, gridMaterial);
   grid.renderOrder = 0;
 
   // Create bounds to show the actual spacemap limits
   const boundsMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
   const boundsGeometry = new THREE.BufferGeometry();
-  
+
   // Create a rectangle of points for the bounds
   const halfWidth = width / 2;
   const halfHeight = height / 2;
   const boundsVertices = new Float32Array([
-    -halfWidth, 0, -halfHeight,  // Start at bottom-left
-    halfWidth, 0, -halfHeight,   // Bottom-right
-    halfWidth, 0, halfHeight,    // Top-right
-    -halfWidth, 0, halfHeight,   // Top-left
-    -halfWidth, 0, -halfHeight   // Back to start to close the rectangle
+    -halfWidth,
+    0,
+    -halfHeight, // Start at bottom-left
+    halfWidth,
+    0,
+    -halfHeight, // Bottom-right
+    halfWidth,
+    0,
+    halfHeight, // Top-right
+    -halfWidth,
+    0,
+    halfHeight, // Top-left
+    -halfWidth,
+    0,
+    -halfHeight, // Back to start to close the rectangle
   ]);
-  
-  boundsGeometry.setAttribute('position', new THREE.BufferAttribute(boundsVertices, 3));
+
+  boundsGeometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(boundsVertices, 3)
+  );
   const bounds = new THREE.Line(boundsGeometry, boundsMaterial);
   bounds.renderOrder = 2;
 
@@ -321,7 +331,7 @@ async function createSpacemapPlane(
   console.log('Spacemap plane and grid added to scene:', {
     dimensions: { width, height },
     gridCellSize: cellSize,
-    gridLines: { x: xLines, z: zLines }
+    gridLines: { x: xLines, z: zLines },
   });
 }
 
@@ -335,7 +345,7 @@ function parsePositionDTOtoVector3(position: {
 
 export async function loadPlayers(
   playerDtos: PlayerDto[],
-  component: GameComponent,
+  component: GameComponent
 ) {
   if (!component.playerManager) {
     console.error('Player manager not initialized');
@@ -378,7 +388,7 @@ export async function loadAliens(aliens: AlienDto[], component: GameComponent) {
 
 export async function updateSpacemap(
   component: GameComponent,
-  spaceMapData: SpaceMapData,
+  spaceMapData: SpaceMapData
 ): Promise<void> {
   if (component.isLoadingSpacemap) {
     console.log('Skipping spacemap update - still loading previous map');
@@ -407,7 +417,7 @@ export async function updateSpacemap(
           ) {
             component.playerManager.updatePlayerPosition(
               entity.id,
-              parsePositionDTOtoVector3(entity.position),
+              parsePositionDTOtoVector3(entity.position)
             );
           }
 
@@ -436,7 +446,7 @@ export async function updateSpacemap(
     if (component.alienManager) {
       const aliens = spaceMapData.mapObject.aliens;
       const currentAlienIds = new Set(
-        aliens.map((alien) => alien.id).filter((id) => id !== undefined),
+        aliens.map((alien) => alien.id).filter((id) => id !== undefined)
       );
 
       // Remove aliens that are no longer in the map

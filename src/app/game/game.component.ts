@@ -44,7 +44,7 @@ export class GameComponent implements OnInit, OnDestroy {
   constructor(
     private hubService: HubService,
     private route: ActivatedRoute,
-    private keyboardService: KeyboardService,
+    private keyboardService: KeyboardService
   ) {}
 
   ngOnInit(): void {
@@ -100,7 +100,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.updateCount++;
       const currentTime = performance.now();
       const deltaTime = currentTime - this.lastTime;
-      
+
       if (deltaTime >= 1000) {
         this.ups = Math.round((this.updateCount * 1000) / deltaTime);
         this.updateCount = 0;
@@ -127,10 +127,10 @@ export class GameComponent implements OnInit, OnDestroy {
             this.camera!.position,
             this.controls.target
           );
-          
+
           // Update the target to the player's position
           this.controls.target.copy(playerShip.position);
-          
+
           // Update the camera position to maintain the same relative offset
           this.camera!.position.copy(playerShip.position).add(cameraOffset);
         }
@@ -167,17 +167,19 @@ export class GameComponent implements OnInit, OnDestroy {
 
     // Update orbit controls to follow player if available
     if (this.playerData && this.playerManager && this.controls) {
-      const playerPosition = this.playerManager.getPlayerPosition(this.playerData.id);
+      const playerPosition = this.playerManager.getPlayerPosition(
+        this.playerData.id
+      );
       if (playerPosition) {
         // Calculate the offset from the current camera position to the target
         const cameraOffset = new THREE.Vector3().subVectors(
           this.camera!.position,
           this.controls.target
         );
-        
+
         // Update the target to the player's position
         this.controls.target.copy(playerPosition);
-        
+
         // Update the camera position to maintain the same relative offset
         this.camera!.position.copy(playerPosition).add(cameraOffset);
       }
@@ -226,11 +228,15 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   // Public method to handle player movement
-  public async movePlayerTo(position: { x: number; y: number; z: number }): Promise<void> {
+  public async movePlayerTo(position: {
+    x: number;
+    y: number;
+    z: number;
+  }): Promise<void> {
     if (this.playerData) {
       await this.hubService.send('requestMove', {
         username: this.playerData.username,
-        position: position
+        position: position,
       });
     }
   }

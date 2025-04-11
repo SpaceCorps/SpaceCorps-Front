@@ -17,7 +17,7 @@ import { AuthService } from '../../services/auth.service';
 export class InventorySelectedItemComponent implements OnInit {
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   @Input({
@@ -53,7 +53,7 @@ export class InventorySelectedItemComponent implements OnInit {
   }
 
   getChildMapping(
-    item: SellableItems,
+    item: SellableItems
   ): { childrenKey: string; maxSlots: number; title: string }[] {
     switch (item.itemType) {
       case 'Ship':
@@ -118,7 +118,7 @@ export class InventorySelectedItemComponent implements OnInit {
   onDrop(
     event: DragEvent,
     mapping: { childrenKey: string; maxSlots: number; title: string },
-    slotIndex: number,
+    slotIndex: number
   ) {
     event.preventDefault();
     const data = event.dataTransfer?.getData('text/plain');

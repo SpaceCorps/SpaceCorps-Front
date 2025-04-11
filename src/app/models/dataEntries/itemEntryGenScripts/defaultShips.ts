@@ -1,9 +1,9 @@
-import { Ship } from "../../player/Items";
+import { Ship } from '../../player/Items';
 
 export const defaultShips: Ship[] = [
   {
-    name: "Protos",
-    itemType: "Ship",
+    name: 'Protos',
+    itemType: 'Ship',
     id: 1,
     baseHealth: 8000,
     baseSpeed: 150,
@@ -11,11 +11,11 @@ export const defaultShips: Ship[] = [
     shieldSlotCount: 2,
     laserSlotCount: 2,
     priceCats: 1111,
-    priceThulium: 0
+    priceThulium: 0,
   },
   {
-    name: "Ostrion",
-    itemType: "Ship",
+    name: 'Ostrion',
+    itemType: 'Ship',
     id: 2,
     baseHealth: 32000,
     baseSpeed: 180,
@@ -23,11 +23,11 @@ export const defaultShips: Ship[] = [
     shieldSlotCount: 3,
     laserSlotCount: 3,
     priceCats: 155000,
-    priceThulium: 0
+    priceThulium: 0,
   },
   {
-    name: "Paragon",
-    itemType: "Ship",
+    name: 'Paragon',
+    itemType: 'Ship',
     id: 3,
     baseHealth: 96000,
     baseSpeed: 200,
@@ -35,11 +35,11 @@ export const defaultShips: Ship[] = [
     shieldSlotCount: 5,
     laserSlotCount: 5,
     priceCats: 655000,
-    priceThulium: 0
+    priceThulium: 0,
   },
   {
-    name: "Echelon",
-    itemType: "Ship",
+    name: 'Echelon',
+    itemType: 'Ship',
     id: 4,
     baseHealth: 128000,
     baseSpeed: 210,
@@ -47,11 +47,11 @@ export const defaultShips: Ship[] = [
     shieldSlotCount: 6,
     laserSlotCount: 6,
     priceCats: 0,
-    priceThulium: 12000
+    priceThulium: 12000,
   },
   {
-    name: "Specter",
-    itemType: "Ship",
+    name: 'Specter',
+    itemType: 'Ship',
     id: 5,
     baseHealth: 196000,
     baseSpeed: 185,
@@ -59,11 +59,11 @@ export const defaultShips: Ship[] = [
     shieldSlotCount: 6,
     laserSlotCount: 6,
     priceCats: 1000000,
-    priceThulium: 0
+    priceThulium: 0,
   },
   {
-    name: "Orionix",
-    itemType: "Ship",
+    name: 'Orionix',
+    itemType: 'Ship',
     id: 6,
     baseHealth: 256000,
     baseSpeed: 225,
@@ -71,11 +71,11 @@ export const defaultShips: Ship[] = [
     shieldSlotCount: 10,
     laserSlotCount: 10,
     priceCats: 0,
-    priceThulium: 25000
+    priceThulium: 25000,
   },
   {
-    name: "Wraith",
-    itemType: "Ship",
+    name: 'Wraith',
+    itemType: 'Ship',
     id: 7,
     baseHealth: 324000,
     baseSpeed: 210,
@@ -83,6 +83,6 @@ export const defaultShips: Ship[] = [
     shieldSlotCount: 14,
     laserSlotCount: 14,
     priceCats: 0,
-    priceThulium: 65000
-  }
+    priceThulium: 65000,
+  },
 ];

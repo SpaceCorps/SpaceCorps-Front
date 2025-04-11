@@ -3,11 +3,14 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createSelectionBox } from './game.utils';
 
 // Static cache for geometries and materials
-const modelCache = new Map<string, {
-  geometries: Map<string, THREE.BufferGeometry>;
-  materials: Map<string, THREE.Material>;
-  instancedMeshes: THREE.InstancedMesh[];
-}>();
+const modelCache = new Map<
+  string,
+  {
+    geometries: Map<string, THREE.BufferGeometry>;
+    materials: Map<string, THREE.Material>;
+    instancedMeshes: THREE.InstancedMesh[];
+  }
+>();
 
 interface AlienData {
   id: string;
@@ -61,24 +64,25 @@ export class AlienManager {
     const loader = new GLTFLoader();
     try {
       console.log(`Loading alien model for: ${alienName}`);
-      
+
       // Check if we already have this model in cache
       let cache = modelCache.get('Protos');
       if (!cache) {
         cache = {
           geometries: new Map(),
           materials: new Map(),
-          instancedMeshes: []
+          instancedMeshes: [],
         };
         modelCache.set('Protos', cache);
 
-        const gltf = await loader.loadAsync(
-          `/models/ships/Protos/Protos.glb`,
-        );
+        const gltf = await loader.loadAsync(`/models/ships/Protos/Protos.glb`);
 
         // Process all meshes and cache geometries/materials
-        const meshData: { geometry: THREE.BufferGeometry, material: THREE.Material }[] = [];
-        
+        const meshData: {
+          geometry: THREE.BufferGeometry;
+          material: THREE.Material;
+        }[] = [];
+
         gltf.scene.traverse((child) => {
           if (child instanceof THREE.Mesh) {
             const geometryKey = child.geometry.uuid;
@@ -93,7 +97,7 @@ export class AlienManager {
 
             meshData.push({
               geometry: cache!.geometries.get(geometryKey)!,
-              material: cache!.materials.get(materialKey)!
+              material: cache!.materials.get(materialKey)!,
             });
           }
         });
@@ -145,7 +149,7 @@ export class AlienManager {
     for (const mesh of alienData.instancedMeshes) {
       mesh.setMatrixAt(alienData.instanceIndex, this.tempMatrix);
     }
-    
+
     // Only update instance matrix once per mesh
     for (const mesh of alienData.instancedMeshes) {
       mesh.instanceMatrix.needsUpdate = true;
@@ -174,7 +178,7 @@ export class AlienManager {
       currentRotation: new THREE.Quaternion(),
       currentScale: new THREE.Vector3(1, 1, 1),
       targetPosition: undefined,
-      selectionBox
+      selectionBox,
     };
 
     this.alienDictionary.set(alienData.id, alienMeshData);
@@ -188,15 +192,24 @@ export class AlienManager {
     if (alienData) {
       // Set the target position
       alienData.targetPosition = position.clone();
-      
+
       // Calculate movement direction for rotation
-      if (alienData.currentPosition && !alienData.currentPosition.equals(position)) {
+      if (
+        alienData.currentPosition &&
+        !alienData.currentPosition.equals(position)
+      ) {
         this.tempVector.subVectors(position, alienData.currentPosition);
         const targetRotation = Math.atan2(this.tempVector.x, this.tempVector.z);
-        this.tempQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetRotation);
-        alienData.currentRotation.slerp(this.tempQuaternion, this.ROTATION_SPEED);
+        this.tempQuaternion.setFromAxisAngle(
+          new THREE.Vector3(0, 1, 0),
+          targetRotation
+        );
+        alienData.currentRotation.slerp(
+          this.tempQuaternion,
+          this.ROTATION_SPEED
+        );
       }
-      
+
       this.needsMatrixUpdate = true;
     }
   }
@@ -232,12 +245,18 @@ export class AlienManager {
       for (const [_, alienData] of this.alienDictionary) {
         if (alienData.targetPosition) {
           // Calculate distance to target
-          this.tempVector.subVectors(alienData.targetPosition, alienData.currentPosition);
+          this.tempVector.subVectors(
+            alienData.targetPosition,
+            alienData.currentPosition
+          );
           const distanceToTarget = this.tempVector.length();
 
           if (distanceToTarget > this.POSITION_THRESHOLD) {
             // Smoothly interpolate towards target position
-            alienData.currentPosition.lerp(alienData.targetPosition, this.INTERPOLATION_FACTOR);
+            alienData.currentPosition.lerp(
+              alienData.targetPosition,
+              this.INTERPOLATION_FACTOR
+            );
 
             // Update selection box position
             if (alienData.selectionBox) {

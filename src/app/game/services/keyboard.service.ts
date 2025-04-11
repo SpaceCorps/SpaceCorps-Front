@@ -1,12 +1,11 @@
-import {Injectable} from '@angular/core';
-import {HubService} from './hub.service';
+import { Injectable } from '@angular/core';
+import { HubService } from './hub.service';
 import * as THREE from 'three';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class KeyboardService {
-
   private scene?: THREE.Scene;
 
   constructor(private hubService: HubService) {
@@ -21,7 +20,7 @@ export class KeyboardService {
     switch (event.key) {
       case 'o':
         await this.logEntities();
-        console.log(this.scene!.children)
+        console.log(this.scene!.children);
         break;
       default:
         break;

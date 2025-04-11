@@ -1,7 +1,7 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {PlayerInfoStatisticsComponent} from './player-info-statistics.component';
-import {provideHttpClient} from '@angular/common/http';
-import {provideHttpClientTesting} from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PlayerInfoStatisticsComponent } from './player-info-statistics.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('PlayerInfoStatisticsComponent', () => {
   let component: PlayerInfoStatisticsComponent;
@@ -10,12 +10,8 @@ describe('PlayerInfoStatisticsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PlayerInfoStatisticsComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
-      ]
-    })
-      .compileComponents();
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PlayerInfoStatisticsComponent);
     component = fixture.componentInstance;

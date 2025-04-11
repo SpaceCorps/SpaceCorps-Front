@@ -9,7 +9,7 @@ import { Inventory } from '../models/player/Inventory';
   selector: 'app-users-editor',
   templateUrl: './users-editor.component.html',
   styleUrls: ['./users-editor.component.scss'],
-  imports: [FormsModule]
+  imports: [FormsModule],
 })
 export class UsersEditorComponent implements OnInit {
   users: PlayerData[] | null = null;
@@ -18,8 +18,7 @@ export class UsersEditorComponent implements OnInit {
   command: string = '';
   commandHistory: string[] = [];
 
-  constructor(private apiService: ApiService) {
-  }
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.fetchUsers();
@@ -77,7 +76,7 @@ export class UsersEditorComponent implements OnInit {
               `${timestamp} Error setting ${resource} for ${username}: ${JSON.stringify(error)}`
             );
           },
-        })
+        });
       } else {
         this.commandHistory.unshift(
           `${timestamp} Invalid amount: ${commandParts[4]}`
@@ -103,8 +102,9 @@ export class UsersEditorComponent implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.commandHistory.unshift(
-          `${this.getCurrentTime()} Error fetching inventory for ${username}: ${error.message}`);
-      }
-    })
+          `${this.getCurrentTime()} Error fetching inventory for ${username}: ${error.message}`
+        );
+      },
+    });
   }
 }

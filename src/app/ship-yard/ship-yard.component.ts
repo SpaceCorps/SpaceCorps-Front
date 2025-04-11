@@ -2,17 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { NgForOf, NgIf } from '@angular/common';
 import { ApiService } from '../services/api.service';
 import { AuthService } from '../services/auth.service';
-import {getFieldsForItemCategory as getAllFieldsForItemCategory, SellableItems} from '../models/player/Items';
-import {ShipModelComponent} from '../components/ship-model/ship-model.component';
+import {
+  getFieldsForItemCategory as getAllFieldsForItemCategory,
+  SellableItems,
+} from '../models/player/Items';
+import { ShipModelComponent } from '../components/ship-model/ship-model.component';
 
 @Component({
-    selector: 'app-ship-yard',
-    templateUrl: './ship-yard.component.html',
+  selector: 'app-ship-yard',
+  templateUrl: './ship-yard.component.html',
   imports: [NgForOf, NgIf, ShipModelComponent],
-    styleUrls: ['./ship-yard.component.scss']
+  styleUrls: ['./ship-yard.component.scss'],
 })
 export class ShipYardComponent implements OnInit {
-
   categories: SellableItems['itemType'][] = [
     'Ship',
     'Laser',
@@ -21,7 +23,7 @@ export class ShipYardComponent implements OnInit {
     'ShieldCell',
     'Engine',
     'Thruster',
-    'LaserAmmo'
+    'LaserAmmo',
   ];
 
   selectedCategory: SellableItems['itemType'] | null = null;
@@ -31,29 +33,27 @@ export class ShipYardComponent implements OnInit {
 
   username: string | null = null;
 
-  constructor (
+  constructor(
     private apiService: ApiService,
     private authService: AuthService
-  ) {
-  }
+  ) {}
 
-  ngOnInit () {
+  ngOnInit() {
     this.fetchPlayerData();
   }
 
-  selectCategory (category: SellableItems['itemType']) {
+  selectCategory(category: SellableItems['itemType']) {
     this.selectedCategory = category;
     this.fetchItems(category);
   }
 
-  fetchItems (category: SellableItems['itemType']) {
+  fetchItems(category: SellableItems['itemType']) {
     this.apiService.getItemEntriesByCategory(category).subscribe((data) => {
       this.items = data as SellableItems[];
     });
   }
 
-  fetchPlayerData () {
-
+  fetchPlayerData() {
     if (!this.username) {
       const playerData = this.authService.getPlayerData();
 
@@ -71,11 +71,9 @@ export class ShipYardComponent implements OnInit {
         this.playerBalance.cats = data.cats;
         this.playerBalance.thulium = data.thulium;
       });
-
   }
 
-  buyItem (item: SellableItems) {
-
+  buyItem(item: SellableItems) {
     if (this.username === null) {
       alert('No username found');
       return;
@@ -95,24 +93,27 @@ export class ShipYardComponent implements OnInit {
       .buyItem({
         username: this.username,
         itemId: item.id,
-        itemType: item.itemType
+        itemType: item.itemType,
       })
       .subscribe({
         next: (data) => {
           console.log(data);
           setTimeout(() => {
             this.fetchPlayerData();
-          }, 200)
+          }, 200);
         },
         error: (error) => {
           console.error('Error buying item', error);
-        }
+        },
       });
   }
 
-  protected getFieldsForItemCategory(category: SellableItems['itemType']){
+  protected getFieldsForItemCategory(category: SellableItems['itemType']) {
     const fields = getAllFieldsForItemCategory(category);
-    return fields.filter(field => !['name', 'id', 'priceCats', 'priceThulium'].includes(field.key));
+    return fields.filter(
+      (field) =>
+        !['name', 'id', 'priceCats', 'priceThulium'].includes(field.key)
+    );
   }
 
   protected readonly JSON = JSON;

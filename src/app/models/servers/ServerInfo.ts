@@ -1,3 +1,3 @@
 export type ServerInfo = {
-  version: string
-}
+  version: string;
+};

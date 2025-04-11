@@ -15,17 +15,11 @@ import { SpawnableAlien } from '../models/entity/SpawnableAlien';
 
 @Component({
   selector: 'app-spacemap-editor',
-  imports: [
-    FormsModule,
-    FontAwesomeModule,
-    NgClass,
-    ErrorModalComponent,
-  ],
+  imports: [FormsModule, FontAwesomeModule, NgClass, ErrorModalComponent],
   templateUrl: './spacemap-editor.component.html',
-  styleUrl: './spacemap-editor.component.scss'
+  styleUrl: './spacemap-editor.component.scss',
 })
 export class SpacemapEditorComponent {
-
   spaceMapDataEntryNames: string[] = [];
   selectedSpaceMapDataEntry: SpaceMapDataEntry | null = null;
   selectedSpaceMapDataEntryName: string | null = null;
@@ -36,8 +30,7 @@ export class SpacemapEditorComponent {
     private apiService: ApiService,
     private router: Router,
     private route: ActivatedRoute
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
     this.fetchSpaceMapDataEntryNames();
@@ -55,12 +48,12 @@ export class SpacemapEditorComponent {
       next: (data: SpaceMapDataEntry) => {
         this.selectedSpaceMapDataEntry = data;
         this.updateUrlWithMapName(name);
-        console.log("Fetched SpaceMapDataEntry: ", data);
+        console.log('Fetched SpaceMapDataEntry: ', data);
       },
       error: (err: HttpErrorResponse) => {
         this.error = err;
         console.log(err);
-      }
+      },
     });
   }
 
@@ -69,10 +62,11 @@ export class SpacemapEditorComponent {
       next: () => {
         this.fetchSpaceMapDataEntryNames();
         this.newSpaceMapName = null;
-      }, error: (err: HttpErrorResponse) => {
+      },
+      error: (err: HttpErrorResponse) => {
         this.error = err;
         console.log(err);
-      }
+      },
     });
   }
 
@@ -83,12 +77,16 @@ export class SpacemapEditorComponent {
         preferredColor: this.selectedSpaceMapDataEntry.preferredColor,
       };
 
-      this.apiService.updateSpaceMapDataEntry(this.selectedSpaceMapDataEntryName, updateRequest)
+      this.apiService
+        .updateSpaceMapDataEntry(
+          this.selectedSpaceMapDataEntryName,
+          updateRequest
+        )
         .subscribe({
           error: (err: HttpErrorResponse) => {
             this.error = err;
             console.log(err);
-          }
+          },
         });
     }
   }
@@ -101,30 +99,29 @@ export class SpacemapEditorComponent {
    * @deprecated This method is not used and should be removed
    */
   createDefaultStarMap() {
-
     const m1Map: SpaceMapDataEntry = {
       name: 'M-1',
       size: { width: 320, height: 180 },
       preferredColor: 'red',
       spawnableAliens: [],
-      staticEntities: []
-    }
+      staticEntities: [],
+    };
 
     const t1Map: SpaceMapDataEntry = {
       name: 'T-1',
       size: { width: 320, height: 180 },
       preferredColor: 'blue',
       spawnableAliens: [],
-      staticEntities: []
-    }
+      staticEntities: [],
+    };
 
     const v1Map: SpaceMapDataEntry = {
       name: 'V-1',
       size: { width: 320, height: 180 },
       preferredColor: 'green',
       spawnableAliens: [],
-      staticEntities: []
-    }
+      staticEntities: [],
+    };
 
     this.createAndUpdateSpaceMapDataEntry(m1Map);
     this.createAndUpdateSpaceMapDataEntry(t1Map);
@@ -132,7 +129,7 @@ export class SpacemapEditorComponent {
 
     setTimeout(() => {
       this.fetchSpaceMapDataEntryNames();
-    }, 300)
+    }, 300);
   }
 
   deleteSpaceMap(name: string) {
@@ -144,7 +141,7 @@ export class SpacemapEditorComponent {
           void this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { map: null },
-            queryParamsHandling: 'merge'
+            queryParamsHandling: 'merge',
           });
         }
         this.selectedSpaceMapDataEntry = null;
@@ -152,7 +149,7 @@ export class SpacemapEditorComponent {
       error: (err: HttpErrorResponse) => {
         this.error = err;
         console.log(err);
-      }
+      },
     });
   }
 
@@ -162,7 +159,9 @@ export class SpacemapEditorComponent {
   private createAndUpdateSpaceMapDataEntry(map: SpaceMapDataEntry) {
     this.apiService.postSpaceMapDataEntry(map.name).subscribe(() => {
       this.apiService.updateSpaceMapDataEntry(map.name, map).subscribe(() => {
-        console.log(`${map.name} SpaceMapDataEntry created and updated successfully`);
+        console.log(
+          `${map.name} SpaceMapDataEntry created and updated successfully`
+        );
       });
     });
   }
@@ -171,13 +170,13 @@ export class SpacemapEditorComponent {
     await this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { map: name },
-      queryParamsHandling: 'merge'
+      queryParamsHandling: 'merge',
     });
   }
 
   protected deleteStaticEntity(staticEntity: StaticEntity) {
     if (!this.selectedSpaceMapDataEntryName) {
-      console.error("No map selected");
+      console.error('No map selected');
       return;
     }
     const mapName = this.selectedSpaceMapDataEntryName;
@@ -188,29 +187,31 @@ export class SpacemapEditorComponent {
       error: (err: HttpErrorResponse) => {
         this.error = err;
         console.log(err);
-      }
+      },
     });
   }
 
   protected saveStaticEntities() {
-    console.warn("Not implemented");
+    console.warn('Not implemented');
   }
 
   protected addStaticEntityToMap() {
     if (!this.selectedSpaceMapDataEntryName) {
-      console.error("No map selected");
+      console.error('No map selected');
       return;
     }
     const mapName = this.selectedSpaceMapDataEntryName;
-    this.apiService.addStaticEntityToMap(mapName, this.newStaticEntity).subscribe({
-      next: () => {
-        this.selectSpaceMapDataEntry(mapName);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.error = err;
-        console.log(err);
-      }
-    });
+    this.apiService
+      .addStaticEntityToMap(mapName, this.newStaticEntity)
+      .subscribe({
+        next: () => {
+          this.selectSpaceMapDataEntry(mapName);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.error = err;
+          console.log(err);
+        },
+      });
   }
 
   protected readonly faArrowsRotate = faArrowsRotate;
@@ -220,13 +221,13 @@ export class SpacemapEditorComponent {
     position: { x: 0, y: 0, z: 0 },
     locationName: '',
     safeZoneRadii: 0,
-    destination: ''
-  }
+    destination: '',
+  };
 
   newSpawnableAlien: SpawnableAlien = {
     id: 0,
     name: '',
-    spawnLimit: 0
+    spawnLimit: 0,
   };
 
   addSpawnableAlien() {
@@ -235,7 +236,7 @@ export class SpacemapEditorComponent {
     const newAlien: SpawnableAlien = {
       id: this.selectedSpaceMapDataEntry.spawnableAliens.length + 1,
       name: this.newSpawnableAlien.name,
-      spawnLimit: this.newSpawnableAlien.spawnLimit
+      spawnLimit: this.newSpawnableAlien.spawnLimit,
     };
 
     this.selectedSpaceMapDataEntry.spawnableAliens.push(newAlien);
@@ -245,15 +246,16 @@ export class SpacemapEditorComponent {
     this.newSpawnableAlien = {
       id: 0,
       name: '',
-      spawnLimit: 0
+      spawnLimit: 0,
     };
   }
 
   deleteSpawnableAlien(alien: SpawnableAlien) {
     if (!this.selectedSpaceMapDataEntry) return;
-    this.selectedSpaceMapDataEntry.spawnableAliens = this.selectedSpaceMapDataEntry.spawnableAliens.filter(
-      a => a.id !== alien.id
-    );
+    this.selectedSpaceMapDataEntry.spawnableAliens =
+      this.selectedSpaceMapDataEntry.spawnableAliens.filter(
+        (a) => a.id !== alien.id
+      );
     this.saveSpawnableAliens();
   }
 
@@ -261,5 +263,4 @@ export class SpacemapEditorComponent {
     if (!this.selectedSpaceMapDataEntry) return;
     this.updateSpaceMapDataEntry();
   }
-
 }

@@ -13,17 +13,19 @@
     />
     @if (username?.invalid && username?.touched) {
       <div class="text-error text-sm mt-1">
-        @if (username?.errors?.["required"]) {
+        @if (username?.errors?.['required']) {
           <span>Username is required</span>
         }
-        @if (username?.errors?.["minlength"]) {
+        @if (username?.errors?.['minlength']) {
           <span>Username must be at least 3 characters</span>
         }
-        @if (username?.errors?.["maxlength"]) {
+        @if (username?.errors?.['maxlength']) {
           <span>Username must be at most 20 characters</span>
         }
-        @if (username?.errors?.["pattern"]) {
-          <span>Username can only contain letters, numbers, and underscores</span>
+        @if (username?.errors?.['pattern']) {
+          <span
+            >Username can only contain letters, numbers, and underscores</span
+          >
         }
       </div>
     }
@@ -39,10 +41,10 @@
     />
     @if (email?.invalid && email?.touched) {
       <div class="text-error text-sm mt-1">
-        @if (email?.errors?.["required"]) {
+        @if (email?.errors?.['required']) {
           <span>Email is required</span>
         }
-        @if (email?.errors?.["email"]) {
+        @if (email?.errors?.['email']) {
           <span>Please enter a valid email address</span>
         }
       </div>
@@ -59,14 +61,17 @@
     />
     @if (password?.invalid && password?.touched) {
       <div class="text-error text-sm mt-1">
-        @if (password?.errors?.["required"]) {
+        @if (password?.errors?.['required']) {
           <span>Password is required</span>
         }
-        @if (password?.errors?.["minlength"]) {
+        @if (password?.errors?.['minlength']) {
           <span>Password must be at least 8 characters</span>
         }
-        @if (password?.errors?.["pattern"]) {
-          <span>Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character</span>
+        @if (password?.errors?.['pattern']) {
+          <span
+            >Password must contain at least one uppercase letter, one lowercase
+            letter, one number, and one special character</span
+          >
         }
       </div>
     }
@@ -80,18 +85,21 @@
       class="input input-bordered"
       [ngClass]="{
         'input-error':
-          (confirmPassword?.invalid || registerForm.errors?.['passwordMismatch']) &&
-          confirmPassword?.touched
+          (confirmPassword?.invalid ||
+            registerForm.errors?.['passwordMismatch']) &&
+          confirmPassword?.touched,
       }"
     />
     @if (confirmPassword?.invalid && confirmPassword?.touched) {
       <div class="text-error text-sm mt-1">
-        @if (confirmPassword?.errors?.["required"]) {
+        @if (confirmPassword?.errors?.['required']) {
           <span>Please confirm your password</span>
         }
       </div>
     }
-    @if (registerForm.errors?.["passwordMismatch"] && confirmPassword?.touched) {
+    @if (
+      registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched
+    ) {
       <div class="text-error text-sm mt-1">
         <span>Passwords do not match</span>
       </div>

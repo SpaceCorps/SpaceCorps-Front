@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { GitHubService } from '../../services/git-hub.service';
-import { DatePipe} from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-github-timeline',
@@ -18,7 +18,7 @@ export class GithubTimelineComponent {
       this.commits = data.filter(
         (commit: any) =>
           this.isBigRelease(commit.commit.message) ||
-          this.isMergePullRequest(commit.commit.message),
+          this.isMergePullRequest(commit.commit.message)
       );
     });
   }

@@ -1,22 +1,30 @@
 <div class="card card-side bg-base-100/50 shadow-xl max-w-120 flex flex-col">
   <div class="card-body">
     <div class="flex flex-row">
-      <div class="justify-center"
-           [ngClass]="{
-            'online': (authService.authState$ | async)?.isLoggedIn
-          }"
+      <div
+        class="justify-center"
+        [ngClass]="{
+          online: (authService.authState$ | async)?.isLoggedIn,
+        }"
       >
-        <img class="avatar rounded-full"
-             src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-             alt="Player Profile Picture"/>
+        <img
+          class="avatar rounded-full"
+          src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+          alt="Player Profile Picture"
+        />
       </div>
       <div class="px-4">
-        <p><strong>{{ templateValues.username }}</strong></p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque maiores molestiae nam nulla rerum sint sit
-          tenetur vero voluptate. Dolor?</p>
+        <p>
+          <strong>{{ templateValues.username }}</strong>
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque
+          maiores molestiae nam nulla rerum sint sit tenetur vero voluptate.
+          Dolor?
+        </p>
       </div>
     </div>
-    <br>
+    <br />
     <p><strong>First login:</strong> {{ templateValues.dateOfReg }}</p>
     <p><strong>Hours:</strong> {{ templateValues.hoursPlayed }}</p>
     <p class="self-center"><strong>Quest progress</strong></p>

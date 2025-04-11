@@ -12,13 +12,16 @@
       </tr>
     </thead>
     <tbody>
-      @for(user of users; track user.userId) {
-      <tr (click)="onUserClick(user.username)" class="hover:cursor-pointer hover:bg-base-300">
-        <td>{{ user.userId }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.cats }}</td>
-        <td>{{ user.thulium }}</td>
-      </tr>
+      @for (user of users; track user.userId) {
+        <tr
+          (click)="onUserClick(user.username)"
+          class="hover:cursor-pointer hover:bg-base-300"
+        >
+          <td>{{ user.userId }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.cats }}</td>
+          <td>{{ user.thulium }}</td>
+        </tr>
       }
     </tbody>
   </table>
@@ -26,38 +29,45 @@
   <!-- Command input -->
   <div class="mockup-code p-4 bg-base-200">
     <div class="command-history">
-      <pre class="max-h-[600px] flex overflow-y-auto flex-col-reverse whitespace-pre-wrap">
+      <pre
+        class="max-h-[600px] flex overflow-y-auto flex-col-reverse whitespace-pre-wrap"
+      >
         @for(command of commandHistory; track command) {
           <code>{{ command }}</code>
         }
       </pre>
     </div>
-    <input type="text" placeholder="Example command: user rorychatt set thulium 10000" [(ngModel)]="command"
-      (keyup.enter)="executeCommand()" class="input input-bordered w-full" />
+    <input
+      type="text"
+      placeholder="Example command: user rorychatt set thulium 10000"
+      [(ngModel)]="command"
+      (keyup.enter)="executeCommand()"
+      class="input input-bordered w-full"
+    />
   </div>
 
   <!-- User inventory -->
-  @if(selectedUserInventory) {
-  <div class="mt-4">
-    <h2 class="text-xl font-bold mb-2">User Items</h2>
-    <table class="table w-full">
-      <thead>
-        <tr>
-          <th>Item ID</th>
-          <th>Item Name</th>
-          <th>Item Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for(item of selectedUserInventory.items; track item.id) {
-        <tr class="hover:cursor-text hover:bg-base-300">
-          <td>{{ item.id }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.itemType }}</td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+  @if (selectedUserInventory) {
+    <div class="mt-4">
+      <h2 class="text-xl font-bold mb-2">User Items</h2>
+      <table class="table w-full">
+        <thead>
+          <tr>
+            <th>Item ID</th>
+            <th>Item Name</th>
+            <th>Item Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of selectedUserInventory.items; track item.id) {
+            <tr class="hover:cursor-text hover:bg-base-300">
+              <td>{{ item.id }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.itemType }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </div>

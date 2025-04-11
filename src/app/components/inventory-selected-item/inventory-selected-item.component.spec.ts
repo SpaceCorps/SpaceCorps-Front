@@ -8,9 +8,8 @@ describe('InventorySelectedItemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [InventorySelectedItemComponent]
-    })
-    .compileComponents();
+      imports: [InventorySelectedItemComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(InventorySelectedItemComponent);
     component = fixture.componentInstance;
