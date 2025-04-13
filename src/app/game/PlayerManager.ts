@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createSelectionBox } from './game.utils';
+import { UpdateManager } from './UpdateManager';
 
 // Static cache for geometries and materials
 const modelCache = new Map<
@@ -43,6 +44,7 @@ export class PlayerManager {
   private lastUpdateTime: number = 0;
   private readonly UPDATE_INTERVAL = 4; // ~240fps
   private readonly ROTATION_SPEED = 0.2;
+  private updateManager: UpdateManager;
   private tempVector: THREE.Vector3 = new THREE.Vector3();
   private tempQuaternion: THREE.Quaternion = new THREE.Quaternion();
   private tempMatrix: THREE.Matrix4 = new THREE.Matrix4();
@@ -53,6 +55,7 @@ export class PlayerManager {
     this.rootGroup.name = 'players';
     this.scene.add(this.rootGroup);
     this.lastUpdateTime = performance.now();
+    this.updateManager = new UpdateManager();
   }
 
   private async loadShipModel(
@@ -194,19 +197,8 @@ export class PlayerManager {
   public updatePlayerPosition(id: string, position: THREE.Vector3): void {
     const playerData = this.playerDictionary.get(id);
     if (playerData) {
-      // Calculate distance to target
-      this.tempVector.subVectors(position, playerData.currentPosition);
-      const distanceToTarget = this.tempVector.length();
-
-      // If we're too far behind, move faster to catch up
-      if (distanceToTarget > this.MAX_CATCHUP_DISTANCE) {
-        // Move directly towards target at maximum catchup speed
-        this.tempVector.normalize().multiplyScalar(this.MAX_CATCHUP_DISTANCE);
-        playerData.currentPosition.add(this.tempVector);
-      } else {
-        // Normal movement
-        playerData.targetPosition = position.clone();
-      }
+      // Set the target position
+      playerData.targetPosition = position.clone();
 
       // Calculate movement direction for rotation
       if (
@@ -221,7 +213,7 @@ export class PlayerManager {
         );
         playerData.currentRotation.slerp(
           this.tempQuaternion,
-          this.ROTATION_SPEED
+          this.updateManager.getInterpolationFactor()
         );
       }
 
@@ -251,56 +243,45 @@ export class PlayerManager {
   }
 
   public animate(): void {
-    const currentTime = performance.now();
-    const deltaTime = currentTime - this.lastUpdateTime;
+    const interpolationFactor = this.updateManager.getInterpolationFactor();
 
-    // Update at high refresh rate for smooth movement
-    if (deltaTime >= this.UPDATE_INTERVAL) {
-      const deltaSeconds = deltaTime / 1000; // Convert to seconds
-      const moveDistance = this.MOVE_SPEED * deltaSeconds; // Distance to move this frame
+    // Batch update all matrices
+    for (const [, playerData] of this.playerDictionary) {
+      if (playerData.targetPosition) {
+        // Calculate distance to target
+        this.tempVector.subVectors(
+          playerData.targetPosition,
+          playerData.currentPosition
+        );
+        const distanceToTarget = this.tempVector.length();
 
-      // Batch update all matrices
-      for (const [, playerData] of this.playerDictionary) {
-        if (playerData.targetPosition) {
-          // Calculate direction to target
-          this.tempVector.subVectors(
+        if (distanceToTarget > 0.01) {
+          // Smoothly interpolate towards target position
+          playerData.currentPosition.lerp(
             playerData.targetPosition,
-            playerData.currentPosition
+            interpolationFactor
           );
-          const distanceToTarget = this.tempVector.length();
 
-          if (distanceToTarget > 0.01) {
-            // Normalize direction vector
-            this.tempVector.normalize();
-
-            // Move towards target at constant speed
-            if (distanceToTarget <= moveDistance) {
-              // If we would overshoot, just snap to target
-              playerData.currentPosition.copy(playerData.targetPosition);
-              delete playerData.targetPosition;
-            } else {
-              // Move at constant speed
-              this.tempVector.multiplyScalar(moveDistance);
-              playerData.currentPosition.add(this.tempVector);
-            }
-
-            // Update selection box position
-            if (playerData.selectionBox) {
-              playerData.selectionBox.position.copy(playerData.currentPosition);
-            }
-
-            // Update matrices for all meshes
-            this.updatePlayerMatrices(playerData);
-          } else {
-            // We're close enough, snap to target
-            playerData.currentPosition.copy(playerData.targetPosition);
-            delete playerData.targetPosition;
+          // Update selection box position
+          if (playerData.selectionBox) {
+            playerData.selectionBox.position.copy(playerData.currentPosition);
           }
+
+          // Update matrices for all meshes
+          this.updatePlayerMatrices(playerData);
+        } else {
+          // We're close enough, snap to target
+          playerData.currentPosition.copy(playerData.targetPosition);
+          delete playerData.targetPosition;
         }
       }
-
-      this.lastUpdateTime = currentTime;
     }
+
+    this.updateManager.update();
+  }
+
+  public onSignalRUpdate(): void {
+    this.updateManager.onSignalRUpdate();
   }
 
   public hasPlayer(id: string): boolean {

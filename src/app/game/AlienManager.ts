@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createSelectionBox } from './game.utils';
+import { UpdateManager } from './UpdateManager';
 
 // Static cache for geometries and materials
 const modelCache = new Map<
@@ -35,13 +36,10 @@ export class AlienManager {
   private alienDictionary: Map<string, AlienMeshData> = new Map();
   private maxInstances: number = 512;
   private nextInstanceIndex: number = 0;
-  private readonly INTERPOLATION_FACTOR = 0.3; // Smooth interpolation factor (0-1)
   private readonly POSITION_THRESHOLD = 0.1; // Distance threshold to snap to target
   private rootGroup: THREE.Group;
   private needsMatrixUpdate: boolean = false;
-  private lastUpdateTime: number = 0;
-  private readonly UPDATE_INTERVAL = 4; // ~240fps
-  private readonly ROTATION_SPEED = 0.2;
+  private updateManager: UpdateManager;
   private tempVector: THREE.Vector3 = new THREE.Vector3();
   private tempQuaternion: THREE.Quaternion = new THREE.Quaternion();
   private tempMatrix: THREE.Matrix4 = new THREE.Matrix4();
@@ -51,7 +49,7 @@ export class AlienManager {
     this.rootGroup = new THREE.Group();
     this.rootGroup.name = 'aliens';
     this.scene.add(this.rootGroup);
-    this.lastUpdateTime = performance.now();
+    this.updateManager = new UpdateManager();
   }
 
   private async loadShipModel(
@@ -206,7 +204,7 @@ export class AlienManager {
         );
         alienData.currentRotation.slerp(
           this.tempQuaternion,
-          this.ROTATION_SPEED
+          this.updateManager.getInterpolationFactor()
         );
       }
 
@@ -236,45 +234,45 @@ export class AlienManager {
   }
 
   public animate(): void {
-    const currentTime = performance.now();
-    const deltaTime = currentTime - this.lastUpdateTime;
+    const interpolationFactor = this.updateManager.getInterpolationFactor();
 
-    // Update at high refresh rate for smooth movement
-    if (deltaTime >= this.UPDATE_INTERVAL) {
-      // Batch update all matrices
-      for (const [, alienData] of this.alienDictionary) {
-        if (alienData.targetPosition) {
-          // Calculate distance to target
-          this.tempVector.subVectors(
+    // Batch update all matrices
+    for (const [, alienData] of this.alienDictionary) {
+      if (alienData.targetPosition) {
+        // Calculate distance to target
+        this.tempVector.subVectors(
+          alienData.targetPosition,
+          alienData.currentPosition
+        );
+        const distanceToTarget = this.tempVector.length();
+
+        if (distanceToTarget > this.POSITION_THRESHOLD) {
+          // Smoothly interpolate towards target position
+          alienData.currentPosition.lerp(
             alienData.targetPosition,
-            alienData.currentPosition
+            interpolationFactor
           );
-          const distanceToTarget = this.tempVector.length();
 
-          if (distanceToTarget > this.POSITION_THRESHOLD) {
-            // Smoothly interpolate towards target position
-            alienData.currentPosition.lerp(
-              alienData.targetPosition,
-              this.INTERPOLATION_FACTOR
-            );
-
-            // Update selection box position
-            if (alienData.selectionBox) {
-              alienData.selectionBox.position.copy(alienData.currentPosition);
-            }
-
-            // Update matrices for all meshes
-            this.updateAlienMatrices(alienData);
-          } else {
-            // We're close enough, snap to target
-            alienData.currentPosition.copy(alienData.targetPosition);
-            delete alienData.targetPosition;
+          // Update selection box position
+          if (alienData.selectionBox) {
+            alienData.selectionBox.position.copy(alienData.currentPosition);
           }
+
+          // Update matrices for all meshes
+          this.updateAlienMatrices(alienData);
+        } else {
+          // We're close enough, snap to target
+          alienData.currentPosition.copy(alienData.targetPosition);
+          delete alienData.targetPosition;
         }
       }
-
-      this.lastUpdateTime = currentTime;
     }
+
+    this.updateManager.update();
+  }
+
+  public onSignalRUpdate(): void {
+    this.updateManager.onSignalRUpdate();
   }
 
   public hasAlien(id: string): boolean {
