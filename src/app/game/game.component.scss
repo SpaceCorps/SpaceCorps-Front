@@ -18,21 +18,3 @@ main {
   font-family: monospace;
   z-index: 1000;
 }
-
-.player-label, .alien-label {
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-  pointer-events: none;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.player-label {
-  color: #4CAF50; // Green color for players
-}
-
-.alien-label {
-  color: #F44336; // Red color for aliens
-}
