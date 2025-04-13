@@ -201,7 +201,7 @@ export class AlienManager {
     nameDiv.style.padding = '2px 5px';
     nameDiv.style.borderRadius = '3px';
     const nameLabel = new CSS2DObject(nameDiv);
-    nameLabel.position.set(0, -1, 0); // Position below the alien
+    nameLabel.position.set(0, -0.5, 0); // Position below the alien
     selectionBox.add(nameLabel);
 
     const alienMeshData: AlienMeshData = {
