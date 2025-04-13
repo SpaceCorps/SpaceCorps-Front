@@ -193,7 +193,7 @@ export class PlayerManager {
     nameDiv.style.padding = '2px 5px';
     nameDiv.style.borderRadius = '3px';
     const nameLabel = new CSS2DObject(nameDiv);
-    nameLabel.position.set(0, 1, 0); // Position above the player
+    nameLabel.position.set(0, -1, 0); // Position below the player
     selectionBox.add(nameLabel);
 
     const playerMeshData: PlayerMeshData = {
@@ -293,7 +293,7 @@ export class PlayerManager {
         );
         const distanceToTarget = this.tempVector.length();
 
-        if (distanceToTarget > 0.01) {
+        if (distanceToTarget > 0.00001) {
           // Smoothly interpolate towards target position
           playerData.currentPosition.lerp(
             playerData.targetPosition,

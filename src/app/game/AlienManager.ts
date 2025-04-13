@@ -37,8 +37,7 @@ export class AlienManager {
   private scene: THREE.Scene;
   private alienDictionary: Map<string, AlienMeshData> = new Map();
   private maxInstances: number = 512;
-  private nextInstanceIndex: number = 0;
-  private readonly POSITION_THRESHOLD = 0.1; // Distance threshold to snap to target
+  private nextInstanceIndex: number = 0; // Distance threshold to snap to target
   private rootGroup: THREE.Group;
   private needsMatrixUpdate: boolean = false;
   private updateManager: UpdateManager;
@@ -111,7 +110,7 @@ export class AlienManager {
           );
           instancedMesh.name = `Protos_instanced`;
           instancedMesh.frustumCulled = false;
-          
+
           // Initialize all instance matrices to a position far away
           const farMatrix = new THREE.Matrix4();
           farMatrix.compose(
@@ -122,7 +121,7 @@ export class AlienManager {
           for (let i = 0; i < this.maxInstances; i++) {
             instancedMesh.setMatrixAt(i, farMatrix);
           }
-          
+
           // Set the first instance's position
           const firstMatrix = new THREE.Matrix4();
           firstMatrix.compose(
@@ -131,7 +130,7 @@ export class AlienManager {
             new THREE.Vector3(1, 1, 1)
           );
           instancedMesh.setMatrixAt(0, firstMatrix);
-          
+
           instancedMesh.instanceMatrix.needsUpdate = true;
           cache.instancedMeshes.push(instancedMesh);
           this.rootGroup.add(instancedMesh);
@@ -202,7 +201,7 @@ export class AlienManager {
     nameDiv.style.padding = '2px 5px';
     nameDiv.style.borderRadius = '3px';
     const nameLabel = new CSS2DObject(nameDiv);
-    nameLabel.position.set(0, 1, 0); // Position above the alien
+    nameLabel.position.set(0, -1, 0); // Position below the alien
     selectionBox.add(nameLabel);
 
     const alienMeshData: AlienMeshData = {
@@ -214,7 +213,7 @@ export class AlienManager {
       currentScale: new THREE.Vector3(1, 1, 1),
       targetPosition: undefined,
       selectionBox,
-      nameLabel
+      nameLabel,
     };
 
     this.alienDictionary.set(alienData.id, alienMeshData);
@@ -265,7 +264,7 @@ export class AlienManager {
   }
 
   public removeAllAliens(): void {
-    for (const [id, ] of this.alienDictionary) {
+    for (const [id] of this.alienDictionary) {
       this.removeAlien(id);
     }
     this.alienDictionary.clear();
@@ -285,7 +284,7 @@ export class AlienManager {
         );
         const distanceToTarget = this.tempVector.length();
 
-        if (distanceToTarget > this.POSITION_THRESHOLD) {
+        if (distanceToTarget > 0.00001) {
           // Smoothly interpolate towards target position
           alienData.currentPosition.lerp(
             alienData.targetPosition,
