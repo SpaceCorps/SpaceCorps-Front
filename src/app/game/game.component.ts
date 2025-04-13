@@ -119,7 +119,7 @@ export class GameComponent implements OnInit, OnDestroy {
         // Reset orbit controls to origin when switching maps
         if (this.controls) {
           this.controls.target.set(0, 0, 0);
-          this.camera!.position.set(0, 50, 0);
+          this.camera!.position.set(0, 5, 5);
         }
       } else {
         await updateSpacemap(this, spaceMapData);
