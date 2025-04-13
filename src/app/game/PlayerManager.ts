@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createSelectionBox } from './game.utils';
 import { UpdateManager } from './UpdateManager';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 // Static cache for geometries and materials
 const modelCache = new Map<
@@ -30,6 +31,7 @@ interface PlayerMeshData {
   currentRotation: THREE.Quaternion;
   currentScale: THREE.Vector3;
   selectionBox?: THREE.Mesh;
+  nameLabel?: CSS2DObject;
 }
 
 export class PlayerManager {
@@ -160,6 +162,18 @@ export class PlayerManager {
     selectionBox.userData = { type: 'player', id: playerData.id };
     this.rootGroup.add(selectionBox);
 
+    // Create name label
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'player-label';
+    nameDiv.textContent = playerData.name;
+    nameDiv.style.color = 'white';
+    nameDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    nameDiv.style.padding = '2px 5px';
+    nameDiv.style.borderRadius = '3px';
+    const nameLabel = new CSS2DObject(nameDiv);
+    nameLabel.position.set(0, 1, 0); // Position above the player
+    selectionBox.add(nameLabel);
+
     const playerMeshData: PlayerMeshData = {
       instancedMeshes: meshes.instancedMeshes,
       matrixArrays: meshes.matrixArrays,
@@ -169,6 +183,7 @@ export class PlayerManager {
       currentScale: new THREE.Vector3(1, 1, 1),
       targetPosition: undefined,
       selectionBox,
+      nameLabel
     };
 
     this.playerDictionary.set(playerData.id, playerMeshData);
@@ -228,7 +243,8 @@ export class PlayerManager {
         this.rootGroup.remove(playerData.selectionBox);
       }
       for (const mesh of playerData.instancedMeshes) {
-        this.rootGroup.remove(mesh);
+        mesh.setMatrixAt(playerData.instanceIndex, new THREE.Matrix4());
+        mesh.instanceMatrix.needsUpdate = true;
       }
       this.playerDictionary.delete(id);
     }

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createSelectionBox } from './game.utils';
 import { UpdateManager } from './UpdateManager';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 // Static cache for geometries and materials
 const modelCache = new Map<
@@ -29,6 +30,7 @@ interface AlienMeshData {
   currentPosition: THREE.Vector3;
   currentRotation: THREE.Quaternion;
   currentScale: THREE.Vector3;
+  nameLabel?: CSS2DObject;
 }
 
 export class AlienManager {
@@ -155,7 +157,8 @@ export class AlienManager {
   }
 
   public async addAlien(alienData: AlienData): Promise<void> {
-    if (this.hasAlien(alienData.id)) {
+    // Remove existing alien if it exists
+    if (this.alienDictionary.has(alienData.id)) {
       this.removeAlien(alienData.id);
     }
 
@@ -168,6 +171,18 @@ export class AlienManager {
     selectionBox.userData = { type: 'alien', id: alienData.id };
     this.rootGroup.add(selectionBox);
 
+    // Create name label
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'alien-label';
+    nameDiv.textContent = alienData.name;
+    nameDiv.style.color = 'white';
+    nameDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    nameDiv.style.padding = '2px 5px';
+    nameDiv.style.borderRadius = '3px';
+    const nameLabel = new CSS2DObject(nameDiv);
+    nameLabel.position.set(0, 1, 0); // Position above the alien
+    selectionBox.add(nameLabel);
+
     const alienMeshData: AlienMeshData = {
       instancedMeshes: meshes.instancedMeshes,
       matrixArrays: meshes.matrixArrays,
@@ -177,6 +192,7 @@ export class AlienManager {
       currentScale: new THREE.Vector3(1, 1, 1),
       targetPosition: undefined,
       selectionBox,
+      nameLabel
     };
 
     this.alienDictionary.set(alienData.id, alienMeshData);
@@ -219,7 +235,8 @@ export class AlienManager {
         this.rootGroup.remove(alienData.selectionBox);
       }
       for (const mesh of alienData.instancedMeshes) {
-        this.rootGroup.remove(mesh);
+        mesh.setMatrixAt(alienData.instanceIndex, new THREE.Matrix4());
+        mesh.instanceMatrix.needsUpdate = true;
       }
       this.alienDictionary.delete(id);
     }
