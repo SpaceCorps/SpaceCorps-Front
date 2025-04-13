@@ -117,6 +117,28 @@ export class PlayerManager {
           );
           instancedMesh.name = `Protos_instanced`;
           instancedMesh.frustumCulled = false;
+          
+          // Initialize all instance matrices to a position far away
+          const farMatrix = new THREE.Matrix4();
+          farMatrix.compose(
+            new THREE.Vector3(0, -10000, 0), // Position far below the scene
+            new THREE.Quaternion(),
+            new THREE.Vector3(1, 1, 1)
+          );
+          for (let i = 0; i < this.maxInstances; i++) {
+            instancedMesh.setMatrixAt(i, farMatrix);
+          }
+          
+          // Set the first instance's position
+          const firstMatrix = new THREE.Matrix4();
+          firstMatrix.compose(
+            initialPosition,
+            new THREE.Quaternion(),
+            new THREE.Vector3(1, 1, 1)
+          );
+          instancedMesh.setMatrixAt(0, firstMatrix);
+          
+          instancedMesh.instanceMatrix.needsUpdate = true;
           cache.instancedMeshes.push(instancedMesh);
           this.rootGroup.add(instancedMesh);
         }
