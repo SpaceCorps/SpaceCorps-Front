@@ -8,7 +8,7 @@ export const defaultLasers: Laser[] = [
     baseDamage: 50,
     criticalChance: 0.1,
     laserAmpSlotCount: 1,
-    priceCats: 10000,
+    priceCredits: 10000,
     priceThulium: 0,
   },
   {
@@ -18,7 +18,7 @@ export const defaultLasers: Laser[] = [
     baseDamage: 60,
     criticalChance: 0.2,
     laserAmpSlotCount: 2,
-    priceCats: 20000,
+    priceCredits: 20000,
     priceThulium: 0,
   },
   {
@@ -28,7 +28,7 @@ export const defaultLasers: Laser[] = [
     baseDamage: 70,
     criticalChance: 0.3,
     laserAmpSlotCount: 3,
-    priceCats: 0,
+    priceCredits: 0,
     priceThulium: 10000,
   },
 ];

@@ -10,7 +10,7 @@ export const defaultShields: Shield[] = [
     passiveRechargeRate: 0,
     absorbance: 0.8,
     shieldCellSlotCount: 2,
-    priceCats: 60000,
+    priceCredits: 60000,
     priceThulium: 0,
   },
 ];

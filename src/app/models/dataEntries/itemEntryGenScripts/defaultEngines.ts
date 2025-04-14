@@ -7,7 +7,7 @@ export const defaultEngines: Engine[] = [
     baseSpeed: 100,
     id: 1,
     thrusterSlotCount: 2,
-    priceCats: 1000,
+    priceCredits: 1000,
     priceThulium: 0,
   },
 ];

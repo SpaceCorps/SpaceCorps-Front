@@ -29,7 +29,7 @@ export class ShipYardComponent implements OnInit {
   selectedCategory: SellableItems['itemType'] | null = null;
   items: SellableItems[] = [];
 
-  playerBalance = { cats: 0, thulium: 0 };
+  playerBalance = { credits: 0, thulium: 0 };
 
   username: string | null = null;
 
@@ -68,7 +68,7 @@ export class ShipYardComponent implements OnInit {
     this.apiService
       .getPlayerInfo({ username: this.username })
       .subscribe((data) => {
-        this.playerBalance.cats = data.cats;
+        this.playerBalance.credits = data.credits;
         this.playerBalance.thulium = data.thulium;
       });
   }
@@ -79,8 +79,8 @@ export class ShipYardComponent implements OnInit {
       return;
     }
 
-    if (item.priceCats > this.playerBalance.cats) {
-      alert('Not enough cats');
+    if (item.priceCredits > this.playerBalance.credits) {
+      alert('Not enough credits');
       return;
     }
 
@@ -112,7 +112,7 @@ export class ShipYardComponent implements OnInit {
     const fields = getAllFieldsForItemCategory(category);
     return fields.filter(
       (field) =>
-        !['name', 'id', 'priceCats', 'priceThulium'].includes(field.key)
+        !['name', 'id', 'priceCredits', 'priceThulium'].includes(field.key)
     );
   }
 

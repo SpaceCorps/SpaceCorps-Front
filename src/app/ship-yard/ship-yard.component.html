@@ -8,7 +8,7 @@
     <!-- Player Balance -->
     <div class="flex justify-between p-4 bg-base-200 rounded-box">
       <div>
-        <p>Balance in Cats: {{ playerBalance.cats }}</p>
+        <p>Balance in Credits: {{ playerBalance.credits }}</p>
         <p>Balance in Thulium: {{ playerBalance.thulium }}</p>
       </div>
     </div>
@@ -43,7 +43,7 @@
               <app-ship-model [shipModelName]="item.name"></app-ship-model>
             }
 
-            <p>Price in Cats: {{ item.priceCats }}</p>
+            <p>Price in Credits: {{ item.priceCredits }}</p>
             <p>Price in Thulium: {{ item.priceThulium }}</p>
 
             <button

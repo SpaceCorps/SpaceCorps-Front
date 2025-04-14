@@ -9,7 +9,7 @@ export const defaultShieldCells: ShieldCell[] = [
     addRechargeRate: 0,
     addPassiveRechargeRate: 0,
     addAbsorbance: 0,
-    priceCats: 10000,
+    priceCredits: 10000,
     priceThulium: 0,
   },
 ];

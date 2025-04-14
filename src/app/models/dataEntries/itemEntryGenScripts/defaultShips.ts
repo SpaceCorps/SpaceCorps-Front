@@ -10,7 +10,7 @@ export const defaultShips: Ship[] = [
     engineSlotCount: 2,
     shieldSlotCount: 2,
     laserSlotCount: 2,
-    priceCats: 1111,
+    priceCredits: 1111,
     priceThulium: 0,
   },
   {
@@ -22,7 +22,7 @@ export const defaultShips: Ship[] = [
     engineSlotCount: 4,
     shieldSlotCount: 3,
     laserSlotCount: 3,
-    priceCats: 155000,
+    priceCredits: 155000,
     priceThulium: 0,
   },
   {
@@ -34,7 +34,7 @@ export const defaultShips: Ship[] = [
     engineSlotCount: 5,
     shieldSlotCount: 5,
     laserSlotCount: 5,
-    priceCats: 655000,
+    priceCredits: 655000,
     priceThulium: 0,
   },
   {
@@ -46,7 +46,7 @@ export const defaultShips: Ship[] = [
     engineSlotCount: 6,
     shieldSlotCount: 6,
     laserSlotCount: 6,
-    priceCats: 0,
+    priceCredits: 0,
     priceThulium: 12000,
   },
   {
@@ -58,7 +58,7 @@ export const defaultShips: Ship[] = [
     engineSlotCount: 8,
     shieldSlotCount: 6,
     laserSlotCount: 6,
-    priceCats: 1000000,
+    priceCredits: 1000000,
     priceThulium: 0,
   },
   {
@@ -70,7 +70,7 @@ export const defaultShips: Ship[] = [
     engineSlotCount: 12,
     shieldSlotCount: 10,
     laserSlotCount: 10,
-    priceCats: 0,
+    priceCredits: 0,
     priceThulium: 25000,
   },
   {
@@ -82,7 +82,7 @@ export const defaultShips: Ship[] = [
     engineSlotCount: 14,
     shieldSlotCount: 14,
     laserSlotCount: 14,
-    priceCats: 0,
+    priceCredits: 0,
     priceThulium: 65000,
   },
 ];

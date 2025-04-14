@@ -15,7 +15,7 @@ export type InventoryItem = {
 };
 
 export type SellableItem = InventoryItem & {
-  priceCats: number;
+  priceCredits: number;
   priceThulium: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
@@ -94,7 +94,7 @@ export function getFieldsForItemCategory(
       { label: 'Name', key: 'name' },
       { label: 'ID', key: 'id' },
       { label: 'Base Damage Multiplier', key: 'baseDamageMultiplier' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
     LaserAmp: [
@@ -103,7 +103,7 @@ export function getFieldsForItemCategory(
       { label: 'Add Base Damage', key: 'addBaseDamage' },
       { label: 'Add Laser Damage Multiplier', key: 'addLaserDamageMultiplier' },
       { label: 'Add Critical Chance', key: 'addCriticalChance' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
     Laser: [
@@ -112,7 +112,7 @@ export function getFieldsForItemCategory(
       { label: 'Base Damage', key: 'baseDamage' },
       { label: 'Critical Chance', key: 'criticalChance' },
       { label: 'Laser Amp Slots', key: 'laserAmpSlotCount' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
     Shield: [
@@ -123,7 +123,7 @@ export function getFieldsForItemCategory(
       { label: 'Passive Recharge Rate', key: 'passiveRechargeRate' },
       { label: 'Absorbance', key: 'absorbance' },
       { label: 'Shield Cell Slots', key: 'shieldCellSlotCount' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
     ShieldCell: [
@@ -133,7 +133,7 @@ export function getFieldsForItemCategory(
       { label: 'Add Recharge Rate', key: 'addRechargeRate' },
       { label: 'Add Passive Recharge Rate', key: 'addPassiveRechargeRate' },
       { label: 'Add Absorbance', key: 'addAbsorbance' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
     Ship: [
@@ -144,7 +144,7 @@ export function getFieldsForItemCategory(
       { label: 'Engine Slots', key: 'engineSlotCount' },
       { label: 'Shield Slots', key: 'shieldSlotCount' },
       { label: 'Laser Slots', key: 'laserSlotCount' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
     Engine: [
@@ -152,7 +152,7 @@ export function getFieldsForItemCategory(
       { label: 'ID', key: 'id' },
       { label: 'Base Speed', key: 'baseSpeed' },
       { label: 'Thruster Slots', key: 'thrusterSlotCount' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
     Thruster: [
@@ -160,7 +160,7 @@ export function getFieldsForItemCategory(
       { label: 'ID', key: 'id' },
       { label: 'Add Base Speed', key: 'addBaseSpeed' },
       { label: 'Base Speed Multiplier', key: 'baseSpeedMultiplier' },
-      { label: 'Price in Cats', key: 'priceCats' },
+      { label: 'Price in Credits', key: 'priceCredits' },
       { label: 'Price in Thulium', key: 'priceThulium' },
     ],
   };
