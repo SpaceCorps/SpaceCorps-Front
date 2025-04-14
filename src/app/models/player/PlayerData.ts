@@ -7,7 +7,7 @@ export type PlayerData = {
   userId: string;
   dateOfRegistration: string;
   totalPlayTime: number;
-  cats: number;
+  credits: number;
   thulium: number;
   currentMap: string;
 };

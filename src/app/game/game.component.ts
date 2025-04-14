@@ -106,12 +106,20 @@ export class GameComponent implements OnInit, OnDestroy {
         this.lastTime = currentTime;
       }
 
+      // Notify managers of the update
+      if (this.playerManager) {
+        this.playerManager.onSignalRUpdate();
+      }
+      if (this.alienManager) {
+        this.alienManager.onSignalRUpdate();
+      }
+
       if (this.currentMapName != spaceMapData.mapName) {
         await loadNewSpacemap(this, spaceMapData);
         // Reset orbit controls to origin when switching maps
         if (this.controls) {
           this.controls.target.set(0, 0, 0);
-          this.camera!.position.set(0, 50, 0);
+          this.camera!.position.set(0, 5, 5);
         }
       } else {
         await updateSpacemap(this, spaceMapData);

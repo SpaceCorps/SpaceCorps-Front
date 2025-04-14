@@ -8,7 +8,7 @@ export const defaultLaserAmps: LaserAmp[] = [
     addBaseDamage: 10,
     addLaserDamageMultiplier: 0,
     addCriticalChance: 0,
-    priceCats: 10000,
+    priceCredits: 10000,
     priceThulium: 0,
   },
 ];

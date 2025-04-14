@@ -6,7 +6,7 @@ export const defaultLaserAmmos: LaserAmmo[] = [
     itemType: 'LaserAmmo',
     baseDamageMultiplier: 1,
     id: 1,
-    priceCats: 100,
+    priceCredits: 100,
     priceThulium: 0,
   },
 ];

@@ -60,8 +60,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Linter
 
-To view all eslint errors:
+1. To view all eslint errors:
 
 ```bash
-npx eslint . --ext .ts
+  npx eslint . --ext .ts
 ```

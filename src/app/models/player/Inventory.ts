@@ -1,7 +1,7 @@
 import { SellableItems } from './Items';
 
 export type Inventory = {
-  cats: number;
+  credits: number;
   thulium: number;
   activeShipName: string;
   items: SellableItems[];
