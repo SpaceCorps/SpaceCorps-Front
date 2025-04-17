@@ -79,15 +79,15 @@ export class ShipYardComponent implements OnInit {
       return;
     }
 
-    if (item.priceCredits > this.playerBalance.credits) {
-      alert('Not enough credits');
-      return;
-    }
+    // if (item.priceCredits > this.playerBalance.credits) {
+    //   alert('Not enough credits');
+    //   return;
+    // }
 
-    if (item.priceThulium > this.playerBalance.thulium) {
-      alert('Not enough thulium');
-      return;
-    }
+    // if (item.priceThulium > this.playerBalance.thulium) {
+    //   alert('Not enough thulium');
+    //   return;
+    // }
 
     this.apiService
       .buyItem({
