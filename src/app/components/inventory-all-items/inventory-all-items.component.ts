@@ -6,9 +6,10 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  inject,
+  effect,
 } from '@angular/core';
-import { ApiService } from '../../services/api.service';
-import { AuthService } from '../../services/auth.service';
+import { StateService } from '../../services/state.service';
 import { SellableItems } from '../../models/player/Items';
 import {
   animate,
@@ -98,16 +99,22 @@ export class InventoryAllItemsComponent implements OnInit, OnChanges {
     new EventEmitter<SellableItems>();
 
   categorizedItems = new Map<string, SellableItems[]>();
+  username: string | null = null;
 
-  constructor(
-    private apiService: ApiService,
-    private authService: AuthService
-  ) {}
+  stateService = inject(StateService);
+
+  constructor() {
+    // Set up effect to watch player data changes
+    effect(() => {
+      const currentPlayer = this.stateService.currentPlayer();
+      if (currentPlayer) {
+        this.username = currentPlayer.username;
+      }
+    });
+  }
 
   async ngOnInit() {
-    const username = this.authService.state().username;
-
-    if (!username) {
+    if (!this.username) {
       console.error('Username was not provided, can not load component.');
       return;
     }

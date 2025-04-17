@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { PlayerStatistics } from '../../models/player/PlayerStatistics';
+import { StateService } from '../../services/state.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-player-info-statistics',
   templateUrl: './player-info-statistics.component.html',
   styleUrl: './player-info-statistics.component.scss',
 })
-export class PlayerInfoStatisticsComponent {
+export class PlayerInfoStatisticsComponent implements OnInit {
   categories = [
     'Experience',
     'Honor',
@@ -20,42 +22,55 @@ export class PlayerInfoStatisticsComponent {
 
   statistics: PlayerStatistics | null = null;
 
+  constructor(
+    private stateService: StateService,
+    private authService: AuthService
+  ) {
+    // Set up effect to watch player data changes
+    effect(() => {
+      const currentPlayer = this.stateService.currentPlayer();
+      if (currentPlayer) {
+        this.statistics = {
+          experience: {
+            totalExperience: currentPlayer.experience,
+          },
+          honor: {
+            totalHonor: currentPlayer.honor,
+          },
+          shipsDestroyed: {
+            totalShipsDestroyed: currentPlayer.shipsDestroyed,
+          },
+          aliensDestroyed: {
+            totalAliensDestroyed: currentPlayer.aliensDestroyed,
+          },
+          rankingPoints: {
+            totalRankingPoints: currentPlayer.rankingPoints,
+          },
+          completedQuests: {
+            totalCompletedQuests: currentPlayer.completedQuests,
+          },
+          completedGates: {
+            totalCompletedGates: currentPlayer.completedGates,
+          },
+          currentTitle: {
+            title: currentPlayer.title,
+          },
+        };
+      }
+    });
+  }
+
   ngOnInit() {
-    this.statistics = this.getPlayerStatistics();
-  }
+    const authPlayerData = this.authService.getPlayerData();
+    if (!authPlayerData) {
+      console.error('Error: Missing PlayerData');
+      return;
+    }
+    const username = authPlayerData.username;
 
-  getPlayerStatistics(): PlayerStatistics {
-    // TODO: Api call here
-    // return this.apiService.getPlayerStatistics();
-    return this.templateStatistics;
+    // Initial fetch of player data
+    this.stateService.fetchPlayerInfo(username);
   }
-
-  templateStatistics: PlayerStatistics = {
-    experience: {
-      totalExperience: 1000,
-    },
-    honor: {
-      totalHonor: 100,
-    },
-    shipsDestroyed: {
-      totalShipsDestroyed: 10,
-    },
-    aliensDestroyed: {
-      totalAliensDestroyed: 5,
-    },
-    rankingPoints: {
-      totalRankingPoints: 100,
-    },
-    completedQuests: {
-      totalCompletedQuests: 5,
-    },
-    completedGates: {
-      totalCompletedGates: 2,
-    },
-    currentTitle: {
-      title: 'Rookie',
-    },
-  };
 
   getCategoryValue(category: string): string | number | null {
     if (!this.statistics) return null;

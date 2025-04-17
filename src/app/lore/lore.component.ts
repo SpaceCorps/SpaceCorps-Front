@@ -22,7 +22,7 @@ export class LoreComponent implements OnInit {
   selectedChapterIndex = 0;
   chapters: Chapter[] = [];
   chaptersWithProgress: Chapter[] = [];
-  completedChapters = 4; // This would normally be loaded from a service
+  completedChapters = 4;
   totalChapters = 60;
   loreScore = 56;
 

@@ -1,20 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { InventoryActiveShipComponent } from '../components/inventory-active-ship/inventory-active-ship.component';
-import { ApiService } from '../services/api.service';
 import { AuthService } from '../services/auth.service';
 import { Inventory } from '../models/player/Inventory';
 import { InventoryAllItemsComponent } from '../components/inventory-all-items/inventory-all-items.component';
-import {
-  Engine,
-  Laser,
-  LaserAmp,
-  SellableItems,
-  Shield,
-  ShieldCell,
-  Ship,
-  Thruster,
-} from '../models/player/Items';
+import { SellableItems } from '../models/player/Items';
 import { InventorySelectedItemComponent } from '../components/inventory-selected-item/inventory-selected-item.component';
+import { StateService } from '../services/state.service';
 
 const ItemTypes = {
   Laser: 'Laser',
@@ -43,9 +34,17 @@ export class PilotInventoryComponent implements OnInit {
   selectedItem: SellableItems | null = null;
 
   constructor(
-    private apiService: ApiService,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private stateService: StateService
+  ) {
+    // Set up effect to watch inventory changes
+    effect(() => {
+      const currentInventory = this.stateService.currentInventory();
+      if (currentInventory) {
+        this.inventory = currentInventory;
+      }
+    });
+  }
 
   ngOnInit() {
     const playerData = this.authService.getPlayerData();
@@ -54,11 +53,9 @@ export class PilotInventoryComponent implements OnInit {
         'No player data found thus cannot get username and load inventory'
       );
     this.username = playerData?.username;
-    this.apiService
-      .getUserInventory(playerData?.username)
-      .subscribe((inventory: Inventory) => {
-        this.inventory = inventory;
-      });
+    
+    // Initial fetch of inventory
+    this.stateService.fetchPlayerInventory(playerData.username);
   }
 
   handleItemSelection($event: SellableItems) {
@@ -89,118 +86,46 @@ export class PilotInventoryComponent implements OnInit {
         if (!childArray[slotIndex]) {
           switch (draggedItem.itemType) {
             case ItemTypes.LaserAmp:
-              this.apiService
-                .equipLaserAmp({
-                  username: this.username,
-                  laserId: this.selectedItem.id,
-                  laserAmpId: draggedItem.id,
-                })
-                .subscribe({
-                  next: () => {
-                    childArray[slotIndex] = draggedItem;
-                    this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id
-                    );
-                  },
-                  error: (err) => {
-                    console.error(err);
-                  },
-                });
+              this.stateService.equipLaserAmp({
+                username: this.username,
+                laserId: this.selectedItem.id,
+                laserAmpId: draggedItem.id,
+              });
               break;
             case ItemTypes.Laser:
-              this.apiService
-                .equipLaser({
-                  username: this.username,
-                  shipId: this.selectedItem.id,
-                  laserId: draggedItem.id,
-                })
-                .subscribe({
-                  next: () => {
-                    childArray[slotIndex] = draggedItem;
-                    this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id
-                    );
-                  },
-                  error: (err) => {
-                    console.error(err);
-                  },
-                });
+              this.stateService.equipLaser({
+                username: this.username,
+                shipId: this.selectedItem.id,
+                laserId: draggedItem.id,
+              });
               break;
             case ItemTypes.ShieldCell:
-              this.apiService
-                .equipShieldCell({
-                  username: this.username,
-                  shieldCellId: draggedItem.id,
-                  shieldId: this.selectedItem.id,
-                })
-                .subscribe({
-                  next: () => {
-                    childArray[slotIndex] = draggedItem;
-                    this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id
-                    );
-                  },
-                  error: (err) => {
-                    console.error(err);
-                  },
-                });
+              this.stateService.equipShieldCell({
+                username: this.username,
+                shieldCellId: draggedItem.id,
+                shieldId: this.selectedItem.id,
+              });
               break;
             case ItemTypes.Shield:
-              this.apiService
-                .equipShield({
-                  username: this.username,
-                  shieldId: draggedItem.id,
-                  shipId: this.selectedItem.id,
-                })
-                .subscribe({
-                  next: () => {
-                    childArray[slotIndex] = draggedItem;
-                    this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id
-                    );
-                  },
-                  error: (err) => {
-                    console.error(err);
-                  },
-                });
+              this.stateService.equipShield({
+                username: this.username,
+                shieldId: draggedItem.id,
+                shipId: this.selectedItem.id,
+              });
               break;
             case ItemTypes.Engine:
-              this.apiService
-                .equipEngine({
-                  username: this.username,
-                  engineId: draggedItem.id,
-                  shipId: this.selectedItem.id,
-                })
-                .subscribe({
-                  next: () => {
-                    childArray[slotIndex] = draggedItem;
-                    this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id
-                    );
-                  },
-                  error: (err) => {
-                    console.error(err);
-                  },
-                });
+              this.stateService.equipEngine({
+                username: this.username,
+                engineId: draggedItem.id,
+                shipId: this.selectedItem.id,
+              });
               break;
             case ItemTypes.Thruster:
-              this.apiService
-                .equipThruster({
-                  username: this.username,
-                  thrusterId: draggedItem.id,
-                  engineId: this.selectedItem.id,
-                })
-                .subscribe({
-                  next: () => {
-                    childArray[slotIndex] = draggedItem;
-                    this.inventory!.items = this.inventory!.items.filter(
-                      (item) => item.id !== draggedItem.id
-                    );
-                  },
-                  error: (err) => {
-                    console.error(err);
-                  },
-                });
+              this.stateService.equipThruster({
+                username: this.username,
+                thrusterId: draggedItem.id,
+                engineId: this.selectedItem.id,
+              });
               break;
             default:
               console.error(`Unknown item type: ${draggedItem.itemType}`);
@@ -222,158 +147,46 @@ export class PilotInventoryComponent implements OnInit {
   }) {
     switch (event.itemType) {
       case ItemTypes.LaserAmp:
-        this.apiService
-          .unequipLaserAmp({
-            username: this.username!,
-            laserId: event.parentId,
-            laserAmpId: event.childId,
-          })
-          .subscribe({
-            next: () => {
-              const laser = this.inventory!.items.find(
-                (i) => i.id === event.parentId
-              ) as Laser;
-              const laserAmp = laser.laserAmps!.find(
-                (i) => i.id === event.childId
-              ) as LaserAmp;
-              this.inventory!.items = [...this.inventory!.items, laserAmp];
-              laser.laserAmps = laser.laserAmps!.filter(
-                (i) => i.id !== event.childId
-              );
-              this.selectedItem = laser;
-            },
-            error: (err) => {
-              console.error(err);
-            },
-          });
+        this.stateService.unequipLaserAmp({
+          username: this.username!,
+          laserId: event.parentId,
+          laserAmpId: event.childId,
+        });
         break;
       case ItemTypes.Laser:
-        this.apiService
-          .unequipLaser({
-            username: this.username!,
-            shipId: event.parentId,
-            laserId: event.childId,
-          })
-          .subscribe({
-            next: () => {
-              const ship = this.inventory!.items.find(
-                (i) => i.id === event.parentId
-              ) as Ship;
-              const laser = ship.lasers!.find(
-                (i) => i.id === event.childId
-              ) as Laser;
-              this.inventory!.items = [...this.inventory!.items, laser];
-              ship.lasers = ship.lasers!.filter((i) => i.id !== event.childId);
-              this.selectedItem = ship;
-            },
-            error: (err) => {
-              console.error(err);
-            },
-          });
+        this.stateService.unequipLaser({
+          username: this.username!,
+          shipId: event.parentId,
+          laserId: event.childId,
+        });
         break;
       case ItemTypes.ShieldCell:
-        this.apiService
-          .unequipShieldCell({
-            username: this.username!,
-            shieldCellId: event.childId,
-            shieldId: event.parentId,
-          })
-          .subscribe({
-            next: () => {
-              const shield = this.inventory!.items.find(
-                (i) => i.id === event.parentId
-              ) as Shield;
-              const shieldCell = shield.shieldCells!.find(
-                (i) => i.id === event.childId
-              ) as ShieldCell;
-              this.inventory!.items = [...this.inventory!.items, shieldCell];
-              shield.shieldCells = shield.shieldCells!.filter(
-                (i) => i.id !== event.childId
-              );
-              this.selectedItem = shield;
-            },
-            error: (err) => {
-              console.error(err);
-            },
-          });
+        this.stateService.unequipShieldCell({
+          username: this.username!,
+          shieldCellId: event.childId,
+          shieldId: event.parentId,
+        });
         break;
       case ItemTypes.Shield:
-        this.apiService
-          .unequipShield({
-            username: this.username!,
-            shieldId: event.childId,
-            shipId: event.parentId,
-          })
-          .subscribe({
-            next: () => {
-              const ship = this.inventory!.items.find(
-                (i) => i.id === event.parentId
-              ) as Ship;
-              const shield = ship.shields!.find(
-                (i) => i.id === event.childId
-              ) as Shield;
-              this.inventory!.items = [...this.inventory!.items, shield];
-              ship.shields = ship.shields!.filter(
-                (i) => i.id !== event.childId
-              );
-              this.selectedItem = ship;
-            },
-            error: (err) => {
-              console.error(err);
-            },
-          });
+        this.stateService.unequipShield({
+          username: this.username!,
+          shieldId: event.childId,
+          shipId: event.parentId,
+        });
         break;
       case ItemTypes.Engine:
-        this.apiService
-          .unequipEngine({
-            username: this.username!,
-            engineId: event.childId,
-            shipId: event.parentId,
-          })
-          .subscribe({
-            next: () => {
-              const ship = this.inventory!.items.find(
-                (i) => i.id === event.parentId
-              ) as Ship;
-              const engine = ship.engines!.find(
-                (i) => i.id === event.childId
-              ) as Engine;
-              this.inventory!.items = [...this.inventory!.items, engine];
-              ship.engines = ship.engines!.filter(
-                (i) => i.id !== event.childId
-              );
-              this.selectedItem = ship;
-            },
-            error: (err) => {
-              console.error(err);
-            },
-          });
+        this.stateService.unequipEngine({
+          username: this.username!,
+          engineId: event.childId,
+          shipId: event.parentId,
+        });
         break;
       case ItemTypes.Thruster:
-        this.apiService
-          .unequipThruster({
-            username: this.username!,
-            thrusterId: event.childId,
-            engineId: event.parentId,
-          })
-          .subscribe({
-            next: () => {
-              const engine = this.inventory!.items.find(
-                (i) => i.id === event.parentId
-              ) as Engine;
-              const thruster = engine.thrusters!.find(
-                (i) => i.id === event.childId
-              ) as Thruster;
-              this.inventory!.items = [...this.inventory!.items, thruster];
-              engine.thrusters = engine.thrusters!.filter(
-                (i) => i.id !== event.childId
-              );
-              this.selectedItem = engine;
-            },
-            error: (err) => {
-              console.error(err);
-            },
-          });
+        this.stateService.unequipThruster({
+          username: this.username!,
+          thrusterId: event.childId,
+          engineId: event.parentId,
+        });
         break;
       default:
         console.error(`Unknown item type: ${event.itemType}`);

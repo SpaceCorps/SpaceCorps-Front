@@ -10,4 +10,12 @@ export type PlayerData = {
   credits: number;
   thulium: number;
   currentMap: string;
+  experience: number;
+  honor: number;
+  shipsDestroyed: number;
+  aliensDestroyed: number;
+  rankingPoints: number;
+  completedQuests: number;
+  completedGates: number;
+  title: string;
 };

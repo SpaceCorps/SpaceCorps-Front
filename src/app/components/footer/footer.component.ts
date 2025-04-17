@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, effect } from '@angular/core';
 import packageJson from '../../../../package.json';
-import { ApiService } from '../../services/api.service';
+import { StateService } from '../../services/state.service';
 import { NgClass } from '@angular/common';
 
 @Component({
@@ -15,23 +15,26 @@ export class FooterComponent implements OnInit {
   outDated: boolean = false;
   serverVersion: string | null = null;
 
-  apiService = inject(ApiService);
+  stateService = inject(StateService);
+
+  constructor() {
+    // Set up effect to watch server version changes
+    effect(() => {
+      const serverInfo = this.stateService.currentServerInfo();
+      if (serverInfo) {
+        this.serverVersion = serverInfo.version;
+        if (this.serverVersion) {
+          this.outDated =
+            this.getMinorVersion(this.serverVersion) >
+            this.getMinorVersion(this.requiredBackendVersion);
+        }
+      }
+    });
+  }
 
   ngOnInit() {
-    this.apiService.getBackendVersion().subscribe({
-      next: (serverInfo) => {
-        this.serverVersion = serverInfo.version;
-
-        if (!this.serverVersion) return;
-
-        this.outDated =
-          this.getMinorVersion(this.serverVersion) >
-          this.getMinorVersion(this.requiredBackendVersion);
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
+    // Initial fetch of server info
+    this.stateService.fetchServerInfo();
   }
 
   private getMinorVersion(fullVersion: string): number {

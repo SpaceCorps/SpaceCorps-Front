@@ -12,6 +12,7 @@ import { ServerInfo } from '../models/servers/ServerInfo';
 import { BuyItemRequest } from '../models/player/BuyItemRequest';
 import { Inventory } from '../models/player/Inventory';
 import { SellableItems } from '../models/player/Items';
+import { Commit } from '../components/github-timeline/commit';
 import {
   EquipEngineRequest,
   EquipLaserAmpRequest,
@@ -26,6 +27,7 @@ import {
   UnequipShieldRequest,
   UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
+import { ChapterProgressDto } from '../models/lore/ChapterProgressDto';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +36,7 @@ export class ApiService {
   private url = isDevMode()
     ? 'http://localhost:5274/api'
     : 'http://179.61.190.125:5274/api';
+  private githubApiUrl = 'https://api.github.com/repos/rorychatt/SpaceCorps-Front/commits?per_page=1000';
 
   constructor(private http: HttpClient) {}
 
@@ -256,5 +259,21 @@ export class ApiService {
       unequipThrusterRequest,
       { headers, responseType: 'text' as 'json' }
     );
+  }
+
+  getChapterProgress(userId: string) {
+    return this.http.get<ChapterProgressDto>(`${this.url}/Lore/Progress/${userId}`);
+  }
+
+  updateChapterProgress(userId: string, completedChapterIds: number[]) {
+    const request: ChapterProgressDto = {
+      userId,
+      completedChapterIds
+    };
+    return this.http.post<ChapterProgressDto>(`${this.url}/Lore/Progress`, request);
+  }
+
+  getGithubCommits() {
+    return this.http.get<Commit[]>(this.githubApiUrl);
   }
 }

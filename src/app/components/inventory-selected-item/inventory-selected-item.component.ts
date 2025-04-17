@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, effect, inject } from '@angular/core';
 import {
   Engine,
   Laser,
@@ -6,8 +6,7 @@ import {
   Shield,
   Ship,
 } from '../../models/player/Items';
-import { ApiService } from '../../services/api.service';
-import { AuthService } from '../../services/auth.service';
+import { StateService } from '../../services/state.service';
 
 @Component({
   selector: 'app-inventory-selected-item',
@@ -15,11 +14,6 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './inventory-selected-item.component.scss',
 })
 export class InventorySelectedItemComponent implements OnInit {
-  constructor(
-    private apiService: ApiService,
-    private authService: AuthService
-  ) {}
-
   @Input({
     required: true,
   })
@@ -42,10 +36,21 @@ export class InventorySelectedItemComponent implements OnInit {
   }>();
 
   draggedItem: SellableItems | null = null;
-  username!: string;
+  username: string | null = null;
+
+  stateService = inject(StateService);
+
+  constructor() {
+    // Set up effect to watch player data changes
+    effect(() => {
+      const currentPlayer = this.stateService.currentPlayer();
+      if (currentPlayer) {
+        this.username = currentPlayer.username;
+      }
+    });
+  }
 
   ngOnInit(): void {
-    this.username = this.authService.getPlayerData()!.username;
     if (!this.username) {
       console.error('Username was not provided, can not load component.');
       return;
