@@ -36,7 +36,7 @@
                 <h2 class="card-title">Create New Item</h2>
                 <button
                   class="btn bg-base-300 btn-xs btn-square mt-4"
-                  (click)="fetchItems(selectedCategory)"
+                  (click)="stateService.fetchShopItems(selectedCategory)"
                   title="Refresh"
                 >
                   <fa-icon [icon]="faArrowsRotate"></fa-icon>
