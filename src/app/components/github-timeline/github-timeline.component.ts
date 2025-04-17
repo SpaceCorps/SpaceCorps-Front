@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { GitHubService } from '../../services/git-hub.service';
+import { Component, inject, OnInit, effect } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Commit } from './commit';
+import { StateService } from '../../services/state.service';
 
 @Component({
   selector: 'app-github-timeline',
@@ -9,19 +9,28 @@ import { Commit } from './commit';
   templateUrl: './github-timeline.component.html',
   styleUrl: './github-timeline.component.scss',
 })
-export class GithubTimelineComponent {
+export class GithubTimelineComponent implements OnInit {
   commits: Commit[] = [];
 
-  constructor(private gitHubService: GitHubService) {}
+  stateService = inject(StateService);
+
+  constructor() {
+    // Set up effect to watch GitHub commits changes
+    effect(() => {
+      const allCommits = this.stateService.currentGithubCommits();
+      if (allCommits) {
+        this.commits = allCommits.filter(
+          (commit: Commit) =>
+            this.isBigRelease(commit.commit.message) ||
+            this.isMergePullRequest(commit.commit.message)
+        );
+      }
+    });
+  }
 
   ngOnInit() {
-    this.gitHubService.getCommits().subscribe((data: Commit[]) => {
-      this.commits = data.filter(
-        (commit: Commit) =>
-          this.isBigRelease(commit.commit.message) ||
-          this.isMergePullRequest(commit.commit.message)
-      );
-    });
+    // Initial fetch of GitHub commits
+    this.stateService.fetchGithubCommits();
   }
 
   isBigRelease(message: string): boolean {

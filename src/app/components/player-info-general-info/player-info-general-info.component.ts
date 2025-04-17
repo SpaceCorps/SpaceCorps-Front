@@ -1,7 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, effect } from '@angular/core';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
-import { ApiService } from '../../services/api.service';
+import { StateService } from '../../services/state.service';
 import { PlayerInfoStatisticsComponent } from '../player-info-statistics/player-info-statistics.component';
 
 @Component({
@@ -12,9 +12,21 @@ import { PlayerInfoStatisticsComponent } from '../player-info-statistics/player-
 })
 export class PlayerInfoGeneralInfoComponent implements OnInit {
   authService = inject(AuthService);
-  apiService = inject(ApiService);
+  stateService = inject(StateService);
 
   authState$ = this.authService.authState$;
+
+  constructor() {
+    // Set up effect to watch player data changes
+    effect(() => {
+      const currentPlayer = this.stateService.currentPlayer();
+      if (currentPlayer) {
+        this.templateValues.username = currentPlayer.username;
+        this.templateValues.hoursPlayed = currentPlayer.totalPlayTime;
+        this.templateValues.dateOfReg = currentPlayer.dateOfRegistration;
+      }
+    });
+  }
 
   ngOnInit() {
     const authPlayerData = this.authService.getPlayerData();
@@ -24,22 +36,8 @@ export class PlayerInfoGeneralInfoComponent implements OnInit {
     }
     const username = authPlayerData.username;
 
-    this.getPlayerInfo(username).subscribe({
-      next: (response) => {
-        this.templateValues.username = response.username;
-        this.templateValues.hoursPlayed = response.totalPlayTime;
-        this.templateValues.dateOfReg = response.dateOfRegistration;
-      },
-      error: (err) => {
-        throw err;
-      },
-    });
-  }
-
-  getPlayerInfo(username: string) {
-    return this.apiService.getPlayerInfo({
-      username: username,
-    });
+    // Initial fetch of player data
+    this.stateService.fetchPlayerInfo(username);
   }
 
   templateValues = {

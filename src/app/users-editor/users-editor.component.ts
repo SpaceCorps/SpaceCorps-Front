@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PlayerData } from '../models/player/PlayerData';
 import { ApiService } from '../services/api.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Inventory } from '../models/player/Inventory';
+import { StateService } from '../services/state.service';
 
 @Component({
   selector: 'app-users-editor',
@@ -18,93 +19,59 @@ export class UsersEditorComponent implements OnInit {
   command: string = '';
   commandHistory: string[] = [];
 
-  constructor(private apiService: ApiService) {}
-
-  ngOnInit(): void {
-    this.fetchUsers();
+  constructor(
+    private apiService: ApiService,
+    private stateService: StateService
+  ) {
+    // Set up effect to watch inventory changes
+    effect(() => {
+      const currentInventory = this.stateService.currentInventory();
+      if (currentInventory) {
+        this.selectedUserInventory = currentInventory;
+      }
+    });
   }
 
-  private fetchUsers() {
+  ngOnInit() {
     this.apiService.getAllPlayers().subscribe({
-      next: (data: PlayerData[]) => {
-        this.users = data;
+      next: (response) => {
+        this.users = response;
       },
       error: (error: HttpErrorResponse) => {
-        this.users = null;
-        this.commandHistory.unshift(`Error fetching users: ${error.message}`);
+        this.commandHistory.unshift(
+          `${this.getCurrentTime()} Error fetching users: ${error.message}`
+        );
       },
     });
   }
 
-  private getCurrentTime(): string {
-    const now = new Date();
-    return `[${now.getHours().toString().padStart(2, '0')}:${now
-      .getMinutes()
-      .toString()
-      .padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+  getCurrentTime(): string {
+    return new Date().toLocaleTimeString();
   }
 
   executeCommand() {
-    const timestamp = this.getCurrentTime();
+    if (!this.command.trim()) return;
 
-    this.commandHistory.unshift(`${timestamp} ${this.command}`);
+    this.commandHistory.unshift(
+      `${this.getCurrentTime()} Executing command: ${this.command}`
+    );
 
-    if (this.commandHistory.length > 10) {
-      this.commandHistory.pop();
-    }
-
-    const commandParts = this.command.split(' ');
-
-    if (
-      commandParts.length === 5 &&
-      commandParts[0] === 'user' &&
-      commandParts[2] === 'set'
-    ) {
-      const username = commandParts[1];
-      const resource = commandParts[3];
-      const amount = parseInt(commandParts[4], 10);
-
-      if (!isNaN(amount)) {
-        this.apiService.handleUserEditorCommand(this.command).subscribe({
-          next: () => {
-            this.commandHistory.unshift(
-              `${timestamp} Successfully set ${resource} for ${username} to ${amount}`
-            );
-          },
-          error: (error: HttpErrorResponse) => {
-            this.commandHistory.unshift(
-              `${timestamp} Error setting ${resource} for ${username}: ${JSON.stringify(error)}`
-            );
-          },
-        });
-      } else {
+    this.apiService.handleUserEditorCommand(this.command).subscribe({
+      next: () => {
         this.commandHistory.unshift(
-          `${timestamp} Invalid amount: ${commandParts[4]}`
+          `${this.getCurrentTime()} Command executed successfully`
         );
-      }
-    } else {
-      this.commandHistory.unshift(
-        `${timestamp} Invalid command: ${this.command}`
-      );
-    }
-
-    this.command = '';
-
-    setTimeout(() => {
-      this.fetchUsers();
-    }, 300);
-  }
-
-  onUserClick(username: string) {
-    this.apiService.getUserInventory(username).subscribe({
-      next: (response) => {
-        this.selectedUserInventory = response;
+        this.command = '';
       },
       error: (error: HttpErrorResponse) => {
         this.commandHistory.unshift(
-          `${this.getCurrentTime()} Error fetching inventory for ${username}: ${error.message}`
+          `${this.getCurrentTime()} Error executing command: ${error.message}`
         );
       },
     });
+  }
+
+  onUserClick(username: string) {
+    this.stateService.fetchPlayerInventory(username);
   }
 }

@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, effect } from '@angular/core';
 import { NgForOf, NgIf } from '@angular/common';
-import { ApiService } from '../services/api.service';
-import { AuthService } from '../services/auth.service';
 import {
   getFieldsForItemCategory as getAllFieldsForItemCategory,
   SellableItems,
 } from '../models/player/Items';
 import { ShipModelComponent } from '../components/ship-model/ship-model.component';
+import { StateService } from '../services/state.service';
 
 @Component({
   selector: 'app-ship-yard',
@@ -28,84 +27,58 @@ export class ShipYardComponent implements OnInit {
 
   selectedCategory: SellableItems['itemType'] | null = null;
   items: SellableItems[] = [];
-
   playerBalance = { credits: 0, thulium: 0 };
-
   username: string | null = null;
 
-  constructor(
-    private apiService: ApiService,
-    private authService: AuthService
-  ) {}
+  private stateService = inject(StateService);
+
+  constructor() {
+    // Set up effect to watch player data changes
+    effect(() => {
+      const playerData = this.stateService.currentPlayer();
+      if (playerData) {
+        this.playerBalance.credits = playerData.credits;
+        this.playerBalance.thulium = playerData.thulium;
+        this.username = playerData.username;
+      }
+    });
+
+    // Set up effect to watch shop items changes
+    effect(() => {
+      const currentShopItems = this.stateService.currentShopItems();
+      if (currentShopItems && this.selectedCategory) {
+        this.items = currentShopItems[this.selectedCategory] || [];
+      }
+    });
+  }
 
   ngOnInit() {
-    this.fetchPlayerData();
+    const playerData = this.stateService.currentPlayer();
+    if (playerData) {
+      this.username = playerData.username;
+    }
   }
 
   selectCategory(category: SellableItems['itemType']) {
     this.selectedCategory = category;
-    this.fetchItems(category);
+    this.stateService.fetchShopItems(category);
   }
 
-  fetchItems(category: SellableItems['itemType']) {
-    this.apiService.getItemEntriesByCategory(category).subscribe((data) => {
-      this.items = data as SellableItems[];
-    });
-  }
-
-  fetchPlayerData() {
+  async buyItem(item: SellableItems) {
     if (!this.username) {
-      const playerData = this.authService.getPlayerData();
-
-      if (!playerData) {
-        console.error('Player data not found');
-        return;
-      }
-
-      this.username = playerData.username;
-    }
-
-    this.apiService
-      .getPlayerInfo({ username: this.username })
-      .subscribe((data) => {
-        this.playerBalance.credits = data.credits;
-        this.playerBalance.thulium = data.thulium;
-      });
-  }
-
-  buyItem(item: SellableItems) {
-    if (this.username === null) {
       alert('No username found');
       return;
     }
 
-    if (item.priceCredits > this.playerBalance.credits) {
-      alert('Not enough credits');
-      return;
-    }
-
-    if (item.priceThulium > this.playerBalance.thulium) {
-      alert('Not enough thulium');
-      return;
-    }
-
-    this.apiService
-      .buyItem({
+    try {
+      await this.stateService.buyItem({
         username: this.username,
-        itemId: item.id,
+        itemId: Number(item.id),
         itemType: item.itemType,
-      })
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-          setTimeout(() => {
-            this.fetchPlayerData();
-          }, 200);
-        },
-        error: (error) => {
-          console.error('Error buying item', error);
-        },
       });
+    } catch (error) {
+      console.error('Error buying item', error);
+    }
   }
 
   protected getFieldsForItemCategory(category: SellableItems['itemType']) {

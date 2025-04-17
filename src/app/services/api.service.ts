@@ -12,6 +12,7 @@ import { ServerInfo } from '../models/servers/ServerInfo';
 import { BuyItemRequest } from '../models/player/BuyItemRequest';
 import { Inventory } from '../models/player/Inventory';
 import { SellableItems } from '../models/player/Items';
+import { Commit } from '../components/github-timeline/commit';
 import {
   EquipEngineRequest,
   EquipLaserAmpRequest,
@@ -26,6 +27,7 @@ import {
   UnequipShieldRequest,
   UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
+import { ChapterProgressDto } from '../models/lore/ChapterProgressDto';
 
 @Injectable({
   providedIn: 'root',
@@ -34,15 +36,23 @@ export class ApiService {
   private url = isDevMode()
     ? 'http://localhost:5274/api'
     : 'http://179.61.190.125:5274/api';
+  private githubApiUrl =
+    'https://api.github.com/repos/rorychatt/SpaceCorps-Front/commits?per_page=1000';
 
   constructor(private http: HttpClient) {}
 
   createNewUser(request: UserCredentialsCreateRequest) {
-    return this.http.post<PlayerData>(`${this.url}/UserCredentials/Create`, request);
+    return this.http.post<PlayerData>(
+      `${this.url}/UserCredentials/Create`,
+      request
+    );
   }
 
   logIn(request: UserCredentialsLoginRequest) {
-    return this.http.post<PlayerData>(`${this.url}/UserCredentials/Verify`, request);
+    return this.http.post<PlayerData>(
+      `${this.url}/UserCredentials/Verify`,
+      request
+    );
   }
 
   getPlayerInfo(request: GetPlayerInfoRequest) {
@@ -109,7 +119,9 @@ export class ApiService {
   }
 
   getItemEntriesByCategory(category: SellableItems['itemType']) {
-    return this.http.get<SellableItems[]>(`${this.url}/ItemEntries/${category}s`);
+    return this.http.get<SellableItems[]>(
+      `${this.url}/ItemEntries/${category}s`
+    );
   }
 
   createNewItemEntry<T extends SellableItems>(newItem: T) {
@@ -256,5 +268,19 @@ export class ApiService {
       unequipThrusterRequest,
       { headers, responseType: 'text' as 'json' }
     );
+  }
+
+  getChapterProgress(userId: string) {
+    return this.http.get<ChapterProgressDto>(
+      `${this.url}/Lore/Progress/${userId}`
+    );
+  }
+
+  updateChapterProgress(request: ChapterProgressDto) {
+    return this.http.post<void>(`${this.url}/Lore/Progress`, request);
+  }
+
+  getGithubCommits() {
+    return this.http.get<Commit[]>(this.githubApiUrl);
   }
 }

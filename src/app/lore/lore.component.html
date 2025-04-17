@@ -1,45 +1,79 @@
-<main class="container mx-auto p-6">
-  <header class="mb-6">
-    <h1 class="text-4xl font-bold">SpaceCorps Lore</h1>
-  </header>
+<div class="min-h-screen bg-base-100 text-base-content">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8 text-white">SpaceCorps Lore</h1>
 
-  <nav class="mb-6">
-    <!-- Dropdown for selecting chapter -->
-    <label for="chapter-select" class="block mb-2 text-lg font-medium"
-      >Choose a Chapter:</label
-    >
-    <select
-      id="chapter-select"
-      class="select select-bordered w-full max-w-xs"
-      [(ngModel)]="selectedChapterIndex"
-      (change)="selectChapter(selectedChapterIndex)"
-    >
-      @for (chapter of chapters; track $index) {
-        <option [value]="$index">{{ chapter.title }}</option>
-      }
-    </select>
-  </nav>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Panel -->
+      <div class="lg:col-span-1 space-y-6">
+        <div class="card bg-base-200 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title text-white mb-4">Reading progress:</h2>
+            <div class="w-full bg-base-300 rounded-full h-4 mb-4">
+              <div
+                class="bg-primary h-4 rounded-full transition-all duration-300"
+                [style.width.%]="(completedChapters / totalChapters) * 100"
+              ></div>
+            </div>
+            <p class="text-sm text-white">
+              {{ completedChapters }} / {{ totalChapters }}
+            </p>
 
-  <!-- Chapter content -->
-  <article class="chapter-content prose bg-base-200 p-6 rounded-lg shadow">
-    <markdown [src]="getChapterLink(selectedChapterIndex)"></markdown>
-  </article>
+            <h3 class="text-lg font-semibold mt-4 mb-2 text-white">
+              Lore score:
+            </h3>
+            <p class="text-2xl font-bold text-primary">{{ loreScore }}%</p>
+          </div>
+        </div>
 
-  <!-- Navigation buttons -->
-  <div class="flex justify-between mt-6">
-    <button
-      class="btn"
-      [disabled]="selectedChapterIndex === 0"
-      (click)="navigateToPrevious()"
-    >
-      Previous
-    </button>
-    <button
-      class="btn"
-      [disabled]="selectedChapterIndex === chapters.length - 1"
-      (click)="navigateToNext()"
-    >
-      Next
-    </button>
+        <div class="card bg-base-200 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title text-white mb-4">Choose a Chapter:</h2>
+            <app-chapter-list
+              [chapters]="chaptersWithProgress"
+              [selectedIndex]="selectedChapterIndex"
+              (chapterSelected)="selectChapter($event)"
+            ></app-chapter-list>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="lg:col-span-2">
+        <div class="card bg-base-200 shadow-xl">
+          <div class="card-body prose max-w-none">
+            <markdown
+              [src]="getChapterLink(selectedChapterIndex)"
+              class="text-white"
+            ></markdown>
+
+            <div class="card-actions justify-between mt-6">
+              <button
+                class="btn btn-primary"
+                [disabled]="selectedChapterIndex === 0"
+                (click)="navigateToPrevious()"
+              >
+                Previous
+              </button>
+              <button
+                class="btn btn-success"
+                [disabled]="
+                  chaptersWithProgress[selectedChapterIndex].isCompleted
+                "
+                (click)="markChapterAsCompleted(selectedChapterIndex)"
+              >
+                Mark as Completed
+              </button>
+              <button
+                class="btn btn-primary"
+                [disabled]="selectedChapterIndex === chapters.length - 1"
+                (click)="navigateToNext()"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</main>
+</div>

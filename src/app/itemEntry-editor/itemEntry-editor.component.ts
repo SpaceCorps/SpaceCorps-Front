@@ -1,21 +1,8 @@
-import { Component } from '@angular/core';
-import { ApiService } from '../services/api.service';
+import { Component, inject, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons/faArrowsRotate';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { firstValueFrom } from 'rxjs';
-import {
-  Engine,
-  getFieldsForItemCategory,
-  LaserAmmo,
-  LaserAmp,
-  Laser,
-  SellableItems,
-  ShieldCell,
-  Shield,
-  Ship,
-  Thruster,
-} from '../models/player/Items';
+import { getFieldsForItemCategory, SellableItems } from '../models/player/Items';
 import {
   defaultEngines,
   defaultThrusters,
@@ -26,6 +13,7 @@ import {
   defaultShips,
   defaultLaserAmmos,
 } from '../models/dataEntries/itemEntryGenScripts';
+import { StateService } from '../services/state.service';
 
 @Component({
   selector: 'app-itemEntry-editor',
@@ -49,9 +37,17 @@ export class ItemEntryEditorComponent {
   protected items: SellableItems[] = [];
   protected newItem: SellableItems | null = null;
 
-  constructor(private apiService: ApiService) {}
+  stateService = inject(StateService);
 
-  ngOnInit() {}
+  constructor() {
+    // Set up effect to watch shop items changes
+    effect(() => {
+      const currentShopItems = this.stateService.currentShopItems();
+      if (currentShopItems && this.selectedCategory) {
+        this.items = currentShopItems[this.selectedCategory] || [];
+      }
+    });
+  }
 
   protected selectCategory(category: SellableItems['itemType']) {
     if (this.selectedCategory === category) {
@@ -59,31 +55,15 @@ export class ItemEntryEditorComponent {
     } else {
       this.selectedCategory = category;
       this.newItem = this.createNewItemForCategory(category);
-      this.fetchItems(category);
+      this.stateService.fetchShopItems(category);
     }
-  }
-
-  protected fetchItems(category: SellableItems['itemType']) {
-    this.apiService.getItemEntriesByCategory(category).subscribe({
-      next: (data) => {
-        this.items = data;
-      },
-      error: (err) => {
-        console.error('Error fetching items', err);
-      },
-    });
   }
 
   protected createNewItem() {
     if (this.newItem) {
       const oldCategory = this.newItem.itemType;
-      this.apiService.createNewItemEntry(this.newItem).subscribe({
-        next: () => {
-          this.fetchItems(oldCategory);
-        },
-        error: (err) => {
-          console.error('Error creating new item', err);
-        },
+      this.stateService.createNewItemEntry(this.newItem).then(() => {
+        this.stateService.fetchShopItems(oldCategory);
       });
       this.newItem = null;
     }
@@ -107,13 +87,8 @@ export class ItemEntryEditorComponent {
   protected deleteItem(item: SellableItems) {
     if (this.selectedCategory) {
       const oldCategory = this.selectedCategory;
-      this.apiService.deleteItemEntry(item).subscribe({
-        next: () => {
-          this.fetchItems(oldCategory);
-        },
-        error: (err) => {
-          console.error('Error deleting item', err);
-        },
+      this.stateService.deleteItemEntry(item).then(() => {
+        this.stateService.fetchShopItems(oldCategory);
       });
     }
   }
@@ -150,71 +125,76 @@ export class ItemEntryEditorComponent {
         console.error('No default items for category', selectedCategory);
     }
     setTimeout(() => {
-      this.fetchItems(selectedCategory);
+      if (this.selectedCategory) {
+        this.stateService.fetchShopItems(this.selectedCategory);
+      }
     }, 300);
   }
 
-  private generateDefaultEngineItems() {
-    defaultEngines.map(async (engine: Engine) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(engine));
-    });
+  private async generateDefaultEngineItems() {
+    for (const engine of defaultEngines) {
+      await this.stateService.createNewItemEntry(engine);
+    }
   }
 
-  private generateDefaultThrusterItems() {
-    defaultThrusters.map(async (thruster: Thruster) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(thruster));
-    });
+  private async generateDefaultThrusterItems() {
+    for (const thruster of defaultThrusters) {
+      await this.stateService.createNewItemEntry(thruster);
+    }
   }
 
-  private generateDefaultLaserItems() {
-    defaultLasers.map(async (laser: Laser) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(laser));
-    });
+  private async generateDefaultLaserItems() {
+    for (const laser of defaultLasers) {
+      await this.stateService.createNewItemEntry(laser);
+    }
   }
 
-  private generateDefaultLaserAmpItems() {
-    defaultLaserAmps.map(async (laserAmp: LaserAmp) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(laserAmp));
-    });
+  private async generateDefaultLaserAmpItems() {
+    for (const laserAmp of defaultLaserAmps) {
+      await this.stateService.createNewItemEntry(laserAmp);
+    }
   }
 
-  private generateDefaultShieldItems() {
-    defaultShields.map(async (shield: Shield) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(shield));
-    });
+  private async generateDefaultShieldItems() {
+    for (const shield of defaultShields) {
+      await this.stateService.createNewItemEntry(shield);
+    }
   }
 
-  private generateDefaultShieldCellItems() {
-    defaultShieldCells.map(async (shieldCell: ShieldCell) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(shieldCell));
-    });
+  private async generateDefaultShieldCellItems() {
+    for (const shieldCell of defaultShieldCells) {
+      await this.stateService.createNewItemEntry(shieldCell);
+    }
   }
 
-  private generateDefaultShipItems() {
-    defaultShips.map(async (ship: Ship) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(ship));
-    });
+  private async generateDefaultShipItems() {
+    for (const ship of defaultShips) {
+      await this.stateService.createNewItemEntry(ship);
+    }
   }
 
-  private generateDefaultLaserAmmoItems() {
-    defaultLaserAmmos.map(async (laserAmmo: LaserAmmo) => {
-      await firstValueFrom(this.apiService.createNewItemEntry(laserAmmo));
-    });
+  private async generateDefaultLaserAmmoItems() {
+    for (const laserAmmo of defaultLaserAmmos) {
+      await this.stateService.createNewItemEntry(laserAmmo);
+    }
   }
 
-  protected createAllDefaultItems() {
-    this.generateDefaultEngineItems();
-    this.generateDefaultThrusterItems();
-    this.generateDefaultLaserItems();
-    this.generateDefaultLaserAmpItems();
-    this.generateDefaultShieldItems();
-    this.generateDefaultShieldCellItems();
-    this.generateDefaultShipItems();
-    this.generateDefaultLaserAmmoItems();
+  protected async createAllDefaultItems() {
+    await Promise.all([
+      this.generateDefaultEngineItems(),
+      this.generateDefaultThrusterItems(),
+      this.generateDefaultLaserItems(),
+      this.generateDefaultLaserAmpItems(),
+      this.generateDefaultShieldItems(),
+      this.generateDefaultShieldCellItems(),
+      this.generateDefaultShipItems(),
+      this.generateDefaultLaserAmmoItems(),
+    ]);
 
     setTimeout(() => {
-      if (!this.selectedCategory) return;
-      this.fetchItems(this.selectedCategory!);
+      if (this.selectedCategory) {
+        this.stateService.fetchShopItems(this.selectedCategory);
+      }
     }, 300);
   }
 

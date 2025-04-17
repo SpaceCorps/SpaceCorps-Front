@@ -1,23 +1,93 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MarkdownComponent } from 'ngx-markdown';
 import { chapters } from './lore.chapters';
 import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { ChapterListComponent } from '../components/chapter-list/chapter-list.component';
+import { StateService } from '../services/state.service';
+import { AuthService } from '../services/auth.service';
+
+interface Chapter {
+  id: number;
+  title: string;
+  file: string;
+  isCompleted?: boolean;
+}
 
 @Component({
   selector: 'app-lore',
+  standalone: true,
+  imports: [CommonModule, MarkdownComponent, ChapterListComponent],
   templateUrl: './lore.component.html',
   styleUrls: ['./lore.component.scss'],
-  imports: [FormsModule, MarkdownComponent],
 })
 export class LoreComponent implements OnInit {
   selectedChapterIndex = 0;
-  chapters: { title: string; file: string }[] = [];
+  chapters: Chapter[] = [];
+  chaptersWithProgress: Chapter[] = [];
+  completedChapters = 0;
+  totalChapters = chapters.length;
+  loreScore = 0;
+
+  private stateService = inject(StateService);
+  private authService = inject(AuthService);
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.chapters = chapters;
+    this.chapters = chapters.map((chapter, index) => ({
+      ...chapter,
+      id: index + 1, // Assuming chapter IDs start from 1
+    }));
+
+    // Initialize chaptersWithProgress immediately with all chapters marked as not completed
+    this.chaptersWithProgress = this.chapters.map((chapter) => ({
+      ...chapter,
+      isCompleted: false,
+    }));
+
+    const playerData = this.authService.getPlayerData();
+    if (playerData?.userId) {
+      this.loadChapterProgress(playerData.userId);
+    }
+  }
+
+  private async loadChapterProgress(userId: string) {
+    const progress = await this.stateService.fetchChapterProgress(userId);
+    if (progress) {
+      this.chaptersWithProgress = this.chapters.map((chapter) => ({
+        ...chapter,
+        isCompleted: progress.completedChapterIds.includes(chapter.id),
+      }));
+      this.completedChapters = progress.completedChapterIds.length;
+      this.loreScore = Math.round(
+        (this.completedChapters / this.totalChapters) * 100
+      );
+    }
+  }
+
+  async markChapterAsCompleted(index: number) {
+    const playerData = this.authService.getPlayerData();
+    if (!playerData?.userId) {
+      console.error('No user ID found');
+      return;
+    }
+
+    const chapter = this.chapters[index];
+    if (!chapter || chapter.isCompleted) {
+      return;
+    }
+
+    const currentProgress = this.stateService.currentChapterProgress();
+    const completedChapterIds = currentProgress?.completedChapterIds || [];
+
+    if (!completedChapterIds.includes(chapter.id)) {
+      await this.stateService.updateChapterProgress({
+        userId: playerData.userId,
+        completedChapterIds: [...completedChapterIds, chapter.id],
+      });
+      await this.loadChapterProgress(playerData.userId);
+    }
   }
 
   selectChapter(index: number): void {
@@ -33,10 +103,12 @@ export class LoreComponent implements OnInit {
   navigateToNext(): void {
     if (this.selectedChapterIndex < this.chapters.length - 1) {
       this.selectedChapterIndex++;
+      // Automatically mark the previous chapter as completed when moving forward
+      this.markChapterAsCompleted(this.selectedChapterIndex - 1);
     }
   }
 
-  getChapterLink(arg0: number): string {
-    return `/chapters/${this.chapters[arg0].file}`;
+  getChapterLink(index: number): string {
+    return `/chapters/${this.chapters[index].file}`;
   }
 }

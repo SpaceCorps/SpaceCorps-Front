@@ -1,0 +1,62 @@
+<div class="dropdown dropdown-bottom w-full">
+  <div
+    tabindex="0"
+    role="button"
+    class="btn w-full justify-between bg-secondary/80 hover:bg-secondary border-none text-white"
+  >
+    {{ chapters[selectedIndex].title || 'Select Chapter' }}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  </div>
+  <div class="dropdown-content z-10 w-full">
+    <div
+      class="shadow-lg bg-secondary/90 rounded-box w-full mt-2"
+      style="max-height: 60vh"
+    >
+      <ul
+        tabindex="0"
+        class="menu-vertical menu-md p-2 w-full overflow-y-auto"
+        style="max-height: inherit"
+      >
+        @for (chapter of chapters; track $index) {
+          <li>
+            <button
+              (click)="selectChapter($index)"
+              class="flex items-center justify-between text-white hover:bg-secondary w-full text-left whitespace-normal break-words"
+              [class.active]="$index === selectedIndex"
+            >
+              <span class="pr-2">{{ chapter.title }}</span>
+              @if (chapter.isCompleted) {
+                <svg
+                  class="flex-shrink-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>
