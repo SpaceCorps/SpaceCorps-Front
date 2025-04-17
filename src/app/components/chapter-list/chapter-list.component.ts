@@ -12,7 +12,7 @@ interface Chapter {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './chapter-list.component.html',
-  styleUrl: './chapter-list.component.scss',
+  styleUrls: ['./chapter-list.component.scss'],
 })
 export class ChapterListComponent {
   @Input() chapters: Chapter[] = [];
