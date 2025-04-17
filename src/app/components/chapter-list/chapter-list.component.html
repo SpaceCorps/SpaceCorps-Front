@@ -2,7 +2,7 @@
   <div
     tabindex="0"
     role="button"
-    class="btn w-full justify-between bg-orange-900/80 hover:bg-orange-800 border-none text-white"
+    class="btn w-full justify-between bg-secondary/80 hover:bg-secondary border-none text-white"
   >
     {{ chapters[selectedIndex].title || 'Select Chapter' }}
     <svg
@@ -21,7 +21,7 @@
   </div>
   <div class="dropdown-content z-10 w-full">
     <div
-      class="shadow-lg bg-orange-900/90 rounded-box w-full mt-2"
+      class="shadow-lg bg-secondary/90 rounded-box w-full mt-2"
       style="max-height: 60vh"
     >
       <ul
@@ -33,7 +33,7 @@
           <li>
             <button
               (click)="selectChapter($index)"
-              class="flex items-center justify-between text-white hover:bg-orange-800 w-full text-left whitespace-normal break-words"
+              class="flex items-center justify-between text-white hover:bg-secondary w-full text-left whitespace-normal break-words"
               [class.active]="$index === selectedIndex"
             >
               <span class="pr-2">{{ chapter.title }}</span>

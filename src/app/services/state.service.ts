@@ -56,7 +56,7 @@ export class StateService {
   // GitHub methods
   async fetchGithubCommits() {
     try {
-      const commits = await this.apiService.getGithubCommits().toPromise();
+      const commits = await firstValueFrom(this.apiService.getGithubCommits());
       if (commits) {
         this.githubCommits.set(commits);
       }
@@ -70,7 +70,7 @@ export class StateService {
   // Server methods
   async fetchServerInfo() {
     try {
-      const info = await this.apiService.getBackendVersion().toPromise();
+      const info = await firstValueFrom(this.apiService.getBackendVersion());
       if (info) {
         this.serverInfo.set(info);
       }
@@ -83,9 +83,9 @@ export class StateService {
 
   // Player methods
   async fetchPlayerInfo(username: string) {
-    const player = await this.apiService
-      .getPlayerInfo({ username })
-      .toPromise();
+    const player = await firstValueFrom(
+      this.apiService.getPlayerInfo({ username })
+    );
     if (player) {
       this.playerData.set(player);
     }
@@ -93,23 +93,40 @@ export class StateService {
   }
 
   async fetchPlayerInventory(username: string) {
-    const inventory = await this.apiService
-      .getUserInventory(username)
-      .toPromise();
+    const inventory = await firstValueFrom(
+      this.apiService.getUserInventory(username)
+    );
     if (inventory) {
       this.playerInventory.set(inventory);
     }
     return inventory;
   }
 
+  // Chapter progress methods
   async fetchChapterProgress(userId: string) {
-    const progress = await this.apiService
-      .getChapterProgress(userId)
-      .toPromise();
-    if (progress) {
-      this.chapterProgress.set(progress);
+    try {
+      const progress = await firstValueFrom(
+        this.apiService.getChapterProgress(userId)
+      );
+      if (progress) {
+        this.chapterProgress.set(progress);
+      }
+      return progress;
+    } catch (error) {
+      console.error('Error fetching chapter progress:', error);
+      return null;
     }
-    return progress;
+  }
+
+  async updateChapterProgress(request: ChapterProgressDto) {
+    try {
+      await firstValueFrom(this.apiService.updateChapterProgress(request));
+      await this.fetchChapterProgress(request.userId);
+      return true;
+    } catch (error) {
+      console.error('Error updating chapter progress:', error);
+      return false;
+    }
   }
 
   // Shop methods
@@ -299,10 +316,6 @@ export class StateService {
 
   updateInventory(inventory: Inventory) {
     this.playerInventory.set(inventory);
-  }
-
-  updateChapterProgress(progress: ChapterProgressDto) {
-    this.chapterProgress.set(progress);
   }
 
   // Clear state methods

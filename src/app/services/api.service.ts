@@ -36,16 +36,23 @@ export class ApiService {
   private url = isDevMode()
     ? 'http://localhost:5274/api'
     : 'http://179.61.190.125:5274/api';
-  private githubApiUrl = 'https://api.github.com/repos/rorychatt/SpaceCorps-Front/commits?per_page=1000';
+  private githubApiUrl =
+    'https://api.github.com/repos/rorychatt/SpaceCorps-Front/commits?per_page=1000';
 
   constructor(private http: HttpClient) {}
 
   createNewUser(request: UserCredentialsCreateRequest) {
-    return this.http.post<PlayerData>(`${this.url}/UserCredentials/Create`, request);
+    return this.http.post<PlayerData>(
+      `${this.url}/UserCredentials/Create`,
+      request
+    );
   }
 
   logIn(request: UserCredentialsLoginRequest) {
-    return this.http.post<PlayerData>(`${this.url}/UserCredentials/Verify`, request);
+    return this.http.post<PlayerData>(
+      `${this.url}/UserCredentials/Verify`,
+      request
+    );
   }
 
   getPlayerInfo(request: GetPlayerInfoRequest) {
@@ -112,7 +119,9 @@ export class ApiService {
   }
 
   getItemEntriesByCategory(category: SellableItems['itemType']) {
-    return this.http.get<SellableItems[]>(`${this.url}/ItemEntries/${category}s`);
+    return this.http.get<SellableItems[]>(
+      `${this.url}/ItemEntries/${category}s`
+    );
   }
 
   createNewItemEntry<T extends SellableItems>(newItem: T) {
@@ -262,15 +271,13 @@ export class ApiService {
   }
 
   getChapterProgress(userId: string) {
-    return this.http.get<ChapterProgressDto>(`${this.url}/Lore/Progress/${userId}`);
+    return this.http.get<ChapterProgressDto>(
+      `${this.url}/Lore/Progress/${userId}`
+    );
   }
 
-  updateChapterProgress(userId: string, completedChapterIds: number[]) {
-    const request: ChapterProgressDto = {
-      userId,
-      completedChapterIds
-    };
-    return this.http.post<ChapterProgressDto>(`${this.url}/Lore/Progress`, request);
+  updateChapterProgress(request: ChapterProgressDto) {
+    return this.http.post<void>(`${this.url}/Lore/Progress`, request);
   }
 
   getGithubCommits() {
