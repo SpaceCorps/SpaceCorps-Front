@@ -54,21 +54,7 @@
         />
       </div>
 
-      <div class="form-control md:col-span-2">
-        <label class="label" for="logo">
-          <span class="label-text">Logo URL</span>
-        </label>
-        <input
-          type="url"
-          id="logo"
-          [(ngModel)]="request.logo"
-          name="logo"
-          required
-          class="input input-bordered"
-          placeholder="https://example.com/logo.png"
-        />
-      </div>
-
+      <!-- Company Info -->
       <div class="form-control md:col-span-2">
         <label class="label" for="companyInfo">
           <span class="label-text">Company Info</span>
@@ -77,7 +63,7 @@
           id="companyInfo"
           [(ngModel)]="request.companyInfo"
           name="companyInfo"
-          class="textarea textarea-bordered h-24"
+          class="textarea textarea-bordered"
           placeholder="Enter company information"
         ></textarea>
       </div>

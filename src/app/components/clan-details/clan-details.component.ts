@@ -13,7 +13,6 @@ import { ClanData } from '../../models/clan/ClanData';
         
         <!-- Clan Header -->
         <div class="flex items-center gap-4 mb-4">
-          <img [src]="clan.logo" [alt]="clan.name + ' Logo'" class="w-16 h-16 rounded-full">
           <div>
             <div class="flex items-center gap-2">
               <h3 class="text-xl font-bold">{{ clan.name }}</h3>

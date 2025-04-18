@@ -4,7 +4,6 @@ export interface CreateClanRequest {
   name: string;
   tag: string;
   slogan: string;
-  logo: string;
   companyInfo: string;
   isRecruiting: boolean;
   minimumLevel: number;
@@ -16,7 +15,6 @@ export interface UpdateClanRequest {
   name?: string;
   tag?: string;
   slogan?: string;
-  logo?: string;
   companyInfo?: string;
   isRecruiting?: boolean;
   minimumLevel?: number;

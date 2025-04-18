@@ -3,7 +3,6 @@ export interface ClanData {
   name: string;
   tag: string;
   slogan: string;
-  logo: string;
   companyInfo: string;
   leader: string;
   officers: string[];

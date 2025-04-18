@@ -19,7 +19,6 @@ export class CreateClanComponent {
     name: '',
     tag: '',
     slogan: '',
-    logo: '',
     companyInfo: '',
     isRecruiting: true,
     minimumLevel: 0,
