@@ -40,6 +40,15 @@ export class PlayerInfoGeneralInfoComponent implements OnInit {
 
   constructor() {
     effect(() => {
+      const currentPlayer = this.stateService.currentPlayer();
+      console.log('Current player data:', currentPlayer);
+      if (currentPlayer) {
+        this.templateValues.username = currentPlayer.username;
+        this.templateValues.hoursPlayed = currentPlayer.totalPlayTime;
+        this.templateValues.dateOfReg = currentPlayer.dateOfRegistration;
+        this.templateValues.credits = currentPlayer.credits;
+        this.templateValues.thulium = currentPlayer.thulium;
+      }
       this.clanInfo = this.stateService.clanData();
     });
   }
@@ -65,4 +74,24 @@ export class PlayerInfoGeneralInfoComponent implements OnInit {
 
     this.stateService.fetchClanData();
   }
+    const authPlayerData = this.authService.getPlayerData();
+    if (!authPlayerData) {
+      console.error('Error: Missing PlayerData');
+      return;
+    }
+    const username = authPlayerData.username;
+
+    // Initial fetch of player data
+    this.stateService.fetchPlayerInfo(username).catch(error => {
+      console.error('Error fetching player info:', error);
+    });
+  }
+
+  templateValues = {
+    username: 'undefined',
+    dateOfReg: 'undefined',
+    hoursPlayed: 9999,
+    credits: 0,
+    thulium: 0
+  };
 }

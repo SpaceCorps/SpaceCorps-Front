@@ -333,8 +333,8 @@ export class StateService {
   }
 
   // Update methods
-  updatePlayerData(data: PlayerData) {
-    this.playerData.set(data);
+  updatePlayerData(playerData: PlayerData) {
+    this.playerData.set(playerData);
   }
 
   updateInventory(inventory: Inventory) {

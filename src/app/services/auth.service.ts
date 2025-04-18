@@ -5,7 +5,7 @@ import { UserCredentialsCreateRequest } from '../models/auth/UserCredentialsCrea
 import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLoginRequest';
 import { SessionService } from './session.service';
 import { PlayerData } from '../models/player/PlayerData';
-import { AuthState } from '../models/auth/AuthState';
+import { StateService } from './state.service';
 
 @Injectable({
   providedIn: 'root',
@@ -106,6 +106,7 @@ export class AuthService {
       roles: [],
     });
     this.currentState.set(this._authState.value);
+    this.stateService.clearPlayerState();
   }
 
   public register(userCredentialsCreateRequest: UserCredentialsCreateRequest): Observable<PlayerData> {
@@ -129,13 +130,30 @@ export class AuthService {
     );
   }
 
-  public fetchUserAfterSuccessfulLogin(playerData: PlayerData): void {
-    this.updateAuthState({
-      isAuthenticated: true,
-      sessionId: playerData.id,
-      username: playerData.username,
-      userId: playerData.userId,
-      roles: ['player'],
+  fetchUserAfterSuccessfulLogin(request: PlayerData) {
+    console.log('Fetching user after successful login:', request);
+    const getPlayerInfoRequest: GetPlayerInfoRequest = {
+      username: request.username,
+    };
+    this.apiService.getPlayerInfo(getPlayerInfoRequest).subscribe({
+      next: (response) => {
+        console.log('Player info fetched:', response);
+        this.patchState({
+          isLoggedIn: true,
+          username: response.username,
+        });
+        // Update state service with player data
+        this.stateService.updatePlayerData(response);
+        console.log('Updated auth state:', this.state());
+      },
+      error: (err) => {
+        console.error('Error fetching player info:', err);
+        throw err;
+      },
     });
+  }
+
+  getPlayerData() {
+    return this.stateService.currentPlayer();
   }
 }
