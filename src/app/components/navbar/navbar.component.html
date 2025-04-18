@@ -2,12 +2,12 @@
   <nav class="flex justify-between gap-4 container mx-auto max-sm:gap-2">
     <a class="text-center self-center" routerLink="/">SpaceCorps 2025</a>
 
-    @if ((authState$ | async)?.isLoggedIn) {
+    @if ((authState$ | async)?.isAuthenticated) {
       <app-main-menu></app-main-menu>
     }
 
     <ul class="flex gap-2 items-center">
-      @if ((authState$ | async)?.isLoggedIn) {
+      @if ((authState$ | async)?.isAuthenticated) {
         <a class="btn bg-base-200" routerLink="/" (click)="logOut()">
           Log Out
         </a>

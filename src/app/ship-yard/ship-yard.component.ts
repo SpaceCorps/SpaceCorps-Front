@@ -37,9 +37,13 @@ export class ShipYardComponent implements OnInit {
     effect(() => {
       const playerData = this.stateService.currentPlayer();
       if (playerData) {
-        this.playerBalance.credits = playerData.credits;
-        this.playerBalance.thulium = playerData.thulium;
+        this.playerBalance.credits = playerData.credits ?? 0;
+        this.playerBalance.thulium = playerData.thulium ?? 0;
         this.username = playerData.username;
+      } else {
+        this.playerBalance.credits = 0;
+        this.playerBalance.thulium = 0;
+        this.username = null;
       }
     });
 
@@ -52,11 +56,9 @@ export class ShipYardComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    const playerData = this.stateService.currentPlayer();
-    if (playerData) {
-      this.username = playerData.username;
-    }
+  async ngOnInit() {
+    // Always fetch player data when the page opens
+    await this.stateService.fetchPlayerInfo();
   }
 
   selectCategory(category: SellableItems['itemType']) {
@@ -70,14 +72,37 @@ export class ShipYardComponent implements OnInit {
       return;
     }
 
+    // Get current player data to check balance
+    const playerData = this.stateService.currentPlayer();
+    if (!playerData) {
+      alert('Player data not loaded');
+      return;
+    }
+
+    // Check if player has enough currency
+    if (item.priceCredits > playerData.credits || item.priceThulium > playerData.thulium) {
+      alert('Insufficient balance');
+      return;
+    }
+
     try {
-      await this.stateService.buyItem({
+      const success = await this.stateService.buyItem({
         username: this.username,
         itemId: Number(item.id),
         itemType: item.itemType,
       });
+
+      if (success) {
+        // Refresh the shop items for the current category to reflect any changes
+        if (this.selectedCategory) {
+          await this.stateService.fetchShopItems(this.selectedCategory);
+        }
+      } else {
+        alert('Failed to buy item. Please check your balance and try again.');
+      }
     } catch (error) {
       console.error('Error buying item', error);
+      alert('An error occurred while trying to buy the item.');
     }
   }
 

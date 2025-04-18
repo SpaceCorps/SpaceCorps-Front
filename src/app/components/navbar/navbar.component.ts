@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 import { AsyncPipe, CommonModule } from '@angular/common'; // Import CommonModule here
 import { MainMenuComponent } from '../main-menu/main-menu.component';
 import { GithubTimelineComponent } from '../github-timeline/github-timeline.component';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-navbar',
@@ -32,6 +33,8 @@ export class NavbarComponent {
 
   @ViewChild('patchInfoContainer', { static: false })
   patchInfoContainer!: ElementRef;
+
+  protected readonly faUsers = faUsers;
 
   logOut() {
     this.authService.logOut();

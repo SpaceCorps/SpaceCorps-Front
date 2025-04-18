@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { LoginAsAdminBtnComponent } from '../components/login-as-admin-btn/login-as-admin-btn.component';
 import { ErrorModalComponent } from '../components/error-modal/error-modal.component';
 import { AsyncPipe } from '@angular/common';
+import { StateService } from '../services/state.service';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +25,7 @@ import { AsyncPipe } from '@angular/common';
 })
 export class LoginComponent {
   authService = inject(AuthService);
+  stateService = inject(StateService);
   isLoginView = true;
   error: HttpErrorResponse | null = null;
   isLoading = false;
@@ -61,7 +63,7 @@ export class LoginComponent {
         this.isLoading = false;
         this.clearLoginError();
         try {
-          this.authService.fetchUserAfterSuccessfulLogin(response);
+          this.stateService.updatePlayerData(response);
           void this.router.navigate(['lobby']);
         } catch (err) {
           this.error = err as HttpErrorResponse;

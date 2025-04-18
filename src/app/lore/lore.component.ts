@@ -46,10 +46,11 @@ export class LoreComponent implements OnInit {
       isCompleted: false,
     }));
 
-    const playerData = this.authService.getPlayerData();
-    if (playerData?.userId) {
-      this.loadChapterProgress(playerData.userId);
-    }
+    this.authService.authState$.subscribe(state => {
+      if (state.userId) {
+        this.loadChapterProgress(state.userId);
+      }
+    });
   }
 
   private async loadChapterProgress(userId: string) {
@@ -67,27 +68,27 @@ export class LoreComponent implements OnInit {
   }
 
   async markChapterAsCompleted(index: number) {
-    const playerData = this.authService.getPlayerData();
-    if (!playerData?.userId) {
-      console.error('No user ID found');
-      return;
-    }
+    this.authService.authState$.subscribe(state => {
+      if (!state.userId) {
+        console.error('No user ID found');
+        return;
+      }
 
-    const chapter = this.chapters[index];
-    if (!chapter || chapter.isCompleted) {
-      return;
-    }
+      const chapter = this.chapters[index];
+      if (!chapter || chapter.isCompleted) {
+        return;
+      }
 
-    const currentProgress = this.stateService.currentChapterProgress();
-    const completedChapterIds = currentProgress?.completedChapterIds || [];
+      const currentProgress = this.stateService.currentChapterProgress();
+      const completedChapterIds = currentProgress?.completedChapterIds || [];
 
-    if (!completedChapterIds.includes(chapter.id)) {
-      await this.stateService.updateChapterProgress({
-        userId: playerData.userId,
-        completedChapterIds: [...completedChapterIds, chapter.id],
-      });
-      await this.loadChapterProgress(playerData.userId);
-    }
+      if (!completedChapterIds.includes(chapter.id)) {
+        this.stateService.updateChapterProgress({
+          userId: state.userId!,
+          completedChapterIds: [...completedChapterIds, chapter.id],
+        }).then(() => this.loadChapterProgress(state.userId!));
+      }
+    });
   }
 
   selectChapter(index: number): void {

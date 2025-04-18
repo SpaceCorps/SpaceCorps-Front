@@ -18,4 +18,6 @@ export type PlayerData = {
   completedQuests: number;
   completedGates: number;
   title: string;
+  isOnline: boolean;
+  isInvisible: boolean;
 };

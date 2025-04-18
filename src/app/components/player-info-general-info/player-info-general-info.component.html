@@ -1,36 +1,77 @@
-<div class="card card-side bg-base-100/50 shadow-xl max-w-120 flex flex-col">
+<div class="card bg-base-200 shadow-xl">
   <div class="card-body">
-    <div class="flex flex-row">
-      <div
-        class="justify-center"
-        [ngClass]="{
-          online: (authService.authState$ | async)?.isLoggedIn,
-        }"
-      >
-        <img
-          class="avatar rounded-full"
-          src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-          alt="Player Profile Picture"
-        />
+    <!-- Player Status -->
+    <div class="flex items-center gap-2 mb-4">
+      <div class="flex items-center gap-1">
+        <fa-icon 
+          [icon]="faCircle" 
+          [class.text-success]="isOnline && !isInvisible"
+          [class.text-error]="!isOnline"
+          [class.text-warning]="isInvisible"
+          class="text-sm">
+        </fa-icon>
+        <h2 class="card-title text-2xl">{{ username }}</h2>
       </div>
-      <div class="px-4">
-        <p>
-          <strong>{{ templateValues.username }}</strong>
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque
-          maiores molestiae nam nulla rerum sint sit tenetur vero voluptate.
-          Dolor?
-        </p>
+      <div class="text-sm opacity-50" *ngIf="isInvisible">
+        other players can't see that you're online
       </div>
     </div>
-    <br />
-    <p><strong>First login:</strong> {{ templateValues.dateOfReg }}</p>
-    <p><strong>Hours:</strong> {{ templateValues.hoursPlayed }}</p>
-    <p><strong>Credits:</strong> {{ templateValues.credits }}</p>
-    <p><strong>Thulium:</strong> {{ templateValues.thulium }}</p>
-    <p class="self-center"><strong>Quest progress</strong></p>
-    <progress class="progress w-56" value="35" max="100"></progress>
+
+    <!-- Quest Progress -->
+    <div class="w-full bg-base-300 rounded-full h-2 mb-4">
+      <div class="bg-primary h-2 rounded-full" [style.width]="questProgress"></div>
+    </div>
+
+    <!-- Login Info -->
+    <div class="flex flex-col gap-2 mb-4">
+      <div class="flex items-center gap-2">
+        <fa-icon [icon]="faClock" class="text-sm"></fa-icon>
+        <span>First login: {{ firstLogin }}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <fa-icon [icon]="faClock" class="text-sm"></fa-icon>
+        <span>Total hours: {{ totalHours }}</span>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="stat">
+        <div class="stat-title">Experience</div>
+        <div class="stat-value">{{ experience }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Honor</div>
+        <div class="stat-value">{{ honor }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Ships Destroyed</div>
+        <div class="stat-value">{{ shipsDestroyed }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Aliens Destroyed</div>
+        <div class="stat-value">{{ aliensDestroyed }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Ranking Points</div>
+        <div class="stat-value">{{ rankingPoints }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Completed Quests</div>
+        <div class="stat-value">{{ completedQuests }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-title">Completed Gates</div>
+        <div class="stat-value">{{ completedGates }}</div>
+      </div>
+    </div>
+
+    @if (!clanInfo) {
+      <div class="mt-4">
+        <a routerLink="/clans" class="btn btn-primary">
+          Join a Clan
+        </a>
+      </div>
+    }
   </div>
-  <app-player-info-statistics></app-player-info-statistics>
 </div>

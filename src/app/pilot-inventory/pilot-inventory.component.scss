@@ -1,16 +1,20 @@
 .grid {
-  @apply grid grid-cols-4;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
 }
 
 .draggable:hover {
-  @apply cursor-grab;
+  cursor: grab;
 }
 
 .draggable:active {
-  @apply cursor-grabbing;
+  cursor: grabbing;
 }
 
 .empty-slot {
-  @apply border border-dashed flex items-center justify-center;
+  border: 1px dashed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

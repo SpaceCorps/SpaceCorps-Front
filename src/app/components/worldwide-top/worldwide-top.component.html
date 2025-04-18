@@ -1,0 +1,55 @@
+<div class="card bg-base-200 shadow-xl">
+  <div class="card-body">
+    <h2 class="card-title mb-4">Worldwide Top</h2>
+
+    <!-- Column Headers -->
+    <div class="grid grid-cols-6 gap-2 mb-4 text-sm font-semibold opacity-70">
+      <div class="col-span-2">Player</div>
+      <div class="text-center">EXP</div>
+      <div class="text-center">RP</div>
+      <div class="text-center">ALD</div>
+      <div class="text-center">SLD</div>
+    </div>
+
+    <!-- Player List -->
+    <div class="space-y-2">
+      <div *ngFor="let player of topPlayers" class="grid grid-cols-6 gap-2 items-center p-2 hover:bg-base-300 rounded-lg">
+        <!-- Player Info -->
+        <div class="col-span-2 flex items-center gap-2">
+          <div class="w-8 text-center opacity-70">{{ player.rank }}</div>
+          <div class="avatar" *ngIf="player.avatar">
+            <div class="w-8 h-8 rounded-full">
+              <img [src]="player.avatar" [alt]="player.username">
+            </div>
+          </div>
+          <div>{{ player.username }}</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="text-center">{{ player.exp }}</div>
+        <div class="text-center">{{ player.rp }}</div>
+        <div class="text-center">{{ player.ald }}</div>
+        <div class="text-center">{{ player.sld }}</div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center gap-4 mt-4">
+      <button 
+        class="btn btn-sm" 
+        [disabled]="currentPage === 1"
+        (click)="previousPage()"
+      >
+        &lt;
+      </button>
+      <span>{{ currentPage }}/{{ totalPages }}</span>
+      <button 
+        class="btn btn-sm" 
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()"
+      >
+        &gt;
+      </button>
+    </div>
+  </div>
+</div> 

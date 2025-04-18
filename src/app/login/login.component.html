@@ -1,7 +1,7 @@
 @if (error) {
   <app-error-modal [error]="error"></app-error-modal>
 }
-@if (!(authState$ | async)!.isLoggedIn) {
+@if (!(authState$ | async)!.isAuthenticated) {
   <main class="flex items-center justify-center">
     <section class="card bg-base-300/75 w-96 shadow-xl">
       <article class="card-body flex flex-col items-center">
