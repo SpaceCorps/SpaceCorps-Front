@@ -1,5 +1,7 @@
 @use 'tailwindcss';
 
+@import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap');
+
 @plugin "daisyui" {
   themes:
     dark, light, black, dracula, night, sunset, business, abyss, winter, acid;
@@ -38,4 +40,9 @@
   --border: 1px;
   --depth: 1;
   --noise: 0;
+}
+
+// Set Zen Dots as the default font family
+* {
+  font-family: 'Zen Dots', sans-serif;
 }
