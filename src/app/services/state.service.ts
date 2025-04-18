@@ -74,7 +74,7 @@ export class StateService {
   public clanInvitations = this._clanInvitations.asReadonly();
   public searchedClans = this._searchedClans.asReadonly();
 
-  constructor(private apiService: ApiService, private authService: AuthService) {}
+  constructor(private apiService: ApiService, public authService: AuthService) {}
 
   // GitHub methods
   async fetchGithubCommits() {
@@ -105,9 +105,15 @@ export class StateService {
   }
 
   // Player methods
-  async fetchPlayerInfo(username: string) {
+  async fetchPlayerInfo(username?: string) {
+    const targetUsername = username || this.authService.getUsername();
+    if (!targetUsername) {
+      console.error('No username available to fetch player info');
+      return null;
+    }
+
     const player = await firstValueFrom(
-      this.apiService.getPlayerInfo({ username })
+      this.apiService.getPlayerInfo({ username: targetUsername })
     );
     if (player) {
       this.playerData.set(player);
@@ -169,7 +175,7 @@ export class StateService {
   async buyItem(request: BuyItemRequest) {
     try {
       await firstValueFrom(this.apiService.buyItem(request));
-      await this.fetchPlayerInfo(request.username);
+      await this.fetchPlayerInfo();
       return true;
     } catch (error) {
       console.error('Error buying item:', error);

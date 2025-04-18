@@ -54,8 +54,9 @@ export class ShipYardComponent implements OnInit {
 
   ngOnInit() {
     const playerData = this.stateService.currentPlayer();
-    if (playerData) {
-      this.username = playerData.username;
+    if (!playerData) {
+      // If no player data in state, fetch it
+      void this.stateService.fetchPlayerInfo();
     }
   }
 
@@ -71,13 +72,23 @@ export class ShipYardComponent implements OnInit {
     }
 
     try {
-      await this.stateService.buyItem({
+      const success = await this.stateService.buyItem({
         username: this.username,
         itemId: Number(item.id),
         itemType: item.itemType,
       });
+
+      if (success) {
+        // Refresh the shop items for the current category to reflect any changes
+        if (this.selectedCategory) {
+          await this.stateService.fetchShopItems(this.selectedCategory);
+        }
+      } else {
+        alert('Failed to buy item. Please check your balance and try again.');
+      }
     } catch (error) {
       console.error('Error buying item', error);
+      alert('An error occurred while trying to buy the item.');
     }
   }
 

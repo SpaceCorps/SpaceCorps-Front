@@ -37,61 +37,33 @@ export class PlayerInfoGeneralInfoComponent implements OnInit {
   completedGates: number = 0;
   questProgress: string = '0/0';
   protected clanInfo: ClanData | null = null;
+  credits: number = 0;
+  thulium: number = 0;
 
   constructor() {
     effect(() => {
       const currentPlayer = this.stateService.currentPlayer();
-      console.log('Current player data:', currentPlayer);
       if (currentPlayer) {
-        this.templateValues.username = currentPlayer.username;
-        this.templateValues.hoursPlayed = currentPlayer.totalPlayTime;
-        this.templateValues.dateOfReg = currentPlayer.dateOfRegistration;
-        this.templateValues.credits = currentPlayer.credits;
-        this.templateValues.thulium = currentPlayer.thulium;
+        this.username = currentPlayer.username;
+        this.isOnline = currentPlayer.isOnline;
+        this.isInvisible = currentPlayer.isInvisible;
+        this.firstLogin = new Date(currentPlayer.dateOfRegistration).toLocaleDateString();
+        this.totalHours = Math.floor(currentPlayer.totalPlayTime / 60).toString();
+        this.experience = currentPlayer.experience;
+        this.honor = currentPlayer.honor;
+        this.shipsDestroyed = currentPlayer.shipsDestroyed;
+        this.aliensDestroyed = currentPlayer.aliensDestroyed;
+        this.rankingPoints = currentPlayer.rankingPoints;
+        this.completedQuests = currentPlayer.completedQuests;
+        this.completedGates = currentPlayer.completedGates;
+        this.credits = currentPlayer.credits;
+        this.thulium = currentPlayer.thulium;
       }
       this.clanInfo = this.stateService.clanData();
     });
   }
 
   ngOnInit() {
-    const playerData = this.stateService.currentPlayer();
-    if (playerData) {
-      this.username = playerData.username;
-      this.isOnline = playerData.isOnline;
-      this.isInvisible = playerData.isInvisible;
-      this.firstLogin = new Date(playerData.dateOfRegistration).toLocaleDateString();
-      this.totalHours = Math.floor(playerData.totalPlayTime / 60).toString();
-      this.experience = playerData.experience;
-      this.honor = playerData.honor;
-      this.shipsDestroyed = playerData.shipsDestroyed;
-      this.aliensDestroyed = playerData.aliensDestroyed;
-      this.rankingPoints = playerData.rankingPoints;
-      this.completedQuests = playerData.completedQuests;
-      this.completedGates = playerData.completedGates;
-      // TODO: Implement quest progress calculation
-      this.questProgress = '17/42';
-    }
-
     this.stateService.fetchClanData();
   }
-    const authPlayerData = this.authService.getPlayerData();
-    if (!authPlayerData) {
-      console.error('Error: Missing PlayerData');
-      return;
-    }
-    const username = authPlayerData.username;
-
-    // Initial fetch of player data
-    this.stateService.fetchPlayerInfo(username).catch(error => {
-      console.error('Error fetching player info:', error);
-    });
-  }
-
-  templateValues = {
-    username: 'undefined',
-    dateOfReg: 'undefined',
-    hoursPlayed: 9999,
-    credits: 0,
-    thulium: 0
-  };
 }
