@@ -47,15 +47,13 @@ export class PilotInventoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    const playerData = this.authService.getPlayerData();
-    if (!playerData)
-      return console.error(
-        'No player data found thus cannot get username and load inventory'
-      );
-    this.username = playerData?.username;
-    
-    // Initial fetch of inventory
-    this.stateService.fetchPlayerInventory(playerData.username);
+    this.authService.authState$.subscribe(state => {
+      if (!state.username) {
+        return console.error('No username found thus cannot load inventory');
+      }
+      this.username = state.username;
+      this.stateService.fetchPlayerInventory(state.username);
+    });
   }
 
   handleItemSelection($event: SellableItems) {

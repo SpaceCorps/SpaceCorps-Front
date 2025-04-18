@@ -85,4 +85,9 @@ export const routes: Routes = [
       return module.LoreComponent;
     },
   },
+  {
+    path: 'clans',
+    loadComponent: () => import('./clans/clans.component').then(m => m.ClansComponent),
+    title: 'Clans'
+  },
 ];

@@ -1,0 +1,136 @@
+<div class="card bg-base-200">
+  <div class="card-body">
+    <h2 class="card-title">Create New Clan</h2>
+    
+    <form (ngSubmit)="createClan()" #clanForm="ngForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Basic Info -->
+      <div class="form-control">
+        <label class="label" for="name">
+          <span class="label-text">Clan Name</span>
+        </label>
+        <input
+          type="text"
+          id="name"
+          [(ngModel)]="request.name"
+          name="name"
+          required
+          minlength="3"
+          maxlength="32"
+          class="input input-bordered"
+          placeholder="Enter clan name"
+        />
+      </div>
+
+      <div class="form-control">
+        <label class="label" for="tag">
+          <span class="label-text">Clan Tag</span>
+        </label>
+        <input
+          type="text"
+          id="tag"
+          [(ngModel)]="request.tag"
+          name="tag"
+          required
+          minlength="2"
+          maxlength="5"
+          class="input input-bordered"
+          placeholder="[TAG]"
+        />
+      </div>
+
+      <div class="form-control md:col-span-2">
+        <label class="label" for="slogan">
+          <span class="label-text">Slogan</span>
+        </label>
+        <input
+          type="text"
+          id="slogan"
+          [(ngModel)]="request.slogan"
+          name="slogan"
+          required
+          maxlength="128"
+          class="input input-bordered"
+          placeholder="Enter clan slogan"
+        />
+      </div>
+
+      <div class="form-control md:col-span-2">
+        <label class="label" for="logo">
+          <span class="label-text">Logo URL</span>
+        </label>
+        <input
+          type="url"
+          id="logo"
+          [(ngModel)]="request.logo"
+          name="logo"
+          required
+          class="input input-bordered"
+          placeholder="https://example.com/logo.png"
+        />
+      </div>
+
+      <div class="form-control md:col-span-2">
+        <label class="label" for="companyInfo">
+          <span class="label-text">Company Info</span>
+        </label>
+        <textarea
+          id="companyInfo"
+          [(ngModel)]="request.companyInfo"
+          name="companyInfo"
+          class="textarea textarea-bordered h-24"
+          placeholder="Enter company information"
+        ></textarea>
+      </div>
+
+      <!-- Recruitment Settings -->
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <span class="label-text">Open for Recruitment</span>
+          <input
+            type="checkbox"
+            [(ngModel)]="request.isRecruiting"
+            name="isRecruiting"
+            class="checkbox"
+          />
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label" for="minimumLevel">
+          <span class="label-text">Minimum Level</span>
+        </label>
+        <input
+          type="number"
+          id="minimumLevel"
+          [(ngModel)]="request.minimumLevel"
+          name="minimumLevel"
+          required
+          min="0"
+          class="input input-bordered"
+        />
+      </div>
+
+      <div class="form-control">
+        <label class="label" for="minimumRankingPoints">
+          <span class="label-text">Minimum Ranking Points</span>
+        </label>
+        <input
+          type="number"
+          id="minimumRankingPoints"
+          [(ngModel)]="request.minimumRankingPoints"
+          name="minimumRankingPoints"
+          required
+          min="0"
+          class="input input-bordered"
+        />
+      </div>
+
+      <!-- Submit Button -->
+      <div class="md:col-span-2 flex justify-end mt-4">
+        <button type="submit" class="btn btn-primary" [disabled]="!clanForm.form.valid">
+          Create Clan
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

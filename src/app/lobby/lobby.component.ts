@@ -14,13 +14,13 @@ export class LobbyComponent {
   constructor(private router: Router) {}
 
   openGame(): void {
-    const playerData = this.authService.getPlayerData();
-    if (!playerData) {
-      console.error('No username found');
-    } else {
-      const username = playerData!.username;
-      const url = `/game?username=${username}`;
-      void window.open(url, '_blank');
-    }
+    this.authService.authState$.subscribe(state => {
+      if (!state.username) {
+        console.error('No username found');
+      } else {
+        const url = `/game?username=${state.username}`;
+        void window.open(url, '_blank');
+      }
+    });
   }
 }

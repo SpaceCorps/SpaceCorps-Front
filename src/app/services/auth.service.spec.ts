@@ -20,7 +20,7 @@ describe('AuthService', () => {
   it('should log out', () => {
     service.logOut();
     service.authState$.subscribe((state) => {
-      expect(state.isLoggedIn).toBeFalse();
+      expect(state.isAuthenticated).toBeFalse();
     });
   });
 });

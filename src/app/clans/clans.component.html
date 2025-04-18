@@ -1,0 +1,40 @@
+<div class="container mx-auto p-4">
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Clans</h1>
+    @if (!userClan) {
+      <button class="btn btn-primary" (click)="toggleCreateClan()">
+        {{ showCreateClan ? 'Cancel' : 'Create Clan' }}
+      </button>
+    }
+  </header>
+
+  <!-- Create Clan Form -->
+  @if (showCreateClan) {
+    <section class="mb-8">
+      <app-create-clan (created)="toggleCreateClan()"></app-create-clan>
+    </section>
+  }
+
+  <!-- User's Clan Details -->
+  @if (userClan) {
+    <section class="mb-8">
+      <app-clan-details [clan]="userClan"></app-clan-details>
+    </section>
+  }
+
+  <!-- Clan Invitations -->
+  <section class="mb-8">
+    <app-clan-invitations></app-clan-invitations>
+  </section>
+
+  <!-- Clan Search and List -->
+  @if (!userClan) {
+    <section class="mb-8">
+      <app-clan-search></app-clan-search>
+    </section>
+
+    <section>
+      <app-clan-list></app-clan-list>
+    </section>
+  }
+</div> 

@@ -28,6 +28,18 @@ import {
   UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
 import { ChapterProgressDto } from '../models/lore/ChapterProgressDto';
+import { ClanData } from '../models/clan/ClanData';
+import {
+  ClanInvitation,
+  CreateClanRequest,
+  JoinClanRequest,
+  LeaveClanRequest,
+  ChangeMemberRoleRequest,
+  ClanSearchRequest,
+  UpdateClanRequest,
+  KickMemberRequest,
+  InviteToClanRequest,
+} from '../models/clan/ClanDtos';
 
 @Injectable({
   providedIn: 'root',
@@ -282,5 +294,62 @@ export class ApiService {
 
   getGithubCommits() {
     return this.http.get<Commit[]>(this.githubApiUrl);
+  }
+
+  // Clan methods
+  getClanMember(username: string) {
+    return this.http.get<ClanData>(`${this.url}/Clans/member/${username}`);
+  }
+
+  createClan(request: CreateClanRequest) {
+    return this.http.post<ClanData>(`${this.url}/Clans`, request);
+  }
+
+  joinClan(request: JoinClanRequest) {
+    return this.http.post<ClanData>(`${this.url}/Clans/join`, request);
+  }
+
+  leaveClan(request: LeaveClanRequest) {
+    return this.http.post<void>(`${this.url}/Clans/leave`, request);
+  }
+
+  changeMemberRole(request: ChangeMemberRoleRequest) {
+    return this.http.post<ClanData>(`${this.url}/Clans/role`, request);
+  }
+
+  getClanInvitations(username: string) {
+    return this.http.get<ClanInvitation[]>(
+      `${this.url}/Clans/invitations/${username}`
+    );
+  }
+
+  acceptClanInvitation(invitationId: string) {
+    return this.http.post<ClanData>(
+      `${this.url}/Clans/invitations/${invitationId}/accept`,
+      {}
+    );
+  }
+
+  declineClanInvitation(invitationId: string) {
+    return this.http.post<void>(
+      `${this.url}/Clans/invitations/${invitationId}/decline`,
+      {}
+    );
+  }
+
+  searchClans(request: ClanSearchRequest) {
+    return this.http.post<ClanData[]>(`${this.url}/Clans/search`, request);
+  }
+
+  updateClan(request: UpdateClanRequest) {
+    return this.http.post<ClanData>(`${this.url}/Clans/update`, request);
+  }
+
+  kickMember(request: KickMemberRequest) {
+    return this.http.post<ClanData>(`${this.url}/Clans/kick`, request);
+  }
+
+  inviteToClan(request: InviteToClanRequest) {
+    return this.http.post<void>(`${this.url}/Clans/invite`, request);
   }
 }

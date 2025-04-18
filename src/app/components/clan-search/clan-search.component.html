@@ -1,0 +1,117 @@
+<div class="card bg-base-200">
+  <div class="card-body">
+    <h2 class="card-title">Search Clans</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Search Term -->
+      <div class="form-control">
+        <label class="label" for="searchTerm">
+          <span class="label-text">Search</span>
+        </label>
+        <input
+          type="text"
+          id="searchTerm"
+          [(ngModel)]="searchRequest.searchTerm"
+          name="searchTerm"
+          placeholder="Search by name or tag..."
+          class="input input-bordered"
+        />
+      </div>
+
+      <!-- Recruiting Filter -->
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <span class="label-text">Recruiting Only</span>
+          <input
+            type="checkbox"
+            [(ngModel)]="searchRequest.isRecruiting"
+            name="isRecruiting"
+            class="checkbox"
+          />
+        </label>
+      </div>
+
+      <!-- Level Range -->
+      <div class="form-control">
+        <label class="label" for="minLevel">
+          <span class="label-text">Minimum Level</span>
+        </label>
+        <input
+          type="number"
+          id="minLevel"
+          [(ngModel)]="searchRequest.minLevel"
+          name="minLevel"
+          class="input input-bordered"
+          min="0"
+        />
+      </div>
+
+      <div class="form-control">
+        <label class="label" for="maxLevel">
+          <span class="label-text">Maximum Level</span>
+        </label>
+        <input
+          type="number"
+          id="maxLevel"
+          [(ngModel)]="searchRequest.maxLevel"
+          name="maxLevel"
+          class="input input-bordered"
+          min="0"
+        />
+      </div>
+
+      <!-- Ranking Points Range -->
+      <div class="form-control">
+        <label class="label" for="minRankingPoints">
+          <span class="label-text">Min Ranking Points</span>
+        </label>
+        <input
+          type="number"
+          id="minRankingPoints"
+          [(ngModel)]="searchRequest.minRankingPoints"
+          name="minRankingPoints"
+          class="input input-bordered"
+          min="0"
+        />
+      </div>
+
+      <div class="form-control">
+        <label class="label" for="maxRankingPoints">
+          <span class="label-text">Max Ranking Points</span>
+        </label>
+        <input
+          type="number"
+          id="maxRankingPoints"
+          [(ngModel)]="searchRequest.maxRankingPoints"
+          name="maxRankingPoints"
+          class="input input-bordered"
+          min="0"
+        />
+      </div>
+
+      <!-- Sort By -->
+      <div class="form-control">
+        <label class="label" for="sortBy">
+          <span class="label-text">Sort By</span>
+        </label>
+        <select
+          id="sortBy"
+          [(ngModel)]="searchRequest.sortBy"
+          name="sortBy"
+          class="select select-bordered"
+        >
+          <option [ngValue]="null">Default</option>
+          @for (option of sortOptions; track option) {
+            <option [value]="option">{{ option.replace('_', ' ') }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-2 mt-4">
+      <button class="btn" (click)="clearFilters()">Clear</button>
+      <button class="btn btn-primary" (click)="search()">Search</button>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,98 @@
+@if (!clanInfo) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Clan Info</h2>
+      <p class="text-center opacity-70">You are not a member of any clan.</p>
+    </div>
+  </div>
+} @else {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Clan Info</h2>
+      
+      <!-- Clan Header -->
+      <div class="flex items-center gap-4 mb-4">
+        <img [src]="clanInfo.logo" [alt]="clanInfo.name + ' Logo'" class="w-16 h-16 rounded-full">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-xl font-bold">{{ clanInfo.name }}</h3>
+            <span class="badge badge-primary">{{ clanInfo.tag }}</span>
+          </div>
+          <p class="text-sm opacity-70">{{ clanInfo.slogan }}</p>
+        </div>
+      </div>
+
+      <!-- Members Info -->
+      <div class="stats shadow mb-4">
+        <div class="stat">
+          <div class="stat-title">Active Members</div>
+          <div class="stat-value">{{ clanInfo.activeMembers }}</div>
+          <div class="stat-desc">of {{ clanInfo.totalMembers }} total</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Level</div>
+          <div class="stat-value">{{ clanInfo.level }}</div>
+          <div class="stat-desc">Ranking Points: {{ clanInfo.rankingPoints }}</div>
+        </div>
+      </div>
+
+      <!-- Clan Statistics -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="stat bg-base-200 rounded-lg">
+          <div class="stat-title">Total Experience</div>
+          <div class="stat-value text-lg">{{ clanInfo.totalExperience | number }}</div>
+        </div>
+        <div class="stat bg-base-200 rounded-lg">
+          <div class="stat-title">Total Honor</div>
+          <div class="stat-value text-lg">{{ clanInfo.totalHonor | number }}</div>
+        </div>
+        <div class="stat bg-base-200 rounded-lg">
+          <div class="stat-title">Ships Destroyed</div>
+          <div class="stat-value text-lg">{{ clanInfo.totalShipsDestroyed | number }}</div>
+        </div>
+        <div class="stat bg-base-200 rounded-lg">
+          <div class="stat-title">Aliens Destroyed</div>
+          <div class="stat-value text-lg">{{ clanInfo.totalAliensDestroyed | number }}</div>
+        </div>
+      </div>
+
+      <!-- Leadership -->
+      <div class="mt-4">
+        <h3 class="text-lg font-semibold mb-2">Leadership</h3>
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <span class="badge badge-secondary">Leader</span>
+            <span>{{ clanInfo.leader }}</span>
+          </div>
+          @if (clanInfo.officers.length > 0) {
+            <div class="flex items-center gap-2">
+              <span class="badge badge-primary">Officers</span>
+              <span>{{ clanInfo.officers.join(', ') }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Company Info -->
+      @if (clanInfo.companyInfo) {
+        <div class="mt-4">
+          <h3 class="text-lg font-semibold mb-2">Company Info</h3>
+          <p class="text-sm opacity-70">{{ clanInfo.companyInfo }}</p>
+        </div>
+      }
+
+      <!-- Recruitment Status -->
+      <div class="mt-4 flex items-center gap-2">
+        <span class="badge" [class.badge-success]="clanInfo.isRecruiting" [class.badge-error]="!clanInfo.isRecruiting">
+          {{ clanInfo.isRecruiting ? 'Recruiting' : 'Not Recruiting' }}
+        </span>
+        @if (clanInfo.isRecruiting) {
+          <span class="text-sm opacity-70">
+            Requirements: Level {{ clanInfo.minimumLevel }}+, 
+            {{ clanInfo.minimumRankingPoints }}+ Ranking Points
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+} 
