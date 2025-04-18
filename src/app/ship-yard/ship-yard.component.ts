@@ -37,9 +37,13 @@ export class ShipYardComponent implements OnInit {
     effect(() => {
       const playerData = this.stateService.currentPlayer();
       if (playerData) {
-        this.playerBalance.credits = playerData.credits;
-        this.playerBalance.thulium = playerData.thulium;
+        this.playerBalance.credits = playerData.credits ?? 0;
+        this.playerBalance.thulium = playerData.thulium ?? 0;
         this.username = playerData.username;
+      } else {
+        this.playerBalance.credits = 0;
+        this.playerBalance.thulium = 0;
+        this.username = null;
       }
     });
 
@@ -52,12 +56,9 @@ export class ShipYardComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    const playerData = this.stateService.currentPlayer();
-    if (!playerData) {
-      // If no player data in state, fetch it
-      void this.stateService.fetchPlayerInfo();
-    }
+  async ngOnInit() {
+    // Always fetch player data when the page opens
+    await this.stateService.fetchPlayerInfo();
   }
 
   selectCategory(category: SellableItems['itemType']) {
@@ -68,6 +69,19 @@ export class ShipYardComponent implements OnInit {
   async buyItem(item: SellableItems) {
     if (!this.username) {
       alert('No username found');
+      return;
+    }
+
+    // Get current player data to check balance
+    const playerData = this.stateService.currentPlayer();
+    if (!playerData) {
+      alert('Player data not loaded');
+      return;
+    }
+
+    // Check if player has enough currency
+    if (item.priceCredits > playerData.credits || item.priceThulium > playerData.thulium) {
+      alert('Insufficient balance');
       return;
     }
 
