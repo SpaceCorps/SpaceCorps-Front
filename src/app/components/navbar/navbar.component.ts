@@ -11,7 +11,6 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MainMenuComponent } from '../main-menu/main-menu.component';
 import { GithubTimelineComponent } from '../github-timeline/github-timeline.component';
-import { ThemePickerComponent } from '../theme-picker/theme-picker.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUsers, faCog, faInfoCircle, faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { SettingsComponent } from '../settings/settings.component';
@@ -28,7 +27,6 @@ import { GameSettings } from '../../models/game-settings.model';
     FontAwesomeModule,
     MainMenuComponent,
     GithubTimelineComponent,
-    ThemePickerComponent,
     SettingsComponent
   ],
   templateUrl: './navbar.component.html',
