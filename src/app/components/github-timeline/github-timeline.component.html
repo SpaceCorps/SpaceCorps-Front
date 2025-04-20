@@ -6,7 +6,7 @@
       >
         {{ '— ' + commit.commit.message }}
 
-        @if (isBigRelease(commit.commit.message)) {
+        @if (isBigRelease(commit.commit.message) && isLatestRelease(commit)) {
           <span class="badge badge-primary text-sm font-medium ml-2"
             >Latest</span
           >

@@ -1,0 +1,55 @@
+@if (isOpen) {
+  <dialog class="modal modal-open">
+    <div class="modal-box w-11/12 max-w-2xl sm:h-auto h-full sm:max-h-[90vh] max-h-full">
+      <h2 class="text-2xl font-bold mb-8">Settings</h2>
+      
+      <div class="space-y-8 overflow-y-auto">
+        <!-- Theme Settings -->
+        <div class="space-y-3">
+          <h3 class="text-lg font-medium text-base-content/80">Theme</h3>
+          <app-theme-picker></app-theme-picker>
+        </div>
+
+        <!-- Game Settings -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-medium text-base-content/80">Game Settings</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-base-200/50 rounded-lg p-4">
+            <div class="form-control flex flex-row items-center justify-between">
+              <span class="label-text">Show FPS Counter</span>
+              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.showFPS" />
+            </div>
+            <div class="form-control flex flex-row items-center justify-between">
+              <span class="label-text">Enable Particles</span>
+              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.enableParticles" />
+            </div>
+            <div class="form-control flex flex-row items-center justify-between">
+              <span class="label-text">Show Grid</span>
+              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.showGrid" />
+            </div>
+            <div class="form-control flex flex-row items-center justify-between">
+              <span class="label-text">Enable Sound</span>
+              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.enableSound" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Graphics Quality -->
+        <div class="space-y-3">
+          <h3 class="text-lg font-medium text-base-content/80">Graphics Quality</h3>
+          <select class="select select-bordered w-full bg-base-200/50" [(ngModel)]="settings.graphicsQuality">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="ultra">Ultra</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-action mt-8">
+        <button class="btn btn-primary" (click)="save()">Save Changes</button>
+        <button class="btn" (click)="close()">Cancel</button>
+      </div>
+    </div>
+    <div class="modal-backdrop" (click)="close()"></div>
+  </dialog>
+} 
