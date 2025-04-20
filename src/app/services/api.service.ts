@@ -30,15 +30,11 @@ import {
 import { ChapterProgressDto } from '../models/lore/ChapterProgressDto';
 import { ClanData } from '../models/clan/ClanData';
 import {
-  ClanInvitation,
   CreateClanRequest,
-  JoinClanRequest,
-  LeaveClanRequest,
-  ChangeMemberRoleRequest,
-  ClanSearchRequest,
-  UpdateClanRequest,
-  KickMemberRequest,
   InviteToClanRequest,
+  ClanInvitation,
+  ClanSearchRequest,
+  UpdateMemberStatsRequest,
 } from '../models/clan/ClanDtos';
 
 @Injectable({
@@ -296,7 +292,15 @@ export class ApiService {
     return this.http.get<Commit[]>(this.githubApiUrl);
   }
 
-  // Clan methods
+  // Clan endpoints
+  getClan(id: string) {
+    return this.http.get<ClanData>(`${this.url}/Clans/${id}`);
+  }
+
+  getAllClans() {
+    return this.http.get<ClanData[]>(`${this.url}/Clans`);
+  }
+
   getClanMember(username: string) {
     return this.http.get<ClanData>(`${this.url}/Clans/member/${username}`);
   }
@@ -305,16 +309,28 @@ export class ApiService {
     return this.http.post<ClanData>(`${this.url}/Clans`, request);
   }
 
-  joinClan(request: JoinClanRequest) {
-    return this.http.post<ClanData>(`${this.url}/Clans/join`, request);
+  searchClans(params: ClanSearchRequest) {
+    return this.http.get<ClanData[]>(`${this.url}/Clans/search`, {
+      params: params as Record<string, string | number | boolean>,
+    });
   }
 
-  leaveClan(request: LeaveClanRequest) {
-    return this.http.post<void>(`${this.url}/Clans/leave`, request);
+  inviteToClan(clanId: string, request: InviteToClanRequest) {
+    return this.http.post<void>(`${this.url}/Clans/${clanId}/invite`, request);
   }
 
-  changeMemberRole(request: ChangeMemberRoleRequest) {
-    return this.http.post<ClanData>(`${this.url}/Clans/role`, request);
+  acceptClanInvitation(inviteId: string) {
+    return this.http.post<void>(
+      `${this.url}/Clans/invitations/${inviteId}/accept`,
+      {}
+    );
+  }
+
+  declineClanInvitation(inviteId: string) {
+    return this.http.post<void>(
+      `${this.url}/Clans/invitations/${inviteId}/decline`,
+      {}
+    );
   }
 
   getClanInvitations(username: string) {
@@ -323,33 +339,80 @@ export class ApiService {
     );
   }
 
-  acceptClanInvitation(invitationId: string) {
-    return this.http.post<ClanData>(
-      `${this.url}/Clans/invitations/${invitationId}/accept`,
-      {}
-    );
-  }
-
-  declineClanInvitation(invitationId: string) {
+  joinClan(clanId: string, username: string) {
     return this.http.post<void>(
-      `${this.url}/Clans/invitations/${invitationId}/decline`,
-      {}
+      `${this.url}/Clans/${clanId}/join`,
+      JSON.stringify(username),
+      {
+        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      }
     );
   }
 
-  searchClans(request: ClanSearchRequest) {
-    return this.http.post<ClanData[]>(`${this.url}/Clans/search`, request);
+  promoteMember(clanId: string, username: string) {
+    return this.http.post<void>(
+      `${this.url}/Clans/${clanId}/promote`,
+      JSON.stringify(username),
+      {
+        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      }
+    );
   }
 
-  updateClan(request: UpdateClanRequest) {
-    return this.http.post<ClanData>(`${this.url}/Clans/update`, request);
+  demoteMember(clanId: string, username: string) {
+    return this.http.post<void>(
+      `${this.url}/Clans/${clanId}/demote`,
+      JSON.stringify(username),
+      {
+        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      }
+    );
   }
 
-  kickMember(request: KickMemberRequest) {
-    return this.http.post<ClanData>(`${this.url}/Clans/kick`, request);
+  updateMemberActivity(clanId: string, username: string, isOnline: boolean) {
+    return this.http.post<void>(
+      `${this.url}/Clans/${clanId}/members/${username}/activity`,
+      JSON.stringify(isOnline),
+      { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+    );
   }
 
-  inviteToClan(request: InviteToClanRequest) {
-    return this.http.post<void>(`${this.url}/Clans/invite`, request);
+  updateMemberStats(
+    clanId: string,
+    username: string,
+    request: UpdateMemberStatsRequest
+  ) {
+    return this.http.post<void>(
+      `${this.url}/Clans/${clanId}/members/${username}/stats`,
+      request
+    );
+  }
+
+  kickMember(clanId: string, request: { kickerUsername: string; memberToKick: string }) {
+    return this.http.post(`${this.url}/Clans/${clanId}/kick`, request);
+  }
+
+  deleteClan(clanId: string, username: string) {
+    return this.http.delete(`${this.url}/Clans/${clanId}`, {
+      body: username
+    });
+  }
+
+  leaveClan(clanId: string, request: { username: string }) {
+    return this.http.post(`${this.url}/Clans/${clanId}/leave`, request);
+  }
+
+  updateClan(request: {
+    clanId: string;
+    slogan: string;
+    companyInfo: string;
+    isRecruiting: boolean;
+    minimumLevel: number;
+    minimumRankingPoints: number;
+  }) {
+    return this.http.patch<ClanData>(
+      `${this.url}/Clans/${request.clanId}`,
+      request
+    );
   }
 }

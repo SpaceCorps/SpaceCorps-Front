@@ -1,0 +1,131 @@
+@if (clan) {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body space-y-6">
+      <!-- Clan Header -->
+      <div>
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="card-title">Clan Name: {{ clan.name }}</h2>
+            <p class="text-sm opacity-70">Clan Tag: [{{ clan.tag }}]</p>
+          </div>
+          <div class="flex flex-col items-end">
+            <span class="badge badge-primary">Total Members: {{ clan.members.length }}</span>
+            @if (currentUserRole) {
+              <div class="mt-2">
+                <span class="text-sm opacity-70">Your Position: </span>
+                <span [class]="'badge ' + getRoleBadgeClass(currentUserRole)">
+                  {{ currentUserRole }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (clan.slogan) {
+          <div class="mt-2">
+            <span class="text-sm font-semibold">Clan Motto: </span>
+            <span class="text-sm opacity-70">{{ clan.slogan }}</span>
+          </div>
+        }
+
+        @if (clan.companyInfo) {
+          <div class="mt-2">
+            <span class="text-sm font-semibold">About Us: </span>
+            <p class="text-sm opacity-70">{{ clan.companyInfo }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Member List -->
+      @if (clan.members.length) {
+        <div>
+          <h3 class="text-lg font-semibold mb-2">Clan Members</h3>
+          <div class="overflow-x-auto">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (member of clan.members; track member.username) {
+                  <tr>
+                    <td>{{ member.username }}</td>
+                    <td>
+                      <span [class]="'badge ' + getRoleBadgeClass(member.role)">
+                        {{ member.role }}
+                      </span>
+                    </td>
+                    <td>
+                      @if (canKickCurrentMember(member.role)) {
+                        <button class="btn btn-error btn-xs" (click)="kickMember(member.username)">
+                          Kick
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- Invite Players Section -->
+      @if (permissions?.canInvite) {
+        <div>
+          <h3 class="text-lg font-semibold mb-2">Invite Players</h3>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Enter player's username to invite them to the clan</span>
+            </label>
+            <div class="input-group">
+              <input
+                type="text"
+                [(ngModel)]="inviteUsername"
+                placeholder="Username"
+                class="input input-bordered w-full"
+              />
+              <button class="btn btn-primary" (click)="invitePlayer()">
+                Send Invite
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Clan Management -->
+      @if (isLeader()) {
+        <div>
+          <h3 class="text-lg font-semibold mb-2">Clan Management</h3>
+          <app-clan-edit 
+            [clan]="clan" 
+            (deleteClan)="deleteClan()"
+          />
+        </div>
+      }
+
+      <!-- Leave Clan -->
+      @if (!isLeader()) {
+        <div class="card-actions justify-end">
+          <button class="btn btn-warning" (click)="leaveClan()">Leave Clan</button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Other Clans List -->
+  <div class="mt-8">
+    <app-clan-list />
+  </div>
+
+} @else {
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Clan Details</h2>
+      <p class="text-center opacity-70">No clan data available.</p>
+    </div>
+  </div>
+}

@@ -1,111 +1,117 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ClanData } from '../../models/clan/ClanData';
+import { FormsModule } from '@angular/forms';
+import { ClanData } from '../../models/clan/ClanDtos';
+import { StateService } from '../../services/state.service';
+import { ClanEditComponent } from '../clan-edit/clan-edit.component';
+import { ClanListComponent } from '../clan-list/clan-list.component';
+import {
+  ClanRole,
+  getClanPermissions,
+  canKickMember,
+  getRoleFromNumber
+} from '../../models/clan/ClanRoles';
+
+type MemberRole = 'LEADER' | 'CO_LEADER' | 'ELDER' | 'ROOKIE';
 
 @Component({
   selector: 'app-clan-details',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    @if (clan) {
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title">Your Clan</h2>
-          
-          <!-- Clan Header -->
-          <div class="flex items-center gap-4 mb-4">
-            <div>
-              <div class="flex items-center gap-2">
-                <h3 class="text-xl font-bold">{{ clan.name }}</h3>
-                <span class="badge badge-primary">{{ clan.tag }}</span>
-              </div>
-              <p class="text-sm opacity-70">{{ clan.slogan }}</p>
-            </div>
-          </div>
-
-          <!-- Members Info -->
-          <div class="stats shadow mb-4">
-            <div class="stat">
-              <div class="stat-title">Active Members</div>
-              <div class="stat-value">{{ clan.activeMembers }}</div>
-              <div class="stat-desc">of {{ clan.totalMembers }} total</div>
-            </div>
-            <div class="stat">
-              <div class="stat-title">Level</div>
-              <div class="stat-value">{{ clan.level }}</div>
-              <div class="stat-desc">Ranking Points: {{ clan.rankingPoints }}</div>
-            </div>
-          </div>
-
-          <!-- Clan Statistics -->
-          <div class="grid grid-cols-2 gap-4">
-            <div class="stat bg-base-200 rounded-lg">
-              <div class="stat-title">Total Experience</div>
-              <div class="stat-value text-lg">{{ clan.totalExperience | number }}</div>
-            </div>
-            <div class="stat bg-base-200 rounded-lg">
-              <div class="stat-title">Total Honor</div>
-              <div class="stat-value text-lg">{{ clan.totalHonor | number }}</div>
-            </div>
-            <div class="stat bg-base-200 rounded-lg">
-              <div class="stat-title">Ships Destroyed</div>
-              <div class="stat-value text-lg">{{ clan.totalShipsDestroyed | number }}</div>
-            </div>
-            <div class="stat bg-base-200 rounded-lg">
-              <div class="stat-title">Aliens Destroyed</div>
-              <div class="stat-value text-lg">{{ clan.totalAliensDestroyed | number }}</div>
-            </div>
-          </div>
-
-          <!-- Leadership -->
-          <div class="mt-4">
-            <h3 class="text-lg font-semibold mb-2">Leadership</h3>
-            <div class="flex flex-col gap-2">
-              <div class="flex items-center gap-2">
-                <span class="badge badge-secondary">Leader</span>
-                <span>{{ clan.leader }}</span>
-              </div>
-              @if (clan.officers && clan.officers.length > 0) {
-                <div class="flex items-center gap-2">
-                  <span class="badge badge-primary">Officers</span>
-                  <span>{{ clan.officers.join(', ') }}</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- Company Info -->
-          @if (clan.companyInfo) {
-            <div class="mt-4">
-              <h3 class="text-lg font-semibold mb-2">Company Info</h3>
-              <p class="text-sm opacity-70">{{ clan.companyInfo }}</p>
-            </div>
-          }
-
-          <!-- Recruitment Status -->
-          <div class="mt-4 flex items-center gap-2">
-            <span class="badge" [class.badge-success]="clan.isRecruiting" [class.badge-error]="!clan.isRecruiting">
-              {{ clan.isRecruiting ? 'Recruiting' : 'Not Recruiting' }}
-            </span>
-            @if (clan.isRecruiting) {
-              <span class="text-sm opacity-70">
-                Requirements: Level {{ clan.minimumLevel }}+, 
-                {{ clan.minimumRankingPoints }}+ Ranking Points
-              </span>
-            }
-          </div>
-        </div>
-      </div>
-    } @else {
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title">Clan Details</h2>
-          <p class="text-center opacity-70">No clan data available.</p>
-        </div>
-      </div>
-    }
-  `
+  imports: [CommonModule, FormsModule, ClanEditComponent, ClanListComponent],
+  templateUrl: './clan-details.component.html'
 })
 export class ClanDetailsComponent {
   @Input() clan!: ClanData | null;
-} 
+  private stateService = inject(StateService);
+
+  protected inviteUsername = '';
+  protected permissions: ReturnType<typeof getClanPermissions> | null = null;
+  protected currentUserRole: MemberRole | null = null;
+
+  constructor() {
+    effect(() => {
+      const currentPlayer = this.stateService.currentPlayer();
+      if (currentPlayer && this.clan) {
+        const member = this.clan.members.find(
+          (m) => m.username === currentPlayer.username
+        );
+        if (member) {
+          const roleNumber = typeof member.role === 'number' ? member.role : 0;
+          this.currentUserRole = getRoleFromNumber(roleNumber) as MemberRole;
+          this.permissions = getClanPermissions(this.currentUserRole as ClanRole);
+        }
+      }
+    });
+  }
+
+  protected getRoleBadgeClass(role: string | number): string {
+    const roleStr = typeof role === 'number' ? getRoleFromNumber(role) : role;
+    switch (roleStr) {
+      case 'LEADER':
+        return 'badge-primary';
+      case 'CO_LEADER':
+        return 'badge-secondary';
+      case 'ELDER':
+        return 'badge-accent';
+      default:
+        return 'badge-ghost';
+    }
+  }
+
+  protected isLeader(): boolean {
+    return this.currentUserRole === 'LEADER';
+  }
+
+  protected canKickCurrentMember(memberRole: string | number): boolean {
+    if (!this.currentUserRole) return false;
+    const memberRoleStr = typeof memberRole === 'number' ? getRoleFromNumber(memberRole) : memberRole;
+    return canKickMember(this.currentUserRole as ClanRole, memberRoleStr as ClanRole);
+  }
+
+  protected async invitePlayer() {
+    if (!this.clan || !this.inviteUsername) return;
+    try {
+      await this.stateService.inviteToClan(this.clan.id, {
+        username: this.inviteUsername,
+      });
+      this.inviteUsername = '';
+    } catch (error) {
+      console.error('Error inviting player:', error);
+      // TODO: Add error handling/notification
+    }
+  }
+
+  protected async kickMember(username: string) {
+    if (!this.clan) return;
+    try {
+      await this.stateService.kickMember(this.clan.id, username);
+    } catch (error) {
+      console.error('Error kicking member:', error);
+      // TODO: Add error handling/notification
+    }
+  }
+
+  protected async leaveClan() {
+    if (!this.clan) return;
+    try {
+      const username = this.stateService.authService.getUsername();
+      if (!username) return;
+      await this.stateService.leaveClan(this.clan.id, username);
+    } catch (error) {
+      console.error('Error leaving clan:', error);
+      // TODO: Add error handling/notification
+    }
+  }
+
+  protected async deleteClan() {
+    if (!this.clan) return;
+    try {
+      const username = this.stateService.authService.getUsername();
+      if (!username) return;
+      await this.stateService.deleteClan(this.clan.id, username);
+    } catch (error) {
+      console.error('Error deleting clan:', error);
+      // TODO: Add error handling/notification
+    }
+  }
+}

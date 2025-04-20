@@ -1,70 +1,42 @@
-import { ClanRole } from './ClanData';
-
 export interface CreateClanRequest {
   name: string;
   tag: string;
   slogan: string;
-  companyInfo: string;
+  companyInfo?: string;
   isRecruiting: boolean;
   minimumLevel: number;
   minimumRankingPoints: number;
 }
 
-export interface UpdateClanRequest {
-  clanId: string;
-  name?: string;
-  tag?: string;
-  slogan?: string;
-  companyInfo?: string;
-  isRecruiting?: boolean;
-  minimumLevel?: number;
-  minimumRankingPoints?: number;
-}
-
-export interface JoinClanRequest {
-  clanId: string;
-  username: string;
-}
-
-export interface LeaveClanRequest {
-  clanId: string;
-  username: string;
-}
-
-export interface KickMemberRequest {
-  clanId: string;
-  username: string;
-  reason: string;
-}
-
-export interface ChangeMemberRoleRequest {
-  clanId: string;
-  username: string;
-  newRole: ClanRole;
-}
-
 export interface InviteToClanRequest {
-  clanId: string;
   username: string;
-  message?: string;
+}
+
+export interface UpdateMemberStatsRequest {
+  experience: number;
+  honor: number;
+  shipsDestroyed: number;
+  aliensDestroyed: number;
 }
 
 export interface ClanInvitation {
   id: string;
+  username: string;
+  inviteDate: string;
+  expiryDate: string;
+  isAccepted: boolean;
+  isDeclined: boolean;
   clanId: string;
   clanName: string;
   clanTag: string;
-  invitedUsername: string;
   invitedByUsername: string;
   message?: string;
-  dateCreated: string;
-  status: InvitationStatus;
 }
 
 export enum InvitationStatus {
   PENDING = 'PENDING',
   ACCEPTED = 'ACCEPTED',
-  DECLINED = 'DECLINED'
+  DECLINED = 'DECLINED',
 }
 
 export enum ClanSortOption {
@@ -76,18 +48,52 @@ export enum ClanSortOption {
   SHIPS_DESTROYED = 'SHIPS_DESTROYED',
   ALIENS_DESTROYED = 'ALIENS_DESTROYED',
   RANKING_POINTS = 'RANKING_POINTS',
-  DATE_CREATED = 'DATE_CREATED'
+  DATE_CREATED = 'DATE_CREATED',
 }
 
 export interface ClanSearchRequest {
-  searchTerm: string;
+  searchTerm?: string;
   isRecruiting?: boolean;
   minLevel?: number;
   maxLevel?: number;
   minRankingPoints?: number;
   maxRankingPoints?: number;
+  minClanLevel?: number;
+  minMemberCount?: number;
   sortBy?: ClanSortOption;
-  sortDescending?: boolean;
-  page: number;
-  pageSize: number;
-} 
+}
+
+export interface ClanData {
+  id: string;
+  name: string;
+  tag: string;
+  slogan: string;
+  companyInfo: string;
+  isRecruiting: boolean;
+  minimumLevel: number;
+  minimumRankingPoints: number;
+  level: number;
+  experience: number;
+  honor: number;
+  shipsDestroyed: number;
+  aliensDestroyed: number;
+  rankingPoints: number;
+  dateCreated: string;
+  members: ClanMember[];
+}
+
+export interface ClanMember {
+  username: string;
+  role: ClanRole;
+  experience: number;
+  honor: number;
+  shipsDestroyed: number;
+  aliensDestroyed: number;
+  dateJoined: string;
+}
+
+export enum ClanRole {
+  LEADER = 'LEADER',
+  OFFICER = 'OFFICER',
+  MEMBER = 'MEMBER'
+}

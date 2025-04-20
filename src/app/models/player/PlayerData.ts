@@ -1,8 +1,10 @@
 import { Position3 } from '../entity/Position3';
 
-export type PlayerData = {
+export interface PlayerData {
   id: string;
   username: string;
+  level: number;
+  rankingPoints: number;
   position: Position3;
   userId: string;
   dateOfRegistration: string;
@@ -14,10 +16,9 @@ export type PlayerData = {
   honor: number;
   shipsDestroyed: number;
   aliensDestroyed: number;
-  rankingPoints: number;
   completedQuests: number;
   completedGates: number;
   title: string;
   isOnline: boolean;
   isInvisible: boolean;
-};
+}

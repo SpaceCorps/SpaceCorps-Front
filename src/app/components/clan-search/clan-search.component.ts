@@ -17,9 +17,7 @@ export class ClanSearchComponent {
 
   protected searchRequest: ClanSearchRequest = {
     searchTerm: '',
-    isRecruiting: true,
-    page: 1,
-    pageSize: 10
+    isRecruiting: true
   };
 
   protected async search(): Promise<void> {
@@ -29,9 +27,7 @@ export class ClanSearchComponent {
   protected clearFilters(): void {
     this.searchRequest = {
       searchTerm: '',
-      isRecruiting: true,
-      page: 1,
-      pageSize: 10
+      isRecruiting: true
     };
     this.search();
   }
