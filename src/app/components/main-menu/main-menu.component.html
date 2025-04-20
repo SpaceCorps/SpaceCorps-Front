@@ -1,118 +1,20 @@
-<!-- Smaller screens: single dropdown -->
-<div class="dropdown block md:hidden">
-  <!-- Trigger button for the dropdown menu -->
-  <label tabindex="0" class="btn bg-base-200"> Menu </label>
-  <!-- Dropdown content appears when the button is clicked/focused -->
-  <ul
-    tabindex="0"
-    class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-56"
-    (mouseleave)="closeAllItems()"
-  >
-    <li>
-      <details
-        [open]="openItem === 'pilot'"
-        (click)="toggleItem('pilot')"
-        (mouseenter)="openItemOnHover('pilot')"
-      >
-        <summary>Pilot</summary>
-        <ul class="bg-base-200">
-          <li><a routerLink="/pilot-info">√Pilot Info</a></li>
-          <li><a routerLink="/pilot-inventory">√Pilot Inventory</a></li>
-          <li><a>Pilot Skill Tree</a></li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details
-        [open]="openItem === 'shop'"
-        (click)="toggleItem('shop')"
-        (mouseenter)="openItemOnHover('shop')"
-      >
-        <summary>Shop</summary>
-        <ul class="bg-base-200">
-          <li><a routerLink="/ship-yard">√Ship Yard</a></li>
-          <li><a>Black Market</a></li>
-          <li><a>Auction</a></li>
-          <li><a>Trade</a></li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details
-        [open]="openItem === 'company'"
-        (click)="toggleItem('company')"
-        (mouseenter)="openItemOnHover('company')"
-      >
-        <summary>Company</summary>
-        <ul class="bg-base-200">
-          <li><a routerLink="/clans">√Clans</a></li>
-          <li><a>Message Box</a></li>
-          <li><a>Spy system</a></li>
-          <li><a>Most Wanted</a></li>
-          <li><a>Star System</a></li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details
-        [open]="openItem === 'wiki'"
-        (click)="toggleItem('wiki')"
-        (mouseenter)="openItemOnHover('wiki')"
-      >
-        <summary>Wiki</summary>
-        <ul class="bg-base-200">
-          <li><a>√How to Play</a></li>
-          <li><a routerLink="/lore">√Lore</a></li>
-          <li><a>√FAQ</a></li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details
-        [open]="openItem === 'admin'"
-        (click)="toggleItem('admin')"
-        (mouseenter)="openItemOnHover('admin')"
-      >
-        <summary>Admin</summary>
-        <ul class="bg-base-200">
-          <li><a routerLink="/users-editor">√Users</a></li>
-          <li><a routerLink="/itemEntry-editor">√ItemEntryEditor</a></li>
-          <li><a routerLink="/spacemap-editor">√SpaceMapEditor</a></li>
-          <li><a>√Logs</a></li>
-        </ul>
-      </details>
-    </li>
-  </ul>
-</div>
-
-<!-- Larger screens: horizontal menu -->
-<ul
-  class="menu menu-horizontal bg-base-200 rounded-box gap-2 min-w-[430px] hidden md:flex"
-  (mouseleave)="closeAllItems()"
->
+<!-- Menu -->
+<ul class="menu" (mouseleave)="closeAllItems()">
   <li>
-    <details
-      [open]="openItem === 'pilot'"
-      (click)="toggleItem('pilot')"
-      (mouseenter)="openItemOnHover('pilot')"
-    >
-      <summary>Pilot</summary>
-      <ul class="bg-base-200">
-        <li><a routerLink="/pilot-info">√Pilot Info</a></li>
-        <li><a routerLink="/pilot-inventory">√Pilot Inventory</a></li>
+    <details [open]="openItem === 'pilot'" (click)="toggleItem('pilot')" (mouseenter)="openItemOnHover('pilot')">
+      <summary class="font-medium">Pilot</summary>
+      <ul class="bg-base-300">
+        <li><a routerLink="/pilot-info">Pilot Info</a></li>
+        <li><a routerLink="/pilot-inventory">Pilot Inventory</a></li>
         <li><a>Pilot Skill Tree</a></li>
       </ul>
     </details>
   </li>
   <li>
-    <details
-      [open]="openItem === 'shop'"
-      (click)="toggleItem('shop')"
-      (mouseenter)="openItemOnHover('shop')"
-    >
-      <summary>Shop</summary>
-      <ul class="bg-base-200">
-        <li><a routerLink="/ship-yard">√Ship Yard</a></li>
+    <details [open]="openItem === 'shop'" (click)="toggleItem('shop')" (mouseenter)="openItemOnHover('shop')">
+      <summary class="font-medium">Shop</summary>
+      <ul class="bg-base-300">
+        <li><a routerLink="/ship-yard">Ship Yard</a></li>
         <li><a>Black Market</a></li>
         <li><a>Auction</a></li>
         <li><a>Trade</a></li>
@@ -120,47 +22,35 @@
     </details>
   </li>
   <li>
-    <details
-      [open]="openItem === 'company'"
-      (click)="toggleItem('company')"
-      (mouseenter)="openItemOnHover('company')"
-    >
-      <summary>Company</summary>
-      <ul class="bg-base-200">
-        <li><a routerLink="/clans">√Clans</a></li>
+    <details [open]="openItem === 'company'" (click)="toggleItem('company')" (mouseenter)="openItemOnHover('company')">
+      <summary class="font-medium">Company</summary>
+      <ul class="bg-base-300">
+        <li><a routerLink="/clans">Clans</a></li>
         <li><a>Message Box</a></li>
-        <li><a>Spy system</a></li>
+        <li><a>Spy System</a></li>
         <li><a>Most Wanted</a></li>
         <li><a>Star System</a></li>
       </ul>
     </details>
   </li>
   <li>
-    <details
-      [open]="openItem === 'wiki'"
-      (click)="toggleItem('wiki')"
-      (mouseenter)="openItemOnHover('wiki')"
-    >
-      <summary>Wiki</summary>
-      <ul class="bg-base-200">
-        <li><a>√How to Play</a></li>
-        <li><a routerLink="/lore">√Lore</a></li>
-        <li><a>√FAQ</a></li>
+    <details [open]="openItem === 'wiki'" (click)="toggleItem('wiki')" (mouseenter)="openItemOnHover('wiki')">
+      <summary class="font-medium">Wiki</summary>
+      <ul class="bg-base-300">
+        <li><a>How to Play</a></li>
+        <li><a routerLink="/lore">Lore</a></li>
+        <li><a>FAQ</a></li>
       </ul>
     </details>
   </li>
   <li>
-    <details
-      [open]="openItem === 'admin'"
-      (click)="toggleItem('admin')"
-      (mouseenter)="openItemOnHover('admin')"
-    >
-      <summary>Admin</summary>
-      <ul class="bg-base-200">
-        <li><a routerLink="/users-editor">√Users</a></li>
-        <li><a routerLink="/itemEntry-editor">√ItemEntryEditor</a></li>
-        <li><a routerLink="/spacemap-editor">√SpaceMapEditor</a></li>
-        <li><a>√Logs</a></li>
+    <details [open]="openItem === 'admin'" (click)="toggleItem('admin')" (mouseenter)="openItemOnHover('admin')">
+      <summary class="font-medium">Admin</summary>
+      <ul class="bg-base-300">
+        <li><a routerLink="/users-editor">Users</a></li>
+        <li><a routerLink="/itemEntry-editor">ItemEntry Editor</a></li>
+        <li><a routerLink="/spacemap-editor">SpaceMap Editor</a></li>
+        <li><a>Logs</a></li>
       </ul>
     </details>
   </li>
