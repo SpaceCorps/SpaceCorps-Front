@@ -89,7 +89,7 @@
     <div class="fixed inset-0 z-50">
       <!-- Backdrop -->
       <div
-        class="absolute inset-0 bg-black bg-opacity-50"
+        class="absolute inset-0 bg-black/30 backdrop-blur-sm"
         (click)="toggleMobileMenu()"
       ></div>
 
@@ -111,6 +111,7 @@
           <div class="p-4">
             <app-main-menu
               class="[&_.menu]:menu-vertical [&_.menu]:bg-transparent [&_ul>li>details>ul]:ml-0 [&_ul>li>details>ul]:pl-4"
+              (menuItemClick)="toggleMobileMenu()"
             ></app-main-menu>
           </div>
         </div>
@@ -121,7 +122,7 @@
             <div>
               <button
                 class="btn btn-block bg-base-200 hover:bg-base-300"
-                (click)="togglePatchInfo()"
+                (click)="togglePatchInfo(); toggleMobileMenu()"
               >
                 Patch Info
               </button>
@@ -143,13 +144,13 @@
             </div>
             <button
               class="btn btn-block bg-base-200 hover:bg-base-300"
-              (click)="logOut()"
+              (click)="logOut(); toggleMobileMenu()"
             >
               Log Out
             </button>
             <button
               class="xs:hidden btn btn-block bg-base-200 hover:bg-base-300"
-              (click)="toggleSettings()"
+              (click)="toggleSettings(); toggleMobileMenu()"
             >
               <fa-icon [icon]="faCog"></fa-icon>
             </button>

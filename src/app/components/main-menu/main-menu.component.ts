@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -6,8 +6,11 @@ import { RouterLink } from '@angular/router';
   templateUrl: './main-menu.component.html',
   imports: [RouterLink],
   styleUrl: './main-menu.component.scss',
+  standalone: true
 })
 export class MainMenuComponent {
+  @Output() menuItemClick = new EventEmitter<void>();
+  
   openItem: string | null = null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   closeTimeout: any;
@@ -25,5 +28,9 @@ export class MainMenuComponent {
     this.closeTimeout = setTimeout(() => {
       this.openItem = null;
     }, 300);
+  }
+
+  onMenuItemClick() {
+    this.menuItemClick.emit();
   }
 }
