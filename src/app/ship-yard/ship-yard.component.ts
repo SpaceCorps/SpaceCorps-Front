@@ -1,16 +1,17 @@
 import { Component, OnInit, inject, effect } from '@angular/core';
-import { NgForOf, NgIf } from '@angular/common';
 import {
   getFieldsForItemCategory as getAllFieldsForItemCategory,
   SellableItems,
 } from '../models/player/Items';
 import { ShipModelComponent } from '../components/ship-model/ship-model.component';
 import { StateService } from '../services/state.service';
+import { NumberFormatPipe } from '../pipes/number-format.pipe';
 
 @Component({
   selector: 'app-ship-yard',
+  standalone: true,
+  imports: [ShipModelComponent, NumberFormatPipe],
   templateUrl: './ship-yard.component.html',
-  imports: [NgForOf, NgIf, ShipModelComponent],
   styleUrls: ['./ship-yard.component.scss'],
 })
 export class ShipYardComponent implements OnInit {
@@ -29,6 +30,7 @@ export class ShipYardComponent implements OnInit {
   items: SellableItems[] = [];
   playerBalance = { credits: 0, thulium: 0 };
   username: string | null = null;
+  drawerCheckbox: HTMLInputElement | null = null;
 
   private stateService = inject(StateService);
 
@@ -59,11 +61,17 @@ export class ShipYardComponent implements OnInit {
   async ngOnInit() {
     // Always fetch player data when the page opens
     await this.stateService.fetchPlayerInfo();
+    // Get reference to drawer checkbox
+    this.drawerCheckbox = document.getElementById('my-drawer-2') as HTMLInputElement;
   }
 
   selectCategory(category: SellableItems['itemType']) {
     this.selectedCategory = category;
     this.stateService.fetchShopItems(category);
+    // Close the drawer
+    if (this.drawerCheckbox) {
+      this.drawerCheckbox.checked = false;
+    }
   }
 
   async buyItem(item: SellableItems) {

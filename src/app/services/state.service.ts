@@ -21,17 +21,12 @@ import {
   UnequipShieldRequest,
   UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
-import { ClanData } from '../models/clan/ClanData';
+import { ClanData, ClanInvitation } from '../models/clan/ClanData';
 import {
-  ChangeMemberRoleRequest,
-  ClanInvitation,
   ClanSearchRequest,
   CreateClanRequest,
   InviteToClanRequest,
-  JoinClanRequest,
-  KickMemberRequest,
-  LeaveClanRequest,
-  UpdateClanRequest
+  UpdateMemberStatsRequest,
 } from '../models/clan/ClanDtos';
 import { AuthService } from './auth.service';
 
@@ -74,7 +69,10 @@ export class StateService {
   public clanInvitations = this._clanInvitations.asReadonly();
   public searchedClans = this._searchedClans.asReadonly();
 
-  constructor(private apiService: ApiService, public authService: AuthService) {}
+  constructor(
+    private apiService: ApiService,
+    public authService: AuthService
+  ) {}
 
   // GitHub methods
   async fetchGithubCommits() {
@@ -362,9 +360,17 @@ export class StateService {
   public async fetchClanData(username?: string): Promise<void> {
     try {
       const targetUsername = username || this.authService.getUsername();
-      if (!targetUsername) return;
+      console.log('Fetching clan data for username:', targetUsername);
 
-      const response = await firstValueFrom(this.apiService.getClanMember(targetUsername));
+      if (!targetUsername) {
+        console.log('No username available to fetch clan data');
+        return;
+      }
+
+      const response = await firstValueFrom(
+        this.apiService.getClanMember(targetUsername)
+      );
+      console.log('Received clan data:', response);
       this._clanData.set(response);
     } catch (error) {
       console.error('Error fetching clan data:', error);
@@ -374,7 +380,9 @@ export class StateService {
 
   public async createClan(request: CreateClanRequest): Promise<void> {
     try {
-      const response = await firstValueFrom(this.apiService.createClan(request));
+      const response = await firstValueFrom(
+        this.apiService.createClan(request)
+      );
       this._clanData.set(response);
     } catch (error) {
       console.error('Error creating clan:', error);
@@ -382,29 +390,45 @@ export class StateService {
     }
   }
 
-  public async updateClan(request: UpdateClanRequest): Promise<void> {
+  public async updateClan(
+    clanId: string,
+    username: string,
+    request: UpdateMemberStatsRequest
+  ): Promise<void> {
     try {
-      const response = await firstValueFrom(this.apiService.updateClan(request));
-      this._clanData.set(response as ClanData);
+      await firstValueFrom(
+        this.apiService.updateMemberStats(clanId, username, request)
+      );
+      await this.fetchClanData(username);
     } catch (error) {
       console.error('Error updating clan:', error);
       throw error;
     }
   }
 
-  public async joinClan(request: JoinClanRequest): Promise<void> {
+  public async joinClan(clanId: string, username: string): Promise<void> {
     try {
-      const response = await firstValueFrom(this.apiService.joinClan(request));
-      this._clanData.set(response);
+      await firstValueFrom(this.apiService.joinClan(clanId, username));
+      await this.fetchClanData(username);
     } catch (error) {
       console.error('Error joining clan:', error);
       throw error;
     }
   }
 
-  public async leaveClan(request: LeaveClanRequest): Promise<void> {
+  public async deleteClan(clanId: string, username: string): Promise<void> {
     try {
-      await firstValueFrom(this.apiService.leaveClan(request));
+      await firstValueFrom(this.apiService.deleteClan(clanId, username));
+      this._clanData.set(null);
+    } catch (error) {
+      console.error('Error deleting clan:', error);
+      throw error;
+    }
+  }
+
+  public async leaveClan(clanId: string, username: string): Promise<void> {
+    try {
+      await firstValueFrom(this.apiService.leaveClan(clanId, { username }));
       this._clanData.set(null);
     } catch (error) {
       console.error('Error leaving clan:', error);
@@ -412,29 +436,50 @@ export class StateService {
     }
   }
 
-  public async kickMember(request: KickMemberRequest): Promise<void> {
+  public async kickMember(clanId: string, memberToKick: string): Promise<void> {
     try {
-      const response = await firstValueFrom(this.apiService.kickMember(request));
-      this._clanData.set(response as ClanData);
+      const kickerUsername = this.authService.getUsername();
+      if (!kickerUsername) {
+        throw new Error('No username available to kick member');
+      }
+
+      await firstValueFrom(
+        this.apiService.kickMember(clanId, {
+          kickerUsername,
+          memberToKick,
+        })
+      );
+      await this.fetchClanData();
     } catch (error) {
       console.error('Error kicking member:', error);
       throw error;
     }
   }
 
-  public async changeMemberRole(request: ChangeMemberRoleRequest): Promise<void> {
+  public async changeMemberRole(
+    clanId: string,
+    username: string,
+    isPromotion: boolean
+  ): Promise<void> {
     try {
-      const response = await firstValueFrom(this.apiService.changeMemberRole(request));
-      this._clanData.set(response);
+      if (isPromotion) {
+        await firstValueFrom(this.apiService.promoteMember(clanId, username));
+      } else {
+        await firstValueFrom(this.apiService.demoteMember(clanId, username));
+      }
+      await this.fetchClanData(username);
     } catch (error) {
       console.error('Error changing member role:', error);
       throw error;
     }
   }
 
-  public async inviteToClan(request: InviteToClanRequest): Promise<void> {
+  public async inviteToClan(
+    clanId: string,
+    request: InviteToClanRequest
+  ): Promise<void> {
     try {
-      await firstValueFrom(this.apiService.inviteToClan(request));
+      await firstValueFrom(this.apiService.inviteToClan(clanId, request));
     } catch (error) {
       console.error('Error sending clan invitation:', error);
       throw error;
@@ -446,7 +491,9 @@ export class StateService {
       const username = this.authService.getUsername();
       if (!username) return;
 
-      const response = await firstValueFrom(this.apiService.getClanInvitations(username));
+      const response = await firstValueFrom(
+        this.apiService.getClanInvitations(username)
+      );
       this._clanInvitations.set(response);
     } catch (error) {
       console.error('Error fetching clan invitations:', error);
@@ -456,8 +503,11 @@ export class StateService {
 
   public async acceptClanInvitation(invitationId: string): Promise<void> {
     try {
-      const response = await firstValueFrom(this.apiService.acceptClanInvitation(invitationId));
-      this._clanData.set(response);
+      await firstValueFrom(this.apiService.acceptClanInvitation(invitationId));
+      const username = this.authService.getUsername();
+      if (username) {
+        await this.fetchClanData(username);
+      }
       await this.fetchClanInvitations();
     } catch (error) {
       console.error('Error accepting clan invitation:', error);
@@ -477,11 +527,32 @@ export class StateService {
 
   public async searchClans(request: ClanSearchRequest): Promise<void> {
     try {
-      const response = await firstValueFrom(this.apiService.searchClans(request));
+      const response = await firstValueFrom(
+        this.apiService.searchClans(request)
+      );
       this._searchedClans.set(response);
     } catch (error) {
       console.error('Error searching clans:', error);
       this._searchedClans.set([]);
+    }
+  }
+
+  public async updateClanDetails(request: {
+    clanId: string;
+    slogan: string;
+    companyInfo: string;
+    isRecruiting: boolean;
+    minimumLevel: number;
+    minimumRankingPoints: number;
+  }): Promise<void> {
+    try {
+      const response = await firstValueFrom(
+        this.apiService.updateClan(request)
+      );
+      this._clanData.set(response);
+    } catch (error) {
+      console.error('Error updating clan details:', error);
+      throw error;
     }
   }
 }

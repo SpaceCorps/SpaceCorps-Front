@@ -44,7 +44,11 @@ export class GithubTimelineComponent implements OnInit {
   }
 
   isLatestRelease(commit: Commit): boolean {
-    return this.commits.findIndex(c => this.isBigRelease(c.commit.message)) === this.commits.indexOf(commit);
+    const bigReleaseIndex = this.commits.findIndex(c => this.isBigRelease(c.commit.message));
+    if (bigReleaseIndex === -1) {
+      return false; // No big release found
+    }
+    return bigReleaseIndex === this.commits.indexOf(commit);
   }
 
   isLastCommit(commit: Commit): boolean {

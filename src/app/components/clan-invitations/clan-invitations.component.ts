@@ -1,14 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StateService } from '../../services/state.service';
-import { ClanInvitation } from '../../models/clan/ClanDtos';
+import { ClanInvitation } from '../../models/clan/ClanData';
 
 @Component({
   selector: 'app-clan-invitations',
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (invitations().length > 0) {
+    @if (!invitations() || invitations().length === 0) {
+      <!-- Don't show anything if there are no invitations -->
+    } @else {
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
           <h2 class="card-title">Clan Invitations</h2>

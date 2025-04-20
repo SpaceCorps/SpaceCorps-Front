@@ -4,9 +4,9 @@
     <details [open]="openItem === 'pilot'" (click)="toggleItem('pilot')" (mouseenter)="openItemOnHover('pilot')">
       <summary class="font-medium">Pilot</summary>
       <ul class="bg-base-300">
-        <li><a routerLink="/pilot-info">Pilot Info</a></li>
-        <li><a routerLink="/pilot-inventory">Pilot Inventory</a></li>
-        <li><a>Pilot Skill Tree</a></li>
+        <li><a routerLink="/pilot-info" (click)="onMenuItemClick()">Pilot Info</a></li>
+        <li><a routerLink="/pilot-inventory" (click)="onMenuItemClick()">Pilot Inventory</a></li>
+        <li><a (click)="onMenuItemClick()">Pilot Skill Tree</a></li>
       </ul>
     </details>
   </li>
@@ -14,10 +14,10 @@
     <details [open]="openItem === 'shop'" (click)="toggleItem('shop')" (mouseenter)="openItemOnHover('shop')">
       <summary class="font-medium">Shop</summary>
       <ul class="bg-base-300">
-        <li><a routerLink="/ship-yard">Ship Yard</a></li>
-        <li><a>Black Market</a></li>
-        <li><a>Auction</a></li>
-        <li><a>Trade</a></li>
+        <li><a routerLink="/ship-yard" (click)="onMenuItemClick()">Ship Yard</a></li>
+        <li><a (click)="onMenuItemClick()">Black Market</a></li>
+        <li><a (click)="onMenuItemClick()">Auction</a></li>
+        <li><a (click)="onMenuItemClick()">Trade</a></li>
       </ul>
     </details>
   </li>
@@ -25,11 +25,11 @@
     <details [open]="openItem === 'company'" (click)="toggleItem('company')" (mouseenter)="openItemOnHover('company')">
       <summary class="font-medium">Company</summary>
       <ul class="bg-base-300">
-        <li><a routerLink="/clans">Clans</a></li>
-        <li><a>Message Box</a></li>
-        <li><a>Spy System</a></li>
-        <li><a>Most Wanted</a></li>
-        <li><a>Star System</a></li>
+        <li><a routerLink="/clans" (click)="onMenuItemClick()">Clans</a></li>
+        <li><a (click)="onMenuItemClick()">Message Box</a></li>
+        <li><a (click)="onMenuItemClick()">Spy System</a></li>
+        <li><a (click)="onMenuItemClick()">Most Wanted</a></li>
+        <li><a (click)="onMenuItemClick()">Star System</a></li>
       </ul>
     </details>
   </li>
@@ -37,9 +37,9 @@
     <details [open]="openItem === 'wiki'" (click)="toggleItem('wiki')" (mouseenter)="openItemOnHover('wiki')">
       <summary class="font-medium">Wiki</summary>
       <ul class="bg-base-300">
-        <li><a>How to Play</a></li>
-        <li><a routerLink="/lore">Lore</a></li>
-        <li><a>FAQ</a></li>
+        <li><a (click)="onMenuItemClick()">How to Play</a></li>
+        <li><a routerLink="/lore" (click)="onMenuItemClick()">Lore</a></li>
+        <li><a (click)="onMenuItemClick()">FAQ</a></li>
       </ul>
     </details>
   </li>
@@ -47,10 +47,10 @@
     <details [open]="openItem === 'admin'" (click)="toggleItem('admin')" (mouseenter)="openItemOnHover('admin')">
       <summary class="font-medium">Admin</summary>
       <ul class="bg-base-300">
-        <li><a routerLink="/users-editor">Users</a></li>
-        <li><a routerLink="/itemEntry-editor">ItemEntry Editor</a></li>
-        <li><a routerLink="/spacemap-editor">SpaceMap Editor</a></li>
-        <li><a>Logs</a></li>
+        <li><a routerLink="/users-editor" (click)="onMenuItemClick()">Users</a></li>
+        <li><a routerLink="/itemEntry-editor" (click)="onMenuItemClick()">ItemEntry Editor</a></li>
+        <li><a routerLink="/spacemap-editor" (click)="onMenuItemClick()">SpaceMap Editor</a></li>
+        <li><a (click)="onMenuItemClick()">Logs</a></li>
       </ul>
     </details>
   </li>

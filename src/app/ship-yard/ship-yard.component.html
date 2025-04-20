@@ -1,83 +1,79 @@
 <section class="drawer lg:drawer-open">
   <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-  <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden">
-    Open All Shop Categories
-  </label>
-
+  
   <section class="drawer-content flex flex-col gap-4 p-4">
-    <!-- Player Balance -->
-    <div class="flex justify-between p-4 bg-base-200 rounded-box">
-      <div>
-        <p>Balance in Credits: {{ playerBalance.credits }}</p>
-        <p>Balance in Thulium: {{ playerBalance.thulium }}</p>
+    <!-- Balance Info -->
+    <div class="bg-base-200 rounded-box p-4">
+      <div class="flex flex-col gap-2">
+        <p class="text-lg">Balance in Credits: {{ playerBalance.credits | numberFormat }}</p>
+        <p class="text-lg">Balance in Thulium: {{ playerBalance.thulium | numberFormat }}</p>
       </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="lg:hidden">
+      <label for="my-drawer-2" class="btn btn-primary drawer-button w-full">
+        Open All Shop Categories
+      </label>
     </div>
 
     <!-- Render Components based on selected category -->
-    <div *ngIf="selectedCategory">
-      <h2>{{ selectedCategory }} Items</h2>
-      <div class="flex flex-wrap gap-4">
-        <div
-          *ngFor="let item of items"
-          class="card bg-base-200 p-4 w-64 mx-auto"
-        >
-          <div class="flex flex-col items-center">
-            <!--            <img [src]="item.icon" alt="{{ item.name }} icon" class="w-16 h-16"/>-->
-            <h3 title="{{ JSON.stringify(item) }}" class="card-title">
-              {{ item.name }}
-            </h3>
+    @if (selectedCategory) {
+      <h2 class="text-2xl font-bold mb-4">{{ selectedCategory }} Items</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (item of items; track item.name) {
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <h3 class="card-title" title="{{ JSON.stringify(item) }}">
+                {{ item.name }}
+              </h3>
 
-            <table class="table">
-              @for (
-                field of getFieldsForItemCategory(selectedCategory);
-                track field.key
-              ) {
-                <tr class="hover:bg-base-100">
-                  <td>{{ field.label }}</td>
-                  <td>{{ item[field.key] }}</td>
-                </tr>
+              <table class="table">
+                @for (field of getFieldsForItemCategory(selectedCategory); track field.key) {
+                  <tr class="hover:bg-base-100">
+                    <td>{{ field.label }}</td>
+                    <td>{{ item[field.key] }}</td>
+                  </tr>
+                }
+              </table>
+
+              @if (selectedCategory === 'Ship') {
+                <div class="flex justify-center">
+                  <app-ship-model [shipModelName]="item.name"></app-ship-model>
+                </div>
               }
-            </table>
 
-            @if (selectedCategory === 'Ship') {
-              <app-ship-model [shipModelName]="item.name"></app-ship-model>
-            }
-
-            <p>Price in Credits: {{ item.priceCredits }}</p>
-            <p>Price in Thulium: {{ item.priceThulium }}</p>
-
-            <button
-              class="btn btn-neutral bg-base-200 mt-4"
-              (click)="buyItem(item)"
-            >
-              Buy Item
-            </button>
+              <div class="card-actions justify-between items-center mt-4">
+                <div>
+                  <p>Credits: {{ item.priceCredits | numberFormat }}</p>
+                  <p>Thulium: {{ item.priceThulium | numberFormat }}</p>
+                </div>
+                <button class="btn btn-primary" (click)="buyItem(item)">
+                  Buy Item
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        }
       </div>
-    </div>
+    }
   </section>
 
   <!-- Side menu with categories -->
   <aside class="drawer-side">
-    <label
-      for="my-drawer-2"
-      aria-label="close sidebar"
-      class="drawer-overlay"
-    ></label>
-    <ul
-      class="menu bg-base-200 text-base-content min-h-full w-80 p-4 gap-4 overflow-y-auto"
-    >
+    <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
+    <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4 gap-4">
       <li class="menu-title"><p>Shop Categories</p></li>
-      <li *ngFor="let category of categories">
-        <a
-          (click)="selectCategory(category)"
-          [class]="category === selectedCategory ? 'active' : ''"
-          class="menu-link"
-        >
-          {{ category }}
-        </a>
-      </li>
+      @for (category of categories; track category) {
+        <li>
+          <a 
+            (click)="selectCategory(category)"
+            [class.active]="category === selectedCategory"
+          >
+            {{ category }}
+          </a>
+        </li>
+      }
     </ul>
   </aside>
 </section>

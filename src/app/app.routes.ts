@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -18,6 +19,7 @@ export const routes: Routes = [
   },
   {
     path: 'lobby',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import('./lobby/lobby.component');
       return module.LobbyComponent;
@@ -25,6 +27,7 @@ export const routes: Routes = [
   },
   {
     path: 'pilot-info',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import('./pilot-info/pilot-info.component');
       return module.PilotInfoComponent;
@@ -32,6 +35,7 @@ export const routes: Routes = [
   },
   {
     path: 'game',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import('./game/game.component');
       return module.GameComponent;
@@ -39,6 +43,7 @@ export const routes: Routes = [
   },
   {
     path: 'spacemap-editor',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import(
         './spacemap-editor/spacemap-editor.component'
@@ -48,6 +53,7 @@ export const routes: Routes = [
   },
   {
     path: 'itemEntry-editor',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import(
         './itemEntry-editor/itemEntry-editor.component'
@@ -57,6 +63,7 @@ export const routes: Routes = [
   },
   {
     path: 'ship-yard',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import('./ship-yard/ship-yard.component');
       return module.ShipYardComponent;
@@ -64,6 +71,7 @@ export const routes: Routes = [
   },
   {
     path: 'users-editor',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import('./users-editor/users-editor.component');
       return module.UsersEditorComponent;
@@ -71,6 +79,7 @@ export const routes: Routes = [
   },
   {
     path: 'pilot-inventory',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import(
         './pilot-inventory/pilot-inventory.component'
@@ -80,6 +89,7 @@ export const routes: Routes = [
   },
   {
     path: 'lore',
+    canActivate: [authGuard],
     loadComponent: async () => {
       const module = await import('./lore/lore.component');
       return module.LoreComponent;
@@ -87,6 +97,7 @@ export const routes: Routes = [
   },
   {
     path: 'clans',
+    canActivate: [authGuard],
     loadComponent: () => import('./clans/clans.component').then(m => m.ClansComponent),
     title: 'Clans'
   },

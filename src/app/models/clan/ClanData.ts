@@ -1,3 +1,5 @@
+import { ClanRole } from "./ClanRoles";
+
 export interface ClanData {
   id: string;
   name: string;
@@ -33,9 +35,22 @@ export interface ClanMember {
   isOnline: boolean;
 }
 
-export enum ClanRole {
-  LEADER = 'LEADER',
-  OFFICER = 'OFFICER',
-  MEMBER = 'MEMBER',
-  RECRUIT = 'RECRUIT'
-} 
+export interface ClanInvitation {
+  id: string;
+  username: string;
+  inviteDate: string;
+  expiryDate: string;
+  isAccepted: boolean;
+  isDeclined: boolean;
+  clanId: string;
+  clanName: string;
+  clanTag: string;
+  invitedByUsername: string;
+  message?: string;
+}
+
+export enum InvitationStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  DECLINED = 'DECLINED',
+}
