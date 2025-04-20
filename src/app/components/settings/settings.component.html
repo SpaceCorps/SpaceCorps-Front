@@ -1,47 +1,111 @@
 @if (isOpen) {
   <dialog class="modal modal-open">
-    <div class="modal-box w-11/12 max-w-2xl sm:h-auto h-full sm:max-h-[90vh] max-h-full">
+    <div
+      class="modal-box w-11/12 max-w-2xl sm:h-auto h-full sm:max-h-[90vh] max-h-full"
+    >
       <h2 class="text-2xl font-bold mb-8">Settings</h2>
-      
+
       <div class="space-y-8 overflow-y-auto">
         <!-- Theme Settings -->
         <div class="space-y-3">
-          <h3 class="text-lg font-medium text-base-content/80">Theme</h3>
-          <app-theme-picker></app-theme-picker>
+          <h3 class="text-lg font-medium text-base-content/80">Theme Properties</h3>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Theme</span>
+            </label>
+            <select
+              class="select select-bordered w-full"
+              [(ngModel)]="selectedTheme"
+              (change)="onThemeChange($event)"
+            >
+              @for (theme of availableThemes; track theme) {
+                <option [value]="theme" [selected]="theme === selectedTheme">
+                  {{ theme }}
+                </option>
+              }
+            </select>
+          </div>
         </div>
 
         <!-- Game Settings -->
-        <div class="space-y-4">
-          <h3 class="text-lg font-medium text-base-content/80">Game Settings</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-base-200/50 rounded-lg p-4">
-            <div class="form-control flex flex-row items-center justify-between">
+        <div class="space-y-3">
+          <h3 class="text-lg font-medium text-base-content/80">
+            Game Settings
+          </h3>
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-base-200/50 rounded-lg p-4"
+          >
+            <div
+              class="form-control flex flex-row items-center justify-between"
+            >
               <span class="label-text">Show FPS Counter</span>
-              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.showFPS" />
+              <input
+                type="checkbox"
+                class="toggle toggle-primary"
+                [(ngModel)]="settings.showFPS"
+                (ngModelChange)="onSettingChange()"
+              />
             </div>
-            <div class="form-control flex flex-row items-center justify-between">
+            <div
+              class="form-control flex flex-row items-center justify-between"
+            >
               <span class="label-text">Enable Particles</span>
-              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.enableParticles" />
+              <input
+                type="checkbox"
+                class="toggle toggle-primary"
+                [(ngModel)]="settings.enableParticles"
+                (ngModelChange)="onSettingChange()"
+              />
             </div>
-            <div class="form-control flex flex-row items-center justify-between">
+            <div
+              class="form-control flex flex-row items-center justify-between"
+            >
               <span class="label-text">Show Grid</span>
-              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.showGrid" />
+              <input
+                type="checkbox"
+                class="toggle toggle-primary"
+                [(ngModel)]="settings.showGrid"
+                (ngModelChange)="onSettingChange()"
+              />
             </div>
-            <div class="form-control flex flex-row items-center justify-between">
+            <div
+              class="form-control flex flex-row items-center justify-between"
+            >
               <span class="label-text">Enable Sound</span>
-              <input type="checkbox" class="toggle toggle-primary" [(ngModel)]="settings.enableSound" />
+              <input
+                type="checkbox"
+                class="toggle toggle-primary"
+                [(ngModel)]="settings.enableSound"
+                (ngModelChange)="onSettingChange()"
+              />
             </div>
           </div>
         </div>
 
         <!-- Graphics Quality -->
         <div class="space-y-3">
-          <h3 class="text-lg font-medium text-base-content/80">Graphics Quality</h3>
-          <select class="select select-bordered w-full bg-base-200/50" [(ngModel)]="settings.graphicsQuality">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="ultra">Ultra</option>
-          </select>
+          <h3 class="text-lg font-medium text-base-content/80">
+            Graphics Quality
+          </h3>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Quality Level</span>
+            </label>
+            <select
+              class="select select-bordered w-full"
+              [(ngModel)]="settings.graphicsQuality"
+              (change)="onSettingChange()"
+            >
+              @for (quality of ['low', 'medium', 'high']; track quality) {
+                <option
+                  [value]="quality"
+                  [selected]="quality === settings.graphicsQuality"
+                >
+                  {{ quality }}
+                </option>
+              }
+            </select>
+          </div>
         </div>
       </div>
 
@@ -52,4 +116,4 @@
     </div>
     <div class="modal-backdrop" (click)="close()"></div>
   </dialog>
-} 
+}

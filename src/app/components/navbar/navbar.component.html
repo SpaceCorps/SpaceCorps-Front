@@ -2,7 +2,10 @@
   <nav class="flex items-center justify-between container mx-auto px-2 sm:px-4">
     <!-- Left side - Logo -->
     <div class="flex-none">
-      <a class="flex flex-col sm:flex-row sm:gap-2 text-lg sm:text-xl font-bold leading-tight" routerLink="/">
+      <a
+        class="flex flex-col sm:flex-row sm:gap-2 text-lg sm:text-xl font-bold leading-tight"
+        routerLink="/"
+      >
         <span>SpaceCorps</span>
         <span>2025</span>
       </a>
@@ -12,12 +15,17 @@
     @if ((authState$ | async)?.isAuthenticated) {
       <!-- Desktop Menu -->
       <div class="hidden lg:flex flex-1 justify-center px-4">
-        <app-main-menu class="flex-shrink-0 [&_.menu]:menu-horizontal [&_.menu]:bg-base-200 [&_.menu]:rounded-box [&_.menu]:gap-2 [&_.menu]:min-w-[460px] [&_summary]:px-3"></app-main-menu>
+        <app-main-menu
+          class="flex-shrink-0 [&_.menu]:menu-horizontal [&_.menu]:bg-base-200 [&_.menu]:rounded-box [&_.menu]:gap-2 [&_.menu]:min-w-[460px] [&_summary]:px-3"
+        ></app-main-menu>
       </div>
 
       <!-- Mobile/Tablet Menu Button -->
       <div class="lg:hidden">
-        <button class="btn btn-sm sm:btn-md bg-base-200" (click)="toggleMobileMenu()">
+        <button
+          class="btn btn-sm sm:btn-md bg-base-200"
+          (click)="toggleMobileMenu()"
+        >
           Menu
         </button>
       </div>
@@ -28,7 +36,10 @@
       @if ((authState$ | async)?.isAuthenticated) {
         <!-- Patch Info Button (visible until md) -->
         <div class="relative">
-          <button class="hidden md:flex btn btn-md bg-base-200 hover:bg-base-300" (click)="togglePatchInfo()">
+          <button
+            class="hidden md:flex btn btn-md bg-base-200 hover:bg-base-300"
+            (click)="togglePatchInfo()"
+          >
             Patch Info
           </button>
 
@@ -38,8 +49,12 @@
             <div class="absolute top-full right-0 mt-2 z-50 w-96">
               <div class="card bg-base-100 shadow-xl">
                 <div class="card-body p-0">
-                  <div class="h-[600px] overflow-y-auto overflow-x-hidden resize-y min-h-[300px] max-h-[900px]">
-                    <app-github-timeline class="block w-full [&_*]:break-words"></app-github-timeline>
+                  <div
+                    class="h-[600px] overflow-y-auto overflow-x-hidden resize-y min-h-[300px] max-h-[900px]"
+                  >
+                    <app-github-timeline
+                      class="block w-full [&_*]:break-words"
+                    ></app-github-timeline>
                   </div>
                 </div>
               </div>
@@ -48,12 +63,18 @@
         </div>
 
         <!-- Log Out Button (visible until sm) -->
-        <button class="hidden sm:flex btn btn-md bg-base-200 hover:bg-base-300" (click)="logOut()">
+        <button
+          class="hidden sm:flex btn btn-md bg-base-200 hover:bg-base-300"
+          (click)="logOut()"
+        >
           Log Out
         </button>
 
         <!-- Settings Button (visible until xs) -->
-        <button class="btn btn-sm sm:btn-md bg-base-200 hover:bg-base-300" (click)="toggleSettings()">
+        <button
+          class="btn btn-sm sm:btn-md bg-base-200 hover:bg-base-300"
+          (click)="toggleSettings()"
+        >
           <fa-icon [icon]="faCog"></fa-icon>
         </button>
       }
@@ -61,17 +82,24 @@
   </nav>
 
   <!-- Settings Component -->
-  <app-settings [(isOpen)]="showSettings" (settingsChange)="saveSettings($event)"></app-settings>
+  <app-settings [(isOpen)]="showSettings"></app-settings>
 
   <!-- Mobile Menu Drawer -->
   @if (showMobileMenu) {
     <div class="fixed inset-0 z-50">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black bg-opacity-50" (click)="toggleMobileMenu()"></div>
-      
+      <div
+        class="absolute inset-0 bg-black bg-opacity-50"
+        (click)="toggleMobileMenu()"
+      ></div>
+
       <!-- Menu Content -->
-      <div class="absolute top-0 left-0 w-80 h-full bg-base-200 shadow-xl flex flex-col">
-        <div class="flex justify-between items-center p-4 border-b border-base-300">
+      <div
+        class="absolute top-0 left-0 w-80 h-full bg-base-200 shadow-xl flex flex-col"
+      >
+        <div
+          class="flex justify-between items-center p-4 border-b border-base-300"
+        >
           <h2 class="text-lg font-bold">Menu</h2>
           <button class="btn btn-sm btn-ghost" (click)="toggleMobileMenu()">
             <fa-icon [icon]="faTimes"></fa-icon>
@@ -81,7 +109,9 @@
         <!-- Main Menu -->
         <div class="flex-1 overflow-y-auto">
           <div class="p-4">
-            <app-main-menu class="[&_.menu]:menu-vertical [&_.menu]:bg-transparent [&_ul>li>details>ul]:ml-0 [&_ul>li>details>ul]:pl-4"></app-main-menu>
+            <app-main-menu
+              class="[&_.menu]:menu-vertical [&_.menu]:bg-transparent [&_ul>li>details>ul]:ml-0 [&_ul>li>details>ul]:pl-4"
+            ></app-main-menu>
           </div>
         </div>
 
@@ -89,25 +119,38 @@
         <div class="p-4 border-t border-base-300">
           <div class="flex flex-col gap-2">
             <div>
-              <button class="btn btn-block bg-base-200 hover:bg-base-300" (click)="togglePatchInfo()">
+              <button
+                class="btn btn-block bg-base-200 hover:bg-base-300"
+                (click)="togglePatchInfo()"
+              >
                 Patch Info
               </button>
               @if (showPatchInfo) {
                 <div class="mt-2">
                   <div class="card bg-base-100 shadow-xl">
                     <div class="card-body p-0">
-                      <div class="h-[600px] overflow-y-auto overflow-x-hidden resize-y min-h-[300px] max-h-[900px]">
-                        <app-github-timeline class="block w-full [&_*]:break-words"></app-github-timeline>
+                      <div
+                        class="h-[600px] overflow-y-auto overflow-x-hidden resize-y min-h-[300px] max-h-[900px]"
+                      >
+                        <app-github-timeline
+                          class="block w-full [&_*]:break-words"
+                        ></app-github-timeline>
                       </div>
                     </div>
                   </div>
                 </div>
               }
             </div>
-            <button class="btn btn-block bg-base-200 hover:bg-base-300" (click)="logOut()">
+            <button
+              class="btn btn-block bg-base-200 hover:bg-base-300"
+              (click)="logOut()"
+            >
               Log Out
             </button>
-            <button class="xs:hidden btn btn-block bg-base-200 hover:bg-base-300" (click)="toggleSettings()">
+            <button
+              class="xs:hidden btn btn-block bg-base-200 hover:bg-base-300"
+              (click)="toggleSettings()"
+            >
               <fa-icon [icon]="faCog"></fa-icon>
             </button>
           </div>

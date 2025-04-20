@@ -14,7 +14,7 @@ import { GithubTimelineComponent } from '../github-timeline/github-timeline.comp
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUsers, faCog, faInfoCircle, faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { SettingsComponent } from '../settings/settings.component';
-import { GameSettings } from '../../models/game-settings.model';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-navbar',
@@ -33,20 +33,15 @@ import { GameSettings } from '../../models/game-settings.model';
   styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent {
-  authService = inject(AuthService);
+  private authService = inject(AuthService);
+  private settingsService = inject(SettingsService);
+  
   authState$ = this.authService.authState$;
+  settings = this.settingsService.getSettings();
 
   showPatchInfo = false;
   showSettings = false;
   showMobileMenu = false;
-
-  settings: GameSettings = {
-    showFPS: false,
-    enableParticles: true,
-    showGrid: false,
-    enableSound: true,
-    graphicsQuality: 'high'
-  };
 
   protected readonly faUsers = faUsers;
   protected readonly faCog = faCog;
@@ -73,11 +68,6 @@ export class NavbarComponent {
     this.showMobileMenu = !this.showMobileMenu;
   }
 
-  saveSettings(newSettings: GameSettings) {
-    this.settings = newSettings;
-    // TODO: Save settings to service/storage
-  }
-
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     if (
@@ -85,14 +75,6 @@ export class NavbarComponent {
       !this.patchInfoContainer.nativeElement.contains(event.target)
     ) {
       this.showPatchInfo = false;
-    }
-  }
-
-  ngOnInit() {
-    // Load saved settings
-    const savedSettings = localStorage.getItem('gameSettings');
-    if (savedSettings) {
-      this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
     }
   }
 }
