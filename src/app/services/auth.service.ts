@@ -4,7 +4,6 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ApiService } from './api.service';
 import { UserCredentialsCreateRequest } from '../models/auth/UserCredentialsCreateRequest';
 import { UserCredentialsLoginRequest } from '../models/auth/UserCredentialsLoginRequest';
-import { SessionService } from './session.service';
 import { PlayerData } from '../models/player/PlayerData';
 import { AuthState } from '../models/auth/AuthState';
 
@@ -26,7 +25,6 @@ export class AuthService {
 
   constructor(
     private apiService: ApiService,
-    private sessionService: SessionService,
     private router: Router
   ) {
     this.loadAuthState();
@@ -50,13 +48,6 @@ export class AuthService {
   public logIn(credentials: UserCredentialsLoginRequest): Observable<PlayerData> {
     return this.apiService.logIn(credentials).pipe(
       tap((playerData: PlayerData) => {
-        const session = {
-          sessionId: playerData.id, // Using player ID as session ID
-          username: playerData.username,
-          userId: playerData.userId,
-          roles: ['player']
-        };
-        this.sessionService.setSession(session);
         this.updateAuthState({
           isAuthenticated: true,
           sessionId: playerData.id,
@@ -99,7 +90,6 @@ export class AuthService {
 
   public logOut(): void {
     localStorage.removeItem(this.AUTH_KEY);
-    this.sessionService.clearSession();
     this._authState.next({
       isAuthenticated: false,
       sessionId: null,
@@ -114,13 +104,6 @@ export class AuthService {
   public register(userCredentialsCreateRequest: UserCredentialsCreateRequest): Observable<PlayerData> {
     return this.apiService.createNewUser(userCredentialsCreateRequest).pipe(
       tap((playerData: PlayerData) => {
-        const session = {
-          sessionId: playerData.id, // Using player ID as session ID
-          username: playerData.username,
-          userId: playerData.userId,
-          roles: ['player']
-        };
-        this.sessionService.setSession(session);
         this.updateAuthState({
           isAuthenticated: true,
           sessionId: playerData.id,
