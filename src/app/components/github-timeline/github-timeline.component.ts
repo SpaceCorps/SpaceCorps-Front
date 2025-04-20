@@ -43,6 +43,10 @@ export class GithubTimelineComponent implements OnInit {
     return regex.test(message);
   }
 
+  isLatestRelease(commit: Commit): boolean {
+    return this.commits.findIndex(c => this.isBigRelease(c.commit.message)) === this.commits.indexOf(commit);
+  }
+
   isLastCommit(commit: Commit): boolean {
     return this.commits.indexOf(commit) === this.commits.length - 1;
   }
