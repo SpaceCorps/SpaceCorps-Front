@@ -19,26 +19,6 @@ export interface UpdateMemberStatsRequest {
   aliensDestroyed: number;
 }
 
-export interface ClanInvitation {
-  id: string;
-  username: string;
-  inviteDate: string;
-  expiryDate: string;
-  isAccepted: boolean;
-  isDeclined: boolean;
-  clanId: string;
-  clanName: string;
-  clanTag: string;
-  invitedByUsername: string;
-  message?: string;
-}
-
-export enum InvitationStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  DECLINED = 'DECLINED',
-}
-
 export enum ClanSortOption {
   NAME = 'NAME',
   LEVEL = 'LEVEL',
@@ -61,39 +41,4 @@ export interface ClanSearchRequest {
   minClanLevel?: number;
   minMemberCount?: number;
   sortBy?: ClanSortOption;
-}
-
-export interface ClanData {
-  id: string;
-  name: string;
-  tag: string;
-  slogan: string;
-  companyInfo: string;
-  isRecruiting: boolean;
-  minimumLevel: number;
-  minimumRankingPoints: number;
-  level: number;
-  experience: number;
-  honor: number;
-  shipsDestroyed: number;
-  aliensDestroyed: number;
-  rankingPoints: number;
-  dateCreated: string;
-  members: ClanMember[];
-}
-
-export interface ClanMember {
-  username: string;
-  role: ClanRole;
-  experience: number;
-  honor: number;
-  shipsDestroyed: number;
-  aliensDestroyed: number;
-  dateJoined: string;
-}
-
-export enum ClanRole {
-  LEADER = 'LEADER',
-  OFFICER = 'OFFICER',
-  MEMBER = 'MEMBER'
 }

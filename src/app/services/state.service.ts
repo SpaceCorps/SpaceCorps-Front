@@ -21,9 +21,8 @@ import {
   UnequipShieldRequest,
   UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
-import { ClanData } from '../models/clan/ClanData';
+import { ClanData, ClanInvitation } from '../models/clan/ClanData';
 import {
-  ClanInvitation,
   ClanSearchRequest,
   CreateClanRequest,
   InviteToClanRequest,
@@ -362,7 +361,7 @@ export class StateService {
     try {
       const targetUsername = username || this.authService.getUsername();
       console.log('Fetching clan data for username:', targetUsername);
-      
+
       if (!targetUsername) {
         console.log('No username available to fetch clan data');
         return;
@@ -444,10 +443,12 @@ export class StateService {
         throw new Error('No username available to kick member');
       }
 
-      await firstValueFrom(this.apiService.kickMember(clanId, {
-        kickerUsername,
-        memberToKick
-      }));
+      await firstValueFrom(
+        this.apiService.kickMember(clanId, {
+          kickerUsername,
+          memberToKick,
+        })
+      );
       await this.fetchClanData();
     } catch (error) {
       console.error('Error kicking member:', error);

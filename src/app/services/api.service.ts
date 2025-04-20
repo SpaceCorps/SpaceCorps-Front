@@ -28,11 +28,10 @@ import {
   UnequipThrusterRequest,
 } from '../models/player/EquipUnequipDtos';
 import { ChapterProgressDto } from '../models/lore/ChapterProgressDto';
-import { ClanData } from '../models/clan/ClanData';
+import { ClanData, ClanInvitation } from '../models/clan/ClanData';
 import {
   CreateClanRequest,
   InviteToClanRequest,
-  ClanInvitation,
   ClanSearchRequest,
   UpdateMemberStatsRequest,
 } from '../models/clan/ClanDtos';

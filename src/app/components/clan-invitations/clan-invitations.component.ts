@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StateService } from '../../services/state.service';
-import { ClanInvitation } from '../../models/clan/ClanDtos';
+import { ClanInvitation } from '../../models/clan/ClanData';
 
 @Component({
   selector: 'app-clan-invitations',

@@ -16,7 +16,7 @@ import { ClanInvitationsComponent } from '../../components/clan-invitations/clan
       <section>
         <h1 class="text-3xl font-bold mb-4">Your Clan</h1>
         @if (clanData()) {
-          <app-clan-details [clan]="clanData()" />
+          <app-clan-details [clan]="clanData()!" />
         } @else {
           <div class="card bg-base-100 shadow-xl">
             <div class="card-body">

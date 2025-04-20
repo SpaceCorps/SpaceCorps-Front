@@ -1,10 +1,10 @@
 export type ClanRole = 'LEADER' | 'CO_LEADER' | 'ELDER' | 'ROOKIE';
 
 export const ClanRoleHierarchy: Record<ClanRole, number> = {
-  'LEADER': 4,
-  'CO_LEADER': 3,
+  'LEADER': 0,
+  'CO_LEADER': 1,
   'ELDER': 2,
-  'ROOKIE': 1
+  'ROOKIE': 3
 };
 
 export interface ClanPermissions {

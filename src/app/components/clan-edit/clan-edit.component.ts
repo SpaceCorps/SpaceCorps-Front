@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ClanData } from '../../models/clan/ClanDtos';
+import { ClanData } from '../../models/clan/ClanData';
 import { StateService } from '../../services/state.service';
 
 @Component({

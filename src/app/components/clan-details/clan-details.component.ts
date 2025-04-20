@@ -1,7 +1,6 @@
 import { Component, Input, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ClanData } from '../../models/clan/ClanDtos';
 import { StateService } from '../../services/state.service';
 import { ClanEditComponent } from '../clan-edit/clan-edit.component';
 import { ClanListComponent } from '../clan-list/clan-list.component';
@@ -9,8 +8,9 @@ import {
   ClanRole,
   getClanPermissions,
   canKickMember,
-  getRoleFromNumber
+  getRoleFromNumber,
 } from '../../models/clan/ClanRoles';
+import { ClanData, ClanMember } from '../../models/clan/ClanData';
 
 type MemberRole = 'LEADER' | 'CO_LEADER' | 'ELDER' | 'ROOKIE';
 
@@ -18,7 +18,7 @@ type MemberRole = 'LEADER' | 'CO_LEADER' | 'ELDER' | 'ROOKIE';
   selector: 'app-clan-details',
   standalone: true,
   imports: [CommonModule, FormsModule, ClanEditComponent, ClanListComponent],
-  templateUrl: './clan-details.component.html'
+  templateUrl: './clan-details.component.html',
 })
 export class ClanDetailsComponent {
   @Input() clan!: ClanData | null;
@@ -33,12 +33,14 @@ export class ClanDetailsComponent {
       const currentPlayer = this.stateService.currentPlayer();
       if (currentPlayer && this.clan) {
         const member = this.clan.members.find(
-          (m) => m.username === currentPlayer.username
+          (m: ClanMember) => m.username === currentPlayer.username
         );
         if (member) {
           const roleNumber = typeof member.role === 'number' ? member.role : 0;
           this.currentUserRole = getRoleFromNumber(roleNumber) as MemberRole;
-          this.permissions = getClanPermissions(this.currentUserRole as ClanRole);
+          this.permissions = getClanPermissions(
+            this.currentUserRole as ClanRole
+          );
         }
       }
     });
@@ -64,8 +66,14 @@ export class ClanDetailsComponent {
 
   protected canKickCurrentMember(memberRole: string | number): boolean {
     if (!this.currentUserRole) return false;
-    const memberRoleStr = typeof memberRole === 'number' ? getRoleFromNumber(memberRole) : memberRole;
-    return canKickMember(this.currentUserRole as ClanRole, memberRoleStr as ClanRole);
+    const memberRoleStr =
+      typeof memberRole === 'number'
+        ? getRoleFromNumber(memberRole)
+        : memberRole;
+    return canKickMember(
+      this.currentUserRole as ClanRole,
+      memberRoleStr as ClanRole
+    );
   }
 
   protected async invitePlayer() {

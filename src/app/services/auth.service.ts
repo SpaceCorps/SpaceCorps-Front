@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ApiService } from './api.service';
 import { UserCredentialsCreateRequest } from '../models/auth/UserCredentialsCreateRequest';
@@ -25,7 +26,8 @@ export class AuthService {
 
   constructor(
     private apiService: ApiService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private router: Router
   ) {
     this.loadAuthState();
   }
@@ -106,6 +108,7 @@ export class AuthService {
       roles: [],
     });
     this.currentState.set(this._authState.value);
+    this.router.navigate(['/']);
   }
 
   public register(userCredentialsCreateRequest: UserCredentialsCreateRequest): Observable<PlayerData> {
