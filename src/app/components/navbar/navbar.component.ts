@@ -15,14 +15,7 @@ import { ThemePickerComponent } from '../theme-picker/theme-picker.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUsers, faCog, faInfoCircle, faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { SettingsComponent } from '../settings/settings.component';
-
-interface GameSettings {
-  showFPS: boolean;
-  enableParticles: boolean;
-  showGrid: boolean;
-  enableSound: boolean;
-  graphicsQuality: 'low' | 'medium' | 'high' | 'ultra';
-}
+import { GameSettings } from '../../models/game-settings.model';
 
 @Component({
   selector: 'app-navbar',
