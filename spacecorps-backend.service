@@ -1,0 +1,16 @@
+[Unit]
+Description=SpaceCorps Backend Service
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/spacecorps/backend
+ExecStart=/usr/bin/dotnet /var/www/spacecorps/backend/SpaceCorps.Backend.dll
+Restart=always
+RestartSec=10
+SyslogIdentifier=spacecorps-backend
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://localhost:5000
+
+[Install]
+WantedBy=multi-user.target 
