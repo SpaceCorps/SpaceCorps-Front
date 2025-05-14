@@ -64,6 +64,9 @@ export class GameComponent implements OnInit, OnDestroy {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+      if (this.labelRenderer) {
+        this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+      }
     }
   }
 
