@@ -1,31 +1,41 @@
 import { Position3 } from '../../models/entity/Position3';
 
-export type SpaceMapData = {
+export interface StaticEntityDto {
+  id: string;
+  name: string;
+  position: Position3;
+  locationName: string;
+  safeZoneRadii: number;
+}
+
+export interface PortalDto extends StaticEntityDto {
+  destinationMap: string;
+  teleportRange: number;
+}
+
+export interface SpaceMapData {
   mapName: string;
   mapObject: {
-    aliens: AlienDto[];
     players: PlayerDto[];
+    aliens: AlienDto[];
     preferredColor: string;
     size: {
       width: number;
       height: number;
     };
-    staticEntities: unknown[];
+    staticEntities: (StaticEntityDto | PortalDto)[];
   };
-};
+}
 
 export type PlayerDto = {
-  activeShipName: string;
-  currentMapName: string;
   id: string;
+  name: string;
   position: Position3;
-  username: string;
+  activeShipName: string;
 };
 
 export type AlienDto = {
   id: string;
   name: string;
   position: Position3;
-  health: number;
-  type: string;
 };

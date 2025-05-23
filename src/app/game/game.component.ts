@@ -15,6 +15,7 @@ import { PlayerData } from '../models/player/PlayerData';
 import { AlienManager } from './AlienManager';
 import { PlayerManager } from './PlayerManager';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
+import { StaticEntityManager } from './StaticEntityManager';
 
 @Component({
   selector: 'app-game',
@@ -29,6 +30,7 @@ export class GameComponent implements OnInit, OnDestroy {
   public entities: Map<string, PlayerDto> = new Map();
   public alienManager?: AlienManager;
   public playerManager?: PlayerManager;
+  public staticEntityManager?: StaticEntityManager;
   public stats?: Stats;
   public currentMapName?: string;
   public playerData: PlayerData | undefined;
@@ -43,7 +45,7 @@ export class GameComponent implements OnInit, OnDestroy {
   constructor(
     private hubService: HubService,
     private route: ActivatedRoute,
-    private keyboardService: KeyboardService
+    public keyboardService: KeyboardService
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +79,14 @@ export class GameComponent implements OnInit, OnDestroy {
 
     hubService.on('server-side-error', (error) => {
       console.warn('HubMessage: Received error:', error);
+    });
+
+    hubService.on('teleportSuccessful', (message: string) => {
+      console.log('Teleportation successful:', message);
+    });
+
+    hubService.on('teleportFailed', (error: string) => {
+      console.error('Teleportation failed:', error);
     });
 
     hubService.on('loginSuccessful', (response: PlayerData) => {
@@ -152,6 +162,7 @@ export class GameComponent implements OnInit, OnDestroy {
     await initializeThreeJs(this);
     this.playerManager = new PlayerManager(this.scene!);
     this.alienManager = new AlienManager(this.scene!);
+    this.staticEntityManager = new StaticEntityManager(this.scene!);
     this.setupPerformanceMeters();
     this.animate();
   }
@@ -173,6 +184,16 @@ export class GameComponent implements OnInit, OnDestroy {
     }
     if (this.alienManager) {
       this.alienManager.animate();
+    }
+
+    // Update player position for portal detection
+    if (this.playerData && this.playerManager) {
+      const playerPosition = this.playerManager.getPlayerPosition(
+        this.playerData.id
+      );
+      if (playerPosition) {
+        this.keyboardService.setPlayerPosition(playerPosition);
+      }
     }
 
     // Update orbit controls to follow player if available
@@ -234,6 +255,10 @@ export class GameComponent implements OnInit, OnDestroy {
     }
     if (this.scene) {
       this.scene.clear();
+    }
+    this.keyboardService.clearPortals();
+    if (this.staticEntityManager) {
+      this.staticEntityManager.removeAllStaticEntities();
     }
   }
 

@@ -30,11 +30,17 @@ export class HubService {
     });
   }
 
-  public on<T = unknown>(event: string, callback: (...args: T[]) => void): void {
+  public on<T = unknown>(
+    event: string,
+    callback: (...args: T[]) => void
+  ): void {
     this.hubConnection?.on(event, callback);
   }
 
-  public off<T = unknown>(event: string, callback: (...args: T[]) => void): void {
+  public off<T = unknown>(
+    event: string,
+    callback: (...args: T[]) => void
+  ): void {
     this.hubConnection?.off(event, callback);
   }
 
@@ -72,6 +78,9 @@ type ServerRequestTypes = {
       y: number;
       z: number;
     };
+  };
+  requestTeleport: {
+    destinationMap: string;
   };
 };
 

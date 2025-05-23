@@ -1,7 +1,12 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { PlayerDto, SpaceMapData, AlienDto } from './types/SpaceMapData';
+import {
+  PlayerDto,
+  SpaceMapData,
+  AlienDto,
+  StaticEntityDto,
+} from './types/SpaceMapData';
 import { GameComponent } from './game.component';
 
 // Define layers
@@ -124,20 +129,20 @@ export async function loadNewSpacemap(
   spaceMapData: SpaceMapData
 ): Promise<void> {
   if (component.isLoadingSpacemap) {
-    console.log('Skipping spacemap update - still loading previous map');
     return;
   }
 
   try {
     component.isLoadingSpacemap = true;
-    console.log('Loading new space map: ', spaceMapData);
+    console.log('Loading new spacemap: ', spaceMapData);
     component.currentMapName = spaceMapData.mapName;
     await clearScene(component);
     await loadMapEnvironment(component, spaceMapData);
 
-    // Load players and aliens for the new map
+    // Load players, aliens, and static entities for the new map
     await loadPlayers(spaceMapData.mapObject.players, component);
     await loadAliens(spaceMapData.mapObject.aliens, component);
+    await loadStaticEntities(spaceMapData.mapObject.staticEntities, component);
   } finally {
     component.isLoadingSpacemap = false;
   }
@@ -384,17 +389,83 @@ export async function loadAliens(aliens: AlienDto[], component: GameComponent) {
   }
 }
 
+export async function loadStaticEntities(
+  staticEntities: StaticEntityDto[],
+  component: GameComponent
+): Promise<void> {
+  if (!component.staticEntityManager) {
+    console.error('Static entity manager not initialized');
+    return;
+  }
+
+  for (const entity of staticEntities) {
+    const position = parsePositionDTOtoVector3(entity.position);
+    await component.staticEntityManager.addStaticEntity({
+      id: entity.id,
+      name: entity.name,
+      position: position,
+      rotation: new THREE.Euler(0, 0, 0),
+    });
+  }
+}
+
 export async function updateSpacemap(
   component: GameComponent,
   spaceMapData: SpaceMapData
 ): Promise<void> {
   if (component.isLoadingSpacemap) {
-    console.log('Skipping spacemap update - still loading previous map');
     return;
   }
 
   try {
     component.isLoadingSpacemap = true;
+
+    // Clear existing portals
+    component.keyboardService.clearPortals();
+
+    // Handle static entities and portals
+    if (component.staticEntityManager) {
+      const staticEntities = spaceMapData.mapObject.staticEntities;
+      const currentStaticEntityIds = new Set(
+        staticEntities.map((entity) => entity.id)
+      );
+
+      // Remove static entities that are no longer in the map
+      for (const [id] of component.staticEntityManager.getStaticEntityIds()) {
+        if (!currentStaticEntityIds.has(id)) {
+          component.staticEntityManager.removeStaticEntity(id);
+        }
+      }
+
+      // Add or update static entities
+      for (const entity of staticEntities) {
+        const position = parsePositionDTOtoVector3(entity.position);
+        if (component.staticEntityManager.hasStaticEntity(entity.id)) {
+          component.staticEntityManager.updateStaticEntityPosition(
+            entity.id,
+            position
+          );
+        } else {
+          if ('destinationMap' in entity) {
+            // This is a portal
+            const portalMesh = component.staticEntityManager.createPortal(
+              position,
+              entity.destinationMap
+            );
+            component.keyboardService.addPortal(portalMesh);
+          } else {
+            // This is a regular static entity
+            await component.staticEntityManager.addStaticEntity({
+              id: entity.id,
+              name: entity.name,
+              position: position,
+              rotation: new THREE.Euler(0, 0, 0),
+            });
+          }
+        }
+      }
+    }
+
     const entities = component.entities;
     const entitiesIn = spaceMapData.mapObject.players;
 
